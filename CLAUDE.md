@@ -1,0 +1,87 @@
+# Milloin Web - Angular Project
+
+## Project Overview
+Angular web application for the Milloin project.
+
+## Technology Stack
+- **Angular**: 19.2.0
+- **Angular CLI**: 19.2.17
+- **Node.js**: 18.20.5
+- **Package Manager**: npm 10.8.2
+- **TypeScript**: 5.7.2
+- **Styling**: SCSS
+- **Routing**: Enabled
+- **Testing**: Jasmine + Karma
+
+## Dependencies
+- **Core**: @angular/core, @angular/common, @angular/router
+- **Forms**: @angular/forms
+- **HTTP**: @angular/common/http (add when needed)
+- **Testing**: jasmine-core, karma, karma-chrome-launcher
+
+## Development Commands
+
+### Setup
+```bash
+npm install          # Install dependencies
+```
+
+### Development
+```bash
+npm start           # Start development server (same as ng serve)
+ng serve            # Start development server (http://localhost:4200)
+ng serve --open     # Start dev server and open browser
+ng serve --port 4201 # Start on custom port
+```
+
+### Building
+```bash
+npm run build       # Build for production (same as ng build)
+ng build            # Build for production
+npm run watch       # Build and watch for changes
+```
+
+### Testing
+```bash
+npm test            # Run unit tests (same as ng test)
+ng test             # Run unit tests with Karma
+ng test --watch=false --browsers=ChromeHeadless  # Run tests once
+```
+
+### Code Quality
+```bash
+ng lint             # Run linting (if ESLint is configured)
+```
+
+### Code Generation
+```bash
+ng generate component <name>     # Generate component
+ng generate service <name>       # Generate service
+ng generate module <name>        # Generate module
+ng generate directive <name>     # Generate directive
+ng generate pipe <name>          # Generate pipe
+```
+
+## Project Structure
+```
+src/
+├── app/                 # Application source code
+├── assets/             # Static assets
+├── environments/       # Environment configurations
+└── styles.scss        # Global styles
+```
+
+## Development Workflow
+1. Create feature branch from main
+2. Implement changes
+3. Run tests: `ng test`
+4. Run linting: `ng lint`
+5. Build: `ng build`
+6. Commit and push changes
+7. Create pull request
+
+## Important Notes
+- This is an Angular 19 project
+- Uses SCSS for styling
+- Routing is enabled
+- Follow Angular style guide for code conventions
