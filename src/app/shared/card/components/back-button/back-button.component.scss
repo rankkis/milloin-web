@@ -1,0 +1,15 @@
+.back-button {
+  color: var(--spotify-green);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(29, 185, 84, 0.1);
+    transform: scale(1.1);
+  }
+
+  mat-icon {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}

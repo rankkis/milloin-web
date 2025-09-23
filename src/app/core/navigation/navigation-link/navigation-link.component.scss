@@ -6,7 +6,7 @@ a {
   width: 100%;
 }
 
-.card {
+.navigation-link {
   min-height: 200px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
@@ -23,7 +23,7 @@ a {
     border-color: rgba(29, 185, 84, 0.3);
   }
 
-  .card-content {
+  .navigation-link-content {
     position: relative;
     display: flex;
     align-items: center;
@@ -49,7 +49,7 @@ a {
       }
     }
 
-    .card-text {
+    .navigation-link-text {
       position: relative;
       z-index: 2;
       font-family: 'Montserrat', sans-serif;
@@ -87,12 +87,12 @@ a {
 }
 
 @media (max-width: 768px) {
-  .card {
+  .navigation-link {
     margin: 0.5rem 0;
     max-width: 100%;
     min-height: 160px;
 
-    .card-content {
+    .navigation-link-content {
       min-height: 120px;
       padding: 2rem;
 
@@ -104,7 +104,7 @@ a {
         }
       }
 
-      .card-text {
+      .navigation-link-text {
         font-size: 1.4rem;
         font-weight: 600;
       }

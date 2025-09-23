@@ -95,7 +95,7 @@ src/
 ├── app/                           # Application source code
 │   ├── core/                     # Core shared module
 │   │   ├── navigation/           # Generic navigation/grid component
-│   │   │   ├── card/             # Generic reusable card component
+│   │   │   ├── navigation-link/  # Generic navigation link component
 │   │   │   └── navigation.component.* # Navigation layout component
 │   │   └── core.module.ts        # Core module for shared components
 │   ├── app.component.*           # Root application component
@@ -110,11 +110,11 @@ src/
 
 ### Core Components
 - `NavigationComponent`: Generic standalone component with content projection for 3-column responsive grid layout
-- `CardComponent`: Reusable card component with icon and text inputs, featuring Spotify-themed styling
+- `NavigationLinkComponent`: Reusable navigation link component with icon and text inputs, featuring Spotify-themed styling
 - `CoreModule`: Shared module for reusable components and utilities
 
 ### Application Features
-- **Interactive Question Cards**: Displays user-friendly cards for asking Claude AI questions
+- **Interactive Navigation Links**: Displays user-friendly navigation link cards for asking Claude AI questions
 - **Responsive Grid Layout**: 3-column grid that adapts to screen sizes (3→2→1 columns)
 - **Spotify-Inspired Design**: Dark theme with Spotify green accents and modern typography
 
@@ -126,7 +126,7 @@ src/
 - **Responsive Design**: Mobile-first approach with Material's responsive components
 - **3-Column Grid Layout**: Responsive grid that adapts to screen sizes (3→2→1 columns)
 - **Content Projection**: Flexible component architecture using `<ng-content>` slots
-- **Material Cards**: Elevated cards with Spotify-inspired styling and hover effects
+- **Material Navigation Links**: Elevated navigation link cards with Spotify-inspired styling and hover effects
 - **Gradient Text Effects**: Modern gradient overlays on text elements
 
 ## Development Workflow

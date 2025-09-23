@@ -5,17 +5,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-card',
+  selector: 'app-navigation-link',
   imports: [
     CommonModule,
     MatCardModule,
     MatIconModule,
     RouterModule
   ],
-  templateUrl: './card.component.html',
-  styleUrl: './card.component.scss'
+  templateUrl: './navigation-link.component.html',
+  styleUrl: './navigation-link.component.scss'
 })
-export class CardComponent {
+export class NavigationLinkComponent {
   @Input() icon!: string;
   @Input() text!: string;
   @Input() routerLink!: string;

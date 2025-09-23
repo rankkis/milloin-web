@@ -61,3 +61,8 @@ html, body {
 .mat-mdc-raised-button.mat-primary:hover {
   --mdc-protected-button-container-color: var(--spotify-green-hover) !important;
 }
+
+// Import shared card styles
+@import 'app/shared/card/styles/card';
+@import 'app/shared/card/styles/card-header';
+@import 'app/shared/card/styles/card-content';

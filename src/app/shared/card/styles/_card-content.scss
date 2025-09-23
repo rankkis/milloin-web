@@ -1,0 +1,101 @@
+// Card content styles
+.app-card-content {
+  padding: 2rem;
+  color: var(--spotify-white);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--spotify-white);
+    margin-bottom: 1rem;
+  }
+
+  h1 { font-size: 2rem; font-weight: 600; }
+  h2 { font-size: 1.5rem; font-weight: 600; }
+  h3 { font-size: 1.25rem; font-weight: 500; }
+  h4 { font-size: 1.125rem; font-weight: 500; }
+  h5 { font-size: 1rem; font-weight: 500; }
+  h6 { font-size: 0.875rem; font-weight: 500; }
+
+  p {
+    margin-bottom: 1rem;
+    color: var(--spotify-text-light);
+    font-size: 1rem;
+  }
+
+  a {
+    color: var(--spotify-green);
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--spotify-green-hover);
+      text-decoration: underline;
+    }
+  }
+
+  ul, ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    color: var(--spotify-text-light);
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    color: var(--spotify-green);
+  }
+
+  pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--spotify-green);
+
+    code {
+      background: none;
+      padding: 0;
+      color: var(--spotify-white);
+    }
+  }
+
+  blockquote {
+    border-left: 4px solid var(--spotify-green);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: var(--spotify-text-light);
+  }
+
+  .highlight {
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, transparent 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(29, 185, 84, 0.2);
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-card-content {
+    padding: 1.5rem;
+
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.375rem; }
+    h3 { font-size: 1.125rem; }
+
+    p, li {
+      font-size: 0.9rem;
+    }
+  }
+}
