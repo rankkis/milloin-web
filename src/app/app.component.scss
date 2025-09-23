@@ -2,56 +2,64 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 
-  .navbar {
-    max-width: 1200px;
-    margin: 0 auto;
+  .toolbar-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
 
-    .navbar-brand {
-      h1 {
-        margin: 0;
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: white;
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .brand-icon {
+        font-size: 2rem;
+        width: 2rem;
+        height: 2rem;
       }
 
-      .tagline {
-        font-size: 0.875rem;
-        opacity: 0.9;
-        margin-left: 0.5rem;
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+
+        .brand-title {
+          font-size: 1.5rem;
+          font-weight: 500;
+          line-height: 1;
+        }
+
+        .brand-subtitle {
+          font-size: 0.75rem;
+          opacity: 0.8;
+          line-height: 1;
+        }
       }
     }
 
-    .navbar-nav {
+    .nav-section {
       display: flex;
-      gap: 1rem;
+      gap: 0.5rem;
 
-      .nav-link {
+      a[mat-button] {
         color: white;
-        text-decoration: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        font-weight: 500;
 
-        &:hover {
+        &.active-link {
           background: rgba(255, 255, 255, 0.1);
         }
 
-        &.active {
-          background: rgba(255, 255, 255, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.3);
+        mat-icon {
+          margin-right: 0.5rem;
         }
       }
     }
@@ -60,47 +68,44 @@
 
 .main-content {
   flex: 1;
-  background: #f8f9fa;
-  min-height: calc(100vh - 120px);
+  background: #fafafa;
+  min-height: calc(100vh - 128px);
 }
 
 .app-footer {
-  background: #333;
-  color: white;
-  text-align: center;
-  padding: 1rem;
-
-  p {
-    margin: 0;
+  .footer-toolbar {
+    background: #333;
+    color: white;
+    justify-content: center;
     font-size: 0.875rem;
-    opacity: 0.8;
   }
 }
 
 @media (max-width: 768px) {
-  .app-header {
-    .navbar {
-      padding: 1rem;
+  .app-toolbar {
+    .toolbar-content {
       flex-direction: column;
       gap: 1rem;
+      padding: 1rem;
 
-      .navbar-brand {
-        text-align: center;
+      .brand-section {
+        .brand-text {
+          align-items: center;
+          text-align: center;
 
-        h1 {
-          font-size: 1.5rem;
-        }
-
-        .tagline {
-          display: block;
-          margin-left: 0;
-          margin-top: 0.25rem;
+          .brand-title {
+            font-size: 1.25rem;
+          }
         }
       }
 
-      .navbar-nav {
+      .nav-section {
         justify-content: center;
       }
     }
+  }
+
+  .main-content {
+    min-height: calc(100vh - 160px);
   }
 }

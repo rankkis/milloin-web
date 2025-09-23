@@ -1,5 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
 
 export interface WashingMachine {
   id: string;
@@ -11,7 +15,13 @@ export interface WashingMachine {
 
 @Component({
   selector: 'app-washing-machine-card',
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule
+  ],
   templateUrl: './washing-machine-card.component.html',
   styleUrl: './washing-machine-card.component.scss'
 })
@@ -30,11 +40,26 @@ export class WashingMachineCardComponent {
       case 'running':
         return 'warning';
       case 'finished':
-        return 'info';
+        return 'accent';
       case 'maintenance':
-        return 'danger';
+        return 'warn';
       default:
-        return 'secondary';
+        return '';
+    }
+  }
+
+  getStatusIcon(): string {
+    switch (this.washingMachine.status) {
+      case 'available':
+        return 'check_circle';
+      case 'running':
+        return 'sync';
+      case 'finished':
+        return 'done_all';
+      case 'maintenance':
+        return 'build';
+      default:
+        return 'help';
     }
   }
 

@@ -17,6 +17,7 @@ Angular web application for the Milloin project.
 - **Core**: @angular/core, @angular/common, @angular/router
 - **Forms**: @angular/forms
 - **HTTP**: @angular/common/http (add when needed)
+- **UI**: @angular/material, @angular/cdk, @angular/animations (Material Design)
 - **Testing**: jasmine-core, karma, karma-chrome-launcher
 - **Deployment**: angular-cli-ghpages (GitHub Pages deployment)
 
@@ -115,9 +116,19 @@ src/
 - **Status Summary**: Overview statistics of all machines by status
 
 ### Components
-- `WashingMachineCardComponent`: Individual machine display card
-- `WashingMachineListComponent`: Grid layout showing all machines
+- `WashingMachineCardComponent`: Individual machine display card with Material Design
+- `WashingMachineListComponent`: Grid layout showing all machines with Material cards
 - `WashingMachineModule`: Feature module organizing washing machine functionality
+
+### UI Framework
+- **Angular Material 19**: Complete Material Design component library
+- **Material Theme**: Indigo/Pink color scheme with custom status colors
+- **Material Icons**: Google Material Icons for consistent iconography
+- **Responsive Design**: Mobile-first approach with Material's responsive components
+- **Material Toolbar**: Professional navigation header
+- **Material Cards**: Elevated cards for washing machine display
+- **Material Buttons**: Consistent button styling and interactions
+- **Material Chips**: Status indicators with color coding
 
 ## Development Workflow
 1. Create feature branch from main

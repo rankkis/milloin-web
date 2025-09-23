@@ -1,10 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { WashingMachineCardComponent, WashingMachine } from '../washing-machine-card/washing-machine-card.component';
 
 @Component({
   selector: 'app-washing-machine-list',
-  imports: [CommonModule, WashingMachineCardComponent],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatIconModule,
+    WashingMachineCardComponent
+  ],
   templateUrl: './washing-machine-list.component.html',
   styleUrl: './washing-machine-list.component.scss'
 })

@@ -8,57 +8,64 @@
     margin-bottom: 2rem;
 
     h1 {
-      color: #333;
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      font-weight: 700;
+      font-weight: 400;
+      color: var(--primary-color);
     }
 
     .subtitle {
-      color: #666;
       font-size: 1.1rem;
       margin: 0;
+      color: rgba(0, 0, 0, 0.6);
     }
   }
 
   .machines-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
+    justify-items: center;
   }
 
   .summary {
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 1.5rem;
     margin-top: 2rem;
 
     .summary-stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 1rem;
-      text-align: center;
+      justify-items: center;
 
-      .stat-item {
-        padding: 1rem;
-        background: white;
-        border-radius: 6px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      .stat-card {
+        min-width: 140px;
 
-        .stat-label {
-          display: block;
-          font-size: 0.875rem;
-          color: #666;
-          font-weight: 500;
-          margin-bottom: 0.25rem;
-        }
+        .stat-content {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
 
-        .stat-value {
-          display: block;
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #333;
+          mat-icon {
+            font-size: 2rem;
+            width: 2rem;
+            height: 2rem;
+          }
+
+          .stat-text {
+            .stat-value {
+              font-size: 2rem;
+              font-weight: 500;
+              line-height: 1;
+              color: rgba(0, 0, 0, 0.87);
+            }
+
+            .stat-label {
+              font-size: 0.875rem;
+              color: rgba(0, 0, 0, 0.6);
+              margin-top: 0.25rem;
+            }
+          }
         }
       }
     }
@@ -84,10 +91,6 @@
       .summary-stats {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem;
-
-        .stat-item {
-          padding: 0.75rem;
-        }
       }
     }
   }

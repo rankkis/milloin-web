@@ -13,22 +13,53 @@
 
   <div class="summary" *ngIf="washingMachines.length > 0">
     <div class="summary-stats">
-      <div class="stat-item">
-        <span class="stat-label">Available:</span>
-        <span class="stat-value">{{ getCountByStatus('available') }}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Running:</span>
-        <span class="stat-value">{{ getCountByStatus('running') }}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Finished:</span>
-        <span class="stat-value">{{ getCountByStatus('finished') }}</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Maintenance:</span>
-        <span class="stat-value">{{ getCountByStatus('maintenance') }}</span>
-      </div>
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon color="primary">check_circle</mat-icon>
+            <div class="stat-text">
+              <div class="stat-value">{{ getCountByStatus('available') }}</div>
+              <div class="stat-label">Available</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon style="color: #ff9800;">sync</mat-icon>
+            <div class="stat-text">
+              <div class="stat-value">{{ getCountByStatus('running') }}</div>
+              <div class="stat-label">Running</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon color="accent">done_all</mat-icon>
+            <div class="stat-text">
+              <div class="stat-value">{{ getCountByStatus('finished') }}</div>
+              <div class="stat-label">Finished</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-content">
+            <mat-icon color="warn">build</mat-icon>
+            <div class="stat-text">
+              <div class="stat-value">{{ getCountByStatus('maintenance') }}</div>
+              <div class="stat-label">Maintenance</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </div>
 </div>
