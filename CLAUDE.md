@@ -71,7 +71,13 @@ npm run github-deploy   # Deploy to GitHub Pages (creates gh-pages branch)
 - Repository must be public for GitHub Pages (or GitHub Pro for private repos)
 - Deployment creates/updates `gh-pages` branch automatically
 - Base href is set to `/milloin-web/` to match repository name
+- **Angular 19 Build Structure:** Files are built to `dist/milloin-web-app/browser/` (note the `/browser` subdirectory)
+- Deployment script correctly uses `--dir=dist/milloin-web-app/browser` for proper file structure
 - First deployment may take a few minutes to become available
+
+**Troubleshooting:**
+- If favicon or assets don't load, ensure deployment uses the correct `/browser` directory
+- CSP errors may occur if assets are deployed to wrong directory level
 
 ### Code Generation
 ```bash
