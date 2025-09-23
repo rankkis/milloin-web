@@ -1,28 +1,7 @@
-<mat-toolbar color="primary" class="app-toolbar">
-  <div class="toolbar-content">
-    <div class="brand-section">
-      <mat-icon class="brand-icon">local_laundry_service</mat-icon>
-      <div class="brand-text">
-        <span class="brand-title">Milloin</span>
-        <span class="brand-subtitle">Smart Laundry Management</span>
-      </div>
-    </div>
+<header class="app-header">
+  <h1 class="app-title">Milloin</h1>
+</header>
 
-    <div class="nav-section">
-      <a mat-button routerLink="/washing-machines" routerLinkActive="active-link">
-        <mat-icon>washing_machine</mat-icon>
-        Washing Machines
-      </a>
-    </div>
-  </div>
-</mat-toolbar>
-
-<main class="main-content">
+<main class="app-main">
   <router-outlet></router-outlet>
 </main>
-
-<footer class="app-footer">
-  <mat-toolbar class="footer-toolbar">
-    <span>&copy; 2025 Milloin Web App - Smart Laundry Management System</span>
-  </mat-toolbar>
-</footer>

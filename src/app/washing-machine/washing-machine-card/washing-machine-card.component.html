@@ -1,73 +1,11 @@
 <mat-card class="washing-machine-card">
-  <mat-card-header>
-    <div mat-card-avatar>
-      <mat-icon [color]="getStatusColor()">local_laundry_service</mat-icon>
+  <mat-card-content class="card-content">
+    <div class="background-icon">
+      <mat-icon>local_laundry_service</mat-icon>
     </div>
-    <mat-card-title>{{ washingMachine.name }}</mat-card-title>
-    <mat-card-subtitle>{{ washingMachine.location }}</mat-card-subtitle>
-    <div class="status-chip">
-      <mat-chip-set>
-        <mat-chip [color]="getStatusColor()" selected>
-          <mat-icon matChipAvatar>{{ getStatusIcon() }}</mat-icon>
-          {{ getStatusText() }}
-        </mat-chip>
-      </mat-chip-set>
-    </div>
-  </mat-card-header>
-
-  <mat-card-content>
-    <div class="machine-info">
-      <div class="info-row">
-        <mat-icon class="info-icon">tag</mat-icon>
-        <span class="info-label">Machine ID:</span>
-        <span class="info-value">{{ washingMachine.id }}</span>
-      </div>
-
-      <div class="info-row">
-        <mat-icon class="info-icon">place</mat-icon>
-        <span class="info-label">Location:</span>
-        <span class="info-value">{{ washingMachine.location }}</span>
-      </div>
-
-      <div class="info-row" *ngIf="washingMachine.status === 'running' && washingMachine.timeRemaining">
-        <mat-icon class="info-icon">schedule</mat-icon>
-        <span class="info-label">Time Remaining:</span>
-        <span class="info-value">{{ washingMachine.timeRemaining }} minutes</span>
-      </div>
+    <div class="card-text">
+      Kannattaa pestä pyykkiä?
     </div>
   </mat-card-content>
-
-  <mat-card-actions align="end">
-    <button
-      mat-raised-button
-      color="primary"
-      [disabled]="washingMachine.status !== 'available'"
-      *ngIf="washingMachine.status === 'available'">
-      <mat-icon>play_arrow</mat-icon>
-      Start Wash
-    </button>
-
-    <button
-      mat-raised-button
-      color="accent"
-      *ngIf="washingMachine.status === 'finished'">
-      <mat-icon>done</mat-icon>
-      Mark as Empty
-    </button>
-
-    <button
-      mat-stroked-button
-      color="primary"
-      *ngIf="washingMachine.status === 'running'">
-      <mat-icon>visibility</mat-icon>
-      View Progress
-    </button>
-
-    <button
-      mat-stroked-button
-      *ngIf="washingMachine.status === 'maintenance'">
-      <mat-icon>build</mat-icon>
-      Under Maintenance
-    </button>
-  </mat-card-actions>
 </mat-card>
+

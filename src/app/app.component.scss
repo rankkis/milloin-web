@@ -4,108 +4,37 @@
   min-height: 100vh;
 }
 
-.app-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+.app-header {
+  text-align: center;
+  padding: 2rem 2rem 1rem 2rem;
+  background-color: var(--spotify-dark-gray);
 
-  .toolbar-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-
-      .brand-icon {
-        font-size: 2rem;
-        width: 2rem;
-        height: 2rem;
-      }
-
-      .brand-text {
-        display: flex;
-        flex-direction: column;
-
-        .brand-title {
-          font-size: 1.5rem;
-          font-weight: 500;
-          line-height: 1;
-        }
-
-        .brand-subtitle {
-          font-size: 0.75rem;
-          opacity: 0.8;
-          line-height: 1;
-        }
-      }
-    }
-
-    .nav-section {
-      display: flex;
-      gap: 0.5rem;
-
-      a[mat-button] {
-        color: white;
-
-        &.active-link {
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        mat-icon {
-          margin-right: 0.5rem;
-        }
-      }
-    }
+  .app-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3.5rem;
+    margin: 0;
+    font-weight: 900;
+    color: var(--spotify-white);
+    letter-spacing: -0.04em;
+    text-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+    background: linear-gradient(135deg, var(--spotify-white) 0%, var(--spotify-green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 
-.main-content {
+.app-main {
   flex: 1;
-  background: #fafafa;
-  min-height: calc(100vh - 128px);
-}
-
-.app-footer {
-  .footer-toolbar {
-    background: #333;
-    color: white;
-    justify-content: center;
-    font-size: 0.875rem;
-  }
+  background-color: var(--spotify-dark-gray);
 }
 
 @media (max-width: 768px) {
-  .app-toolbar {
-    .toolbar-content {
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1rem;
+  .app-header {
+    padding: 1.5rem 1rem 0.5rem 1rem;
 
-      .brand-section {
-        .brand-text {
-          align-items: center;
-          text-align: center;
-
-          .brand-title {
-            font-size: 1.25rem;
-          }
-        }
-      }
-
-      .nav-section {
-        justify-content: center;
-      }
+    .app-title {
+      font-size: 2.5rem;
     }
-  }
-
-  .main-content {
-    min-height: calc(100vh - 160px);
   }
 }

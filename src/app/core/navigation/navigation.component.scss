@@ -1,0 +1,90 @@
+.navigation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem 2rem 2rem;
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    justify-items: center;
+    margin-bottom: 2rem;
+
+    // Ensure cards don't exceed reasonable max width
+    > * {
+      max-width: 400px;
+      width: 100%;
+    }
+  }
+
+  .footer-content {
+    margin-top: 2rem;
+
+    // Center footer content if it exists
+    &:not(:empty) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
+// Responsive breakpoints
+@media (max-width: 1199px) {
+  .navigation-container {
+    .cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .navigation-container {
+    padding: 1rem;
+
+    .header {
+      .title {
+        font-size: 2rem;
+      }
+    }
+
+    .cards-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+
+      > * {
+        max-width: none;
+      }
+    }
+  }
+}
+
+// For very small cards or when more than 3 columns are needed
+@media (min-width: 1400px) {
+  .navigation-container {
+    max-width: 1400px;
+
+    .cards-grid {
+      // Keep 3 columns even on larger screens for better readability
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+  }
+}
+
+// Special handling for empty grid
+.cards-grid:empty {
+  display: none;
+}
+
+// Animation for card entrance
+.cards-grid > * {
+  transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 1;
+}
+
+// Hover effects for cards
+.cards-grid > *:hover {
+  transform: translateY(-2px);
+}

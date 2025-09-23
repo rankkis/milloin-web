@@ -1,7 +1,7 @@
 # Milloin Web - Angular Project
 
 ## Project Overview
-Angular web application for the Milloin project.
+Angular web application for the Milloin project. Milloin translates to When in english. This service is web application where user may ask different type of pre defined questions like When to use washing machine. By clicking the button this web applications calls to backend which is using Claude AI and electric spot prices to figure out when is cheapest time to start the washing machine.
 
 ## Technology Stack
 - **Angular**: 19.2.0
@@ -93,10 +93,11 @@ ng generate pipe <name>          # Generate pipe
 ```
 src/
 ├── app/                           # Application source code
-│   ├── washing-machine/          # Washing Machine feature module
-│   │   ├── washing-machine-card/ # Individual washing machine card component
-│   │   ├── washing-machine-list/ # List view for all washing machines
-│   │   └── washing-machine.module.ts # Feature module
+│   ├── core/                     # Core shared module
+│   │   ├── navigation/           # Generic navigation/grid component
+│   │   │   ├── card/             # Generic reusable card component
+│   │   │   └── navigation.component.* # Navigation layout component
+│   │   └── core.module.ts        # Core module for shared components
 │   ├── app.component.*           # Root application component
 │   ├── app.config.ts            # Application configuration
 │   └── app.routes.ts            # Application routing
@@ -107,28 +108,26 @@ src/
 
 ## Features
 
-### Washing Machine Management
-- **Washing Machine Cards**: Display individual washing machine status and information
-- **Real-time Status Tracking**: Available, Running, Finished, Maintenance states
-- **Time Remaining Display**: Shows remaining time for running machines
-- **Interactive Actions**: Start wash, mark as empty, view progress buttons
-- **Location Tracking**: Each machine shows its physical location
-- **Status Summary**: Overview statistics of all machines by status
+### Core Components
+- `NavigationComponent`: Generic standalone component with content projection for 3-column responsive grid layout
+- `CardComponent`: Reusable card component with icon and text inputs, featuring Spotify-themed styling
+- `CoreModule`: Shared module for reusable components and utilities
 
-### Components
-- `WashingMachineCardComponent`: Individual machine display card with Material Design
-- `WashingMachineListComponent`: Grid layout showing all machines with Material cards
-- `WashingMachineModule`: Feature module organizing washing machine functionality
+### Application Features
+- **Interactive Question Cards**: Displays user-friendly cards for asking Claude AI questions
+- **Responsive Grid Layout**: 3-column grid that adapts to screen sizes (3→2→1 columns)
+- **Spotify-Inspired Design**: Dark theme with Spotify green accents and modern typography
 
 ### UI Framework
 - **Angular Material 19**: Complete Material Design component library
-- **Material Theme**: Indigo/Pink color scheme with custom status colors
+- **Spotify Theme**: Dark theme with Spotify green (#1db954) and gray (#121212) color scheme
+- **Typography**: Montserrat and Inter fonts for modern, clean appearance
 - **Material Icons**: Google Material Icons for consistent iconography
 - **Responsive Design**: Mobile-first approach with Material's responsive components
-- **Material Toolbar**: Professional navigation header
-- **Material Cards**: Elevated cards for washing machine display
-- **Material Buttons**: Consistent button styling and interactions
-- **Material Chips**: Status indicators with color coding
+- **3-Column Grid Layout**: Responsive grid that adapts to screen sizes (3→2→1 columns)
+- **Content Projection**: Flexible component architecture using `<ng-content>` slots
+- **Material Cards**: Elevated cards with Spotify-inspired styling and hover effects
+- **Gradient Text Effects**: Modern gradient overlays on text elements
 
 ## Development Workflow
 1. Create feature branch from main
@@ -144,3 +143,4 @@ src/
 - Uses SCSS for styling
 - Routing is enabled
 - Follow Angular style guide for code conventions
+- Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests

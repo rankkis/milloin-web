@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
-import { WashingMachineListComponent } from './washing-machine/washing-machine-list/washing-machine-list.component';
+import { HomeComponent } from './home/home.component';
+import { WashingMachineComponent } from './washing-machine/washing-machine.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/washing-machines', pathMatch: 'full' },
-  { path: 'washing-machines', component: WashingMachineListComponent },
-  { path: '**', redirectTo: '/washing-machines' }
+  { path: '', component: HomeComponent },
+  { path: 'washing-machine', component: WashingMachineComponent },
+  { path: '**', redirectTo: '' }
 ];
