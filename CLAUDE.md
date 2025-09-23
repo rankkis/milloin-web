@@ -91,11 +91,33 @@ ng generate pipe <name>          # Generate pipe
 ## Project Structure
 ```
 src/
-├── app/                 # Application source code
-├── assets/             # Static assets
-├── environments/       # Environment configurations
-└── styles.scss        # Global styles
+├── app/                           # Application source code
+│   ├── washing-machine/          # Washing Machine feature module
+│   │   ├── washing-machine-card/ # Individual washing machine card component
+│   │   ├── washing-machine-list/ # List view for all washing machines
+│   │   └── washing-machine.module.ts # Feature module
+│   ├── app.component.*           # Root application component
+│   ├── app.config.ts            # Application configuration
+│   └── app.routes.ts            # Application routing
+├── assets/                       # Static assets
+├── environments/                 # Environment configurations
+└── styles.scss                 # Global styles
 ```
+
+## Features
+
+### Washing Machine Management
+- **Washing Machine Cards**: Display individual washing machine status and information
+- **Real-time Status Tracking**: Available, Running, Finished, Maintenance states
+- **Time Remaining Display**: Shows remaining time for running machines
+- **Interactive Actions**: Start wash, mark as empty, view progress buttons
+- **Location Tracking**: Each machine shows its physical location
+- **Status Summary**: Overview statistics of all machines by status
+
+### Components
+- `WashingMachineCardComponent`: Individual machine display card
+- `WashingMachineListComponent`: Grid layout showing all machines
+- `WashingMachineModule`: Feature module organizing washing machine functionality
 
 ## Development Workflow
 1. Create feature branch from main

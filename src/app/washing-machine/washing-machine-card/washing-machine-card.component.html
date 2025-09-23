@@ -1,0 +1,48 @@
+<div class="washing-machine-card">
+  <div class="card-header">
+    <h3 class="machine-name">{{ washingMachine.name }}</h3>
+    <span class="status-badge" [ngClass]="'status-' + getStatusColor()">
+      {{ getStatusText() }}
+    </span>
+  </div>
+
+  <div class="card-body">
+    <div class="machine-info">
+      <div class="info-item">
+        <span class="label">Location:</span>
+        <span class="value">{{ washingMachine.location }}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="label">Machine ID:</span>
+        <span class="value">{{ washingMachine.id }}</span>
+      </div>
+
+      <div class="info-item" *ngIf="washingMachine.status === 'running' && washingMachine.timeRemaining">
+        <span class="label">Time Remaining:</span>
+        <span class="value">{{ washingMachine.timeRemaining }} minutes</span>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        class="btn btn-primary"
+        [disabled]="washingMachine.status !== 'available'"
+        *ngIf="washingMachine.status === 'available'">
+        Start Wash
+      </button>
+
+      <button
+        class="btn btn-info"
+        *ngIf="washingMachine.status === 'finished'">
+        Mark as Empty
+      </button>
+
+      <button
+        class="btn btn-secondary"
+        *ngIf="washingMachine.status === 'running'">
+        View Progress
+      </button>
+    </div>
+  </div>
+</div>

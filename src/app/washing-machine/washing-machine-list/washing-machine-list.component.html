@@ -1,0 +1,34 @@
+<div class="washing-machine-list">
+  <div class="header">
+    <h1>Washing Machines</h1>
+    <p class="subtitle">Check the status of all available washing machines</p>
+  </div>
+
+  <div class="machines-grid">
+    <app-washing-machine-card
+      *ngFor="let machine of washingMachines"
+      [washingMachine]="machine">
+    </app-washing-machine-card>
+  </div>
+
+  <div class="summary" *ngIf="washingMachines.length > 0">
+    <div class="summary-stats">
+      <div class="stat-item">
+        <span class="stat-label">Available:</span>
+        <span class="stat-value">{{ getCountByStatus('available') }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Running:</span>
+        <span class="stat-value">{{ getCountByStatus('running') }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Finished:</span>
+        <span class="stat-value">{{ getCountByStatus('finished') }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Maintenance:</span>
+        <span class="stat-value">{{ getCountByStatus('maintenance') }}</span>
+      </div>
+    </div>
+  </div>
+</div>
