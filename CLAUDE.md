@@ -18,6 +18,7 @@ Angular web application for the Milloin project.
 - **Forms**: @angular/forms
 - **HTTP**: @angular/common/http (add when needed)
 - **Testing**: jasmine-core, karma, karma-chrome-launcher
+- **Deployment**: angular-cli-ghpages (GitHub Pages deployment)
 
 ## Development Commands
 
@@ -52,6 +53,25 @@ ng test --watch=false --browsers=ChromeHeadless  # Run tests once
 ```bash
 ng lint             # Run linting (if ESLint is configured)
 ```
+
+### Deployment to GitHub Pages
+```bash
+npm run github-build    # Build for GitHub Pages with correct base-href
+npm run github-deploy   # Deploy to GitHub Pages (creates gh-pages branch)
+```
+
+**GitHub Pages URL:** https://rankkis.github.io/milloin-web/
+
+**Deployment Workflow:**
+1. Build for GitHub Pages: `npm run github-build`
+2. Deploy to Pages: `npm run github-deploy`
+3. Site will be available at the URL above
+
+**Important Notes:**
+- Repository must be public for GitHub Pages (or GitHub Pro for private repos)
+- Deployment creates/updates `gh-pages` branch automatically
+- Base href is set to `/milloin-web/` to match repository name
+- First deployment may take a few minutes to become available
 
 ### Code Generation
 ```bash
