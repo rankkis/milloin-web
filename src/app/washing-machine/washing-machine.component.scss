@@ -29,19 +29,84 @@
 
   // Error state
   .error-container {
-    .retry-button {
-      background: var(--spotify-green);
-      color: var(--spotify-black);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-weight: 500;
-      cursor: pointer;
+    .error-actions {
+      display: flex;
+      gap: 1rem;
       margin-top: 1rem;
-      transition: background-color 0.2s ease;
+      flex-wrap: wrap;
 
-      &:hover {
-        background: var(--spotify-green-hover);
+      .retry-button, .debug-button {
+        background: var(--spotify-green);
+        color: var(--spotify-black);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 0.9rem;
+
+        &:hover {
+          background: var(--spotify-green-hover);
+        }
+      }
+
+      .debug-button {
+        background: var(--spotify-text-light);
+        color: var(--spotify-white);
+
+        &:hover {
+          background: #404040;
+        }
+      }
+    }
+
+    .debug-info {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+
+      h6 {
+        color: var(--spotify-green);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .debug-details {
+        margin-bottom: 1rem;
+
+        p {
+          margin-bottom: 0.5rem;
+          font-size: 0.85rem;
+          font-family: 'Courier New', monospace;
+          word-break: break-all;
+
+          strong {
+            color: var(--spotify-white);
+            min-width: 100px;
+            display: inline-block;
+          }
+        }
+      }
+
+      .copy-button {
+        background: transparent;
+        color: var(--spotify-green);
+        border: 1px solid var(--spotify-green);
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: var(--spotify-green);
+          color: var(--spotify-black);
+        }
       }
     }
   }

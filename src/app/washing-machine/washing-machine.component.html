@@ -16,13 +16,46 @@
       <!-- Error State -->
       <div *ngIf="state.error && !state.loading" appCardContentHighlighted class="error-container">
         <p><strong>Virhe:</strong> {{ state.error }}</p>
-        <button
-          type="button"
-          class="retry-button"
-          data-test-id="retry-forecast-button"
-          (click)="getForecast()">
-          Yritä uudelleen
-        </button>
+
+        <div class="error-actions">
+          <button
+            type="button"
+            class="retry-button"
+            data-test-id="retry-forecast-button"
+            (click)="getForecast()">
+            Yritä uudelleen
+          </button>
+
+          <button
+            type="button"
+            class="debug-button"
+            data-test-id="toggle-debug-button"
+            (click)="toggleDebugInfo()">
+            {{ showDebugInfo ? 'Piilota' : 'Näytä' }} tekninen tieto
+          </button>
+        </div>
+
+        <!-- Debug Information for iPhone troubleshooting -->
+        <div *ngIf="showDebugInfo && state.technicalDetails" class="debug-info">
+          <h6>Tekninen tieto (iPhone-vianetsintää varten):</h6>
+          <div class="debug-details">
+            <p><strong>Status:</strong> {{ state.technicalDetails.status || 'N/A' }}</p>
+            <p><strong>Status Text:</strong> {{ state.technicalDetails.statusText || 'N/A' }}</p>
+            <p><strong>URL:</strong> {{ state.technicalDetails.url || 'N/A' }}</p>
+            <p><strong>User Agent:</strong> {{ state.technicalDetails.userAgent || 'N/A' }}</p>
+            <p><strong>Online:</strong> {{ state.technicalDetails.online ? 'Kyllä' : 'Ei' }}</p>
+            <p><strong>Aikaleima:</strong> {{ state.technicalDetails.timestamp || 'N/A' }}</p>
+            <p><strong>Viesti:</strong> {{ state.technicalDetails.message || 'N/A' }}</p>
+          </div>
+
+          <button
+            type="button"
+            class="copy-button"
+            data-test-id="copy-debug-button"
+            (click)="copyDebugInfo(state.technicalDetails)">
+            Kopioi tekninen tieto
+          </button>
+        </div>
       </div>
 
       <!-- Success State with Forecast Data -->
