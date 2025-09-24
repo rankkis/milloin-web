@@ -144,3 +144,4 @@ src/
 - Routing is enabled
 - Follow Angular style guide for code conventions
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests
+- Use inject from angular/core for dependency injection instead of legacy constructor way

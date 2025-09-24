@@ -1,5 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
+// Import shared card styles (must be at top for @use)
+@use 'app/shared/card/styles/card';
+@use 'app/shared/card/styles/card-header';
+@use 'app/shared/card/styles/card-content';
+@use 'app/shared/card/styles/card-content-highlighted';
+
 // Import Material Icons
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
@@ -62,8 +68,3 @@ html, body {
   --mdc-protected-button-container-color: var(--spotify-green-hover) !important;
 }
 
-// Import shared card styles
-@import 'app/shared/card/styles/card';
-@import 'app/shared/card/styles/card-header';
-@import 'app/shared/card/styles/card-content';
-@import 'app/shared/card/styles/card-content-highlighted';

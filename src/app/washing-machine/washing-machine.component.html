@@ -1,23 +1,129 @@
 <div appCard>
   <div appCardHeader
-       title="When should I wash my clothes?"
-       subtitle="Get AI-powered recommendations based on electricity prices and schedule"
+       title="on paras hetki pestä pyykkiä?"
+       subtitle="Saa AI-avusteiset suositukset sähkön hinnan ja aikataulun perusteella"
        [showBackButton]="true"
        backButtonTestId="washing-machine-back-button">
   </div>
   <div appCardContent>
-    <div class="washing-machine-content">
-      <p>This feature will help you determine the optimal time to do your laundry based on:</p>
-      <ul>
-        <li>Current electricity spot prices</li>
-        <li>Your schedule and preferences</li>
-      </ul>
+    <div class="washing-machine-content" *ngIf="forecast$ | async as state">
 
-      <div appCardContentHighlighted>
-        <p><strong>Coming soon:</strong> Smart washing recommendations powered by Claude AI</p>
+      <!-- Loading State -->
+      <div *ngIf="state.loading" class="loading-container">
+        <p>Ladataan optimaalisia pesunkaikoja...</p>
       </div>
 
-      <p>The system will analyze real-time data to suggest the most cost-effective and convenient times for your laundry.</p>
+      <!-- Error State -->
+      <div *ngIf="state.error && !state.loading" appCardContentHighlighted class="error-container">
+        <p><strong>Virhe:</strong> {{ state.error }}</p>
+        <button
+          type="button"
+          class="retry-button"
+          data-test-id="retry-forecast-button"
+          (click)="getForecast()">
+          Yritä uudelleen
+        </button>
+      </div>
+
+      <!-- Success State with Forecast Data -->
+      <div *ngIf="state.data && !state.loading && !state.error" class="forecast-container">
+
+        <!-- Primary Recommendation: Today's Best Time (Highlighted) -->
+        <div *ngIf="state.data.today" class="primary-recommendation" appCardContentHighlighted>
+          <h3>🟢 Paras aika pestä pyykkiä on tänään</h3>
+          <div class="primary-time">
+            <p class="time-display">{{ state.data.today.startTime | date:'HH:mm' }} - {{ state.data.today.endTime | date:'HH:mm' }}</p>
+            <p class="price-info">Hinta: {{ state.data.today.price | number:'1.2-2' }} c/kWh (+siirto)</p>
+          </div>
+        </div>
+
+        <!-- Alternative Options: Tonight/Tomorrow (Regular styling) -->
+        <div *ngIf="state.data.tonight || state.data.tomorrow" class="alternatives-section">
+          <h4>Vaihtoehtoiset ajat</h4>
+
+          <!-- Tonight's Alternative -->
+          <div *ngIf="state.data.tonight" class="time-slot alternative">
+            <h5>... jos yöllä on OK ajaa pyykkiä, niin se voisi kannattaa</h5>
+            <div class="alternative-details">
+              <p><strong>Aika:</strong> {{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
+              <p><strong>Hinta:</strong> {{ state.data.tonight.price | number:'1.2-2' }} c/kWh</p>
+              <p class="savings-comparison">
+                <strong>Säästö:</strong> {{ state.data.tonight.savingsPercentage | number:'1.1-1' }}%
+                <span *ngIf="state.data.today">({{ (state.data.today.price - state.data.tonight.price) | number:'1.2-2' }} c/kWh halvempaa kuin tänään)</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Tomorrow's Alternative -->
+          <div *ngIf="state.data.tomorrow" class="time-slot alternative">
+            <h5>... jos huomiseen voit säästää, niin se voisi kannattaa</h5>
+            <div class="alternative-details">
+              <p><strong>Aika:</strong> {{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
+              <p><strong>Hinta:</strong> {{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</p>
+              <p class="savings-comparison">
+                <strong>Säästö:</strong> {{ state.data.tomorrow.savingsPercentage | number:'1.1-1' }}%
+                <span *ngIf="state.data.today">({{ (state.data.today.price - state.data.tomorrow.price) | number:'1.2-2' }} c/kWh halvempaa kuin tänään)</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fallback: No Today Available - Highlight Best Available -->
+        <div *ngIf="!state.data.today && (state.data.tonight || state.data.tomorrow)" class="primary-recommendation" appCardContentHighlighted>
+          <h3>🟢 Paras saatavilla oleva aika</h3>
+
+          <!-- Show tonight if available, otherwise tomorrow -->
+          <div *ngIf="state.data.tonight; else tomorrowFallback" class="primary-time">
+            <p class="period-label">Tänä yönä</p>
+            <p class="time-display">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
+            <p class="price-info">Hinta: {{ state.data.tonight.price | number:'1.2-2' }} c/kWh</p>
+          </div>
+
+          <ng-template #tomorrowFallback>
+            <div *ngIf="state.data.tomorrow" class="primary-time">
+              <p class="period-label">Huomenna</p>
+              <p class="time-display">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
+              <p class="price-info">Hinta: {{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- No recommendations message -->
+        <div *ngIf="!state.data.today && !state.data.tonight && !state.data.tomorrow" appCardContentHighlighted>
+          <p><strong>Optimaalisia aikoja ei ole saatavilla</strong></p>
+          <p>Kaikissa saatavilla olevissa aikaväleissä on samankaltainen hinnoittelu. Voit ajaa pesukoneen milloin vain sopii.</p>
+        </div>
+      </div>
+
+      <!-- Initial State - Show Get Forecast Button -->
+      <div *ngIf="!state.loading && !state.data && !state.error" class="initial-state">
+        <p>Napsauta alla olevaa painiketta saadaksesi AI-avusteiset suositukset optimaaliselle pyykinpesuajalle perustuen:</p>
+        <ul>
+          <li>Suomen nykyiset sähkön spot-hinnat</li>
+          <li>2 tunnin pesujakson kesto</li>
+          <li>Kustannusoptimointianalyysi</li>
+        </ul>
+
+        <button
+          type="button"
+          class="get-forecast-button"
+          data-test-id="get-forecast-button"
+          (click)="getForecast()">
+          Hae parhaat pesuajat
+        </button>
+      </div>
+
+      <!-- Refresh button when data is loaded -->
+      <div *ngIf="state.data && !state.loading" class="refresh-container">
+        <button
+          type="button"
+          class="refresh-button"
+          data-test-id="refresh-forecast-button"
+          (click)="getForecast()">
+          Päivitä ennuste
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
