@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { CardDirective } from './card/directives/card.directive';
 import { CardHeaderDirective } from './card/directives/card-header.directive';
 import { CardContentDirective } from './card/directives/card-content.directive';
+import { CardContentHighlightedDirective } from './card/directives/card-content-highlighted.directive';
 
 // Card components
 import { BackButtonComponent } from './card/components/back-button/back-button.component';
@@ -16,6 +17,7 @@ import { BackButtonComponent } from './card/components/back-button/back-button.c
     CardDirective,
     CardHeaderDirective,
     CardContentDirective,
+    CardContentHighlightedDirective,
     BackButtonComponent
   ],
   exports: [
@@ -23,6 +25,7 @@ import { BackButtonComponent } from './card/components/back-button/back-button.c
     CardDirective,
     CardHeaderDirective,
     CardContentDirective,
+    CardContentHighlightedDirective,
     // Export components for direct usage
     BackButtonComponent
   ]
