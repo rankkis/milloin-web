@@ -15,6 +15,14 @@ interface SavingsCalculation {
   savingsVsTodayPercentage?: number;
 }
 
+enum PriceCategory {
+  VERY_CHEAP = 'VERY_CHEAP',
+  CHEAP = 'CHEAP',
+  NORMAL = 'NORMAL',
+  EXPENSIVE = 'EXPENSIVE',
+  VERY_EXPENSIVE = 'VERY_EXPENSIVE'
+}
+
 @Component({
   selector: 'app-washing-machine',
   standalone: false,
@@ -116,6 +124,68 @@ export class WashingMachineComponent {
     const endTime = new Date(timeSlot.endTime);
 
     return now >= startTime && now <= endTime;
+  }
+
+  getPriceCategory(price: number): PriceCategory {
+    if (price < 2.5) return PriceCategory.VERY_CHEAP;
+    if (price < 5.0) return PriceCategory.CHEAP;
+    if (price < 10.0) return PriceCategory.NORMAL;
+    if (price < 20.0) return PriceCategory.EXPENSIVE;
+    return PriceCategory.VERY_EXPENSIVE;
+  }
+
+  getPriceCategoryText(price: number): string {
+    const category = this.getPriceCategory(price);
+    switch (category) {
+      case PriceCategory.VERY_CHEAP:
+        return 'erittäin halpa';
+      case PriceCategory.CHEAP:
+        return 'halpa';
+      case PriceCategory.NORMAL:
+        return 'normaali';
+      case PriceCategory.EXPENSIVE:
+        return 'kallis';
+      case PriceCategory.VERY_EXPENSIVE:
+        return 'erittäin kallis';
+    }
+  }
+
+  shouldRecommendNow(timeSlot: any): boolean {
+    const category = this.getPriceCategory(timeSlot.price);
+    return this.isCurrentlyOptimalTime(timeSlot) &&
+           (category === PriceCategory.VERY_CHEAP || category === PriceCategory.CHEAP);
+  }
+
+  getPriceCssClass(price: number): string {
+    const category = this.getPriceCategory(price);
+    switch (category) {
+      case PriceCategory.VERY_CHEAP:
+        return 'price-very-cheap';
+      case PriceCategory.CHEAP:
+        return 'price-cheap';
+      case PriceCategory.NORMAL:
+        return 'price-normal';
+      case PriceCategory.EXPENSIVE:
+        return 'price-expensive';
+      case PriceCategory.VERY_EXPENSIVE:
+        return 'price-very-expensive';
+    }
+  }
+
+  getPriceEmoji(price: number): string {
+    const category = this.getPriceCategory(price);
+    switch (category) {
+      case PriceCategory.VERY_CHEAP:
+        return '👍'; // Thumbs up for very cheap
+      case PriceCategory.CHEAP:
+        return ''; // No emoji for regular cheap
+      case PriceCategory.NORMAL:
+        return ''; // No emoji for normal
+      case PriceCategory.EXPENSIVE:
+        return ''; // No emoji for expensive
+      case PriceCategory.VERY_EXPENSIVE:
+        return '😭'; // Crying face for very expensive
+    }
   }
 
 }

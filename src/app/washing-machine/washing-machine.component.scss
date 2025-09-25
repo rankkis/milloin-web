@@ -250,3 +250,29 @@
     }
   }
 }
+
+// Price category colors
+.price-very-cheap {
+  color: #00ff00 !important; // Bright green
+  font-weight: 600;
+}
+
+.price-cheap {
+  color: var(--spotify-green) !important; // Spotify green
+  font-weight: 600;
+}
+
+.price-normal {
+  color: var(--spotify-white) !important; // Normal white
+  font-weight: 500;
+}
+
+.price-expensive {
+  color: #ff6b6b !important; // Light red
+  font-weight: 600;
+}
+
+.price-very-expensive {
+  color: #ff3333 !important; // Bright red
+  font-weight: 700;
+}
