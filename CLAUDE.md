@@ -55,25 +55,25 @@ ng test --watch=false --browsers=ChromeHeadless  # Run tests once
 ng lint             # Run linting (if ESLint is configured)
 ```
 
-### Deployment to GitHub Pages
+### Deployment to milloin.xyz
 ```bash
-npm run github-build    # Build for GitHub Pages with correct base-href
-npm run github-deploy   # Deploy to GitHub Pages (creates gh-pages branch)
+npm run domain-build    # Build for production with correct base-href
+npm run domain-deploy   # Deploy to milloin.xyz (creates gh-pages branch with CNAME)
 ```
 
-**GitHub Pages URL:** https://rankkis.github.io/milloin-web/
+**Production URL:** https://milloin.xyz/
 
 **Deployment Workflow:**
-1. Build for GitHub Pages: `npm run github-build`
-2. Deploy to Pages: `npm run github-deploy`
-3. Site will be available at the URL above
+1. Build for domain: `npm run domain-build`
+2. Deploy to domain: `npm run domain-deploy`
+3. Site will be available at https://milloin.xyz/
 
 **Important Notes:**
-- Repository must be public for GitHub Pages (or GitHub Pro for private repos)
-- Deployment creates/updates `gh-pages` branch automatically
-- Base href is set to `/milloin-web/` to match repository name
+- Deployment creates/updates `gh-pages` branch automatically with CNAME file
+- Base href is set to `/` for root domain
 - **Angular 19 Build Structure:** Files are built to `dist/milloin-web-app/browser/` (note the `/browser` subdirectory)
 - Deployment script correctly uses `--dir=dist/milloin-web-app/browser` for proper file structure
+- CNAME file is automatically created pointing to milloin.xyz
 - First deployment may take a few minutes to become available
 
 **Troubleshooting:**
@@ -145,3 +145,4 @@ src/
 - Follow Angular style guide for code conventions
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests
 - Use inject from angular/core for dependency injection instead of legacy constructor way
+- Backend api documentation is located here https://milloin-server.vercel.app/api-json

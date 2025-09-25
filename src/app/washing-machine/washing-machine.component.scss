@@ -35,7 +35,7 @@
       margin-top: 1rem;
       flex-wrap: wrap;
 
-      .retry-button, .debug-button {
+      .retry-button {
         background: var(--spotify-green);
         color: var(--spotify-black);
         border: none;
@@ -50,65 +50,8 @@
           background: var(--spotify-green-hover);
         }
       }
-
-      .debug-button {
-        background: var(--spotify-text-light);
-        color: var(--spotify-white);
-
-        &:hover {
-          background: #404040;
-        }
-      }
     }
 
-    .debug-info {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-
-      h6 {
-        color: var(--spotify-green);
-        font-size: 1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-      }
-
-      .debug-details {
-        margin-bottom: 1rem;
-
-        p {
-          margin-bottom: 0.5rem;
-          font-size: 0.85rem;
-          font-family: 'Courier New', monospace;
-          word-break: break-all;
-
-          strong {
-            color: var(--spotify-white);
-            min-width: 100px;
-            display: inline-block;
-          }
-        }
-      }
-
-      .copy-button {
-        background: transparent;
-        color: var(--spotify-green);
-        border: 1px solid var(--spotify-green);
-        padding: 0.4rem 0.8rem;
-        border-radius: 4px;
-        font-weight: 500;
-        cursor: pointer;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: var(--spotify-green);
-          color: var(--spotify-black);
-        }
-      }
-    }
   }
 
   // Forecast container

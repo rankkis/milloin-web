@@ -3,14 +3,17 @@
        title="on paras hetki pestä pyykkiä?"
        subtitle="Saa AI-avusteiset suositukset sähkön hinnan ja aikataulun perusteella"
        [showBackButton]="true"
-       backButtonTestId="washing-machine-back-button">
+       backButtonTestId="washing-machine-back-button"
+       [showRefreshButton]="true"
+       refreshButtonTestId="refresh-forecast-button"
+       (refreshClicked)="getForecast()">
   </div>
   <div appCardContent>
     <div class="washing-machine-content" *ngIf="forecast$ | async as state">
 
       <!-- Loading State -->
       <div *ngIf="state.loading" class="loading-container">
-        <p>Ladataan optimaalisia pesunkaikoja...</p>
+        <p>Ladataan optimaalisia pesuaikoja...</p>
       </div>
 
       <!-- Error State -->
@@ -25,36 +28,6 @@
             (click)="getForecast()">
             Yritä uudelleen
           </button>
-
-          <button
-            type="button"
-            class="debug-button"
-            data-test-id="toggle-debug-button"
-            (click)="toggleDebugInfo()">
-            {{ showDebugInfo ? 'Piilota' : 'Näytä' }} tekninen tieto
-          </button>
-        </div>
-
-        <!-- Debug Information for iPhone troubleshooting -->
-        <div *ngIf="showDebugInfo && state.technicalDetails" class="debug-info">
-          <h6>Tekninen tieto (iPhone-vianetsintää varten):</h6>
-          <div class="debug-details">
-            <p><strong>Status:</strong> {{ state.technicalDetails.status || 'N/A' }}</p>
-            <p><strong>Status Text:</strong> {{ state.technicalDetails.statusText || 'N/A' }}</p>
-            <p><strong>URL:</strong> {{ state.technicalDetails.url || 'N/A' }}</p>
-            <p><strong>User Agent:</strong> {{ state.technicalDetails.userAgent || 'N/A' }}</p>
-            <p><strong>Online:</strong> {{ state.technicalDetails.online ? 'Kyllä' : 'Ei' }}</p>
-            <p><strong>Aikaleima:</strong> {{ state.technicalDetails.timestamp || 'N/A' }}</p>
-            <p><strong>Viesti:</strong> {{ state.technicalDetails.message || 'N/A' }}</p>
-          </div>
-
-          <button
-            type="button"
-            class="copy-button"
-            data-test-id="copy-debug-button"
-            (click)="copyDebugInfo(state.technicalDetails)">
-            Kopioi tekninen tieto
-          </button>
         </div>
       </div>
 
@@ -63,10 +36,32 @@
 
         <!-- Primary Recommendation: Today's Best Time (Highlighted) -->
         <div *ngIf="state.data.today" class="primary-recommendation" appCardContentHighlighted>
-          <h3>🟢 Paras aika pestä pyykkiä on tänään</h3>
-          <div class="primary-time">
-            <p class="time-display">{{ state.data.today.startTime | date:'HH:mm' }} - {{ state.data.today.endTime | date:'HH:mm' }}</p>
-            <p class="price-info">Hinta: {{ state.data.today.price | number:'1.2-2' }} c/kWh (+siirto)</p>
+
+          <!-- Special message when currently in optimal time -->
+          <div *ngIf="isCurrentlyOptimalTime(state.data.today)">
+            <h3>🎉 NYT on täydellinen aika pestä pyykkiä! 🧺✨</h3>
+            <div class="current-optimal-time">
+              <p class="now-message">⏰ Olet nyt optimaalisessa aikaikkunassa!</p>
+              <p class="price-info">Spot-hinta: <strong>{{ state.data.today.price | number:'1.2-2' }} c/kWh</strong></p>
+              <p class="cost-info">Pesun hinta: <strong>{{ calculateWashCost(state.data.today) | number:'1.2-2' }} senttiä</strong></p>
+              <p class="action-message">👍 Käynnistä pesukone nyt saadaksesi parhaan hinnan!</p>
+            </div>
+          </div>
+
+          <!-- Normal message when optimal time is not now -->
+          <div *ngIf="!isCurrentlyOptimalTime(state.data.today)">
+            <h3>🟢 Paras aika pestä pyykkiä on tänään</h3>
+            <div class="primary-time">
+              <p class="time-display">{{ state.data.today.startTime | date:'HH:mm' }} - {{ state.data.today.endTime | date:'HH:mm' }}</p>
+              <p class="price-info">Spot-hinta: <strong>{{ state.data.today.price | number:'1.2-2' }} c/kWh</strong></p>
+              <p class="cost-info">Pesun hinta: <strong>{{ calculateWashCost(state.data.today) | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-info" *ngIf="calculatePotentialSavings(state.data.today) as savings">
+                <strong>Arvioitu säästö vs. nyt:</strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              </p>
+              <p class="optimal-info" *ngIf="!calculatePotentialSavings(state.data.today)">
+                <strong>💡 Optimaalinen aika:</strong> Tämä on paras saatavilla oleva aika edullisen hinnan vuoksi
+              </p>
+            </div>
           </div>
         </div>
 
@@ -79,10 +74,13 @@
             <h5>... jos yöllä on OK ajaa pyykkiä, niin se voisi kannattaa</h5>
             <div class="alternative-details">
               <p><strong>Aika:</strong> {{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
-              <p><strong>Hinta:</strong> {{ state.data.tonight.price | number:'1.2-2' }} c/kWh</p>
-              <p class="savings-comparison">
-                <strong>Säästö:</strong> {{ state.data.tonight.savingsPercentage | number:'1.1-1' }}%
-                <span *ngIf="state.data.today">({{ (state.data.today.price - state.data.tonight.price) | number:'1.2-2' }} c/kWh halvempaa kuin tänään)</span>
+              <p><strong>Spot-hinta:</strong> <strong>{{ state.data.tonight.price | number:'1.2-2' }} c/kWh</strong> (+siirto)</p>
+              <p><strong>Pesun hinta:</strong> <strong>{{ calculateWashCost(state.data.tonight) | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-comparison" *ngIf="calculatePotentialSavings(state.data.tonight) as savings">
+                <strong>Arvioitu säästö vs. nyt:</strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              </p>
+              <p class="optimal-info" *ngIf="!calculatePotentialSavings(state.data.tonight)">
+                <strong>💡</strong> Vaihtoehtoinen edullinen aika
               </p>
             </div>
           </div>
@@ -92,10 +90,13 @@
             <h5>... jos huomiseen voit säästää, niin se voisi kannattaa</h5>
             <div class="alternative-details">
               <p><strong>Aika:</strong> {{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
-              <p><strong>Hinta:</strong> {{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</p>
-              <p class="savings-comparison">
-                <strong>Säästö:</strong> {{ state.data.tomorrow.savingsPercentage | number:'1.1-1' }}%
-                <span *ngIf="state.data.today">({{ (state.data.today.price - state.data.tomorrow.price) | number:'1.2-2' }} c/kWh halvempaa kuin tänään)</span>
+              <p><strong>Spot-hinta:</strong> <strong>{{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</strong> (+siirto)</p>
+              <p><strong>Pesun hinta:</strong> <strong>{{ calculateWashCost(state.data.tomorrow) | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-comparison" *ngIf="calculatePotentialSavings(state.data.tomorrow) as savings">
+                <strong>Arvioitu säästö vs. nyt:</strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              </p>
+              <p class="optimal-info" *ngIf="!calculatePotentialSavings(state.data.tomorrow)">
+                <strong>💡</strong> Vaihtoehtoinen edullinen aika
               </p>
             </div>
           </div>
@@ -109,14 +110,28 @@
           <div *ngIf="state.data.tonight; else tomorrowFallback" class="primary-time">
             <p class="period-label">Tänä yönä</p>
             <p class="time-display">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
-            <p class="price-info">Hinta: {{ state.data.tonight.price | number:'1.2-2' }} c/kWh</p>
+            <p class="price-info">Spot-hinta: <strong>{{ state.data.tonight.price | number:'1.2-2' }} c/kWh</strong></p>
+            <p class="cost-info">Pesun hinta: <strong>{{ calculateWashCost(state.data.tonight) | number:'1.2-2' }} senttiä</strong></p>
+            <p class="savings-info" *ngIf="calculatePotentialSavings(state.data.tonight) as savings">
+              <strong>Arvioitu säästö vs. nyt:</strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+            </p>
+            <p class="optimal-info" *ngIf="!calculatePotentialSavings(state.data.tonight)">
+              <strong>💡 Optimaalinen aika:</strong> Paras saatavilla oleva edullinen aika
+            </p>
           </div>
 
           <ng-template #tomorrowFallback>
             <div *ngIf="state.data.tomorrow" class="primary-time">
               <p class="period-label">Huomenna</p>
               <p class="time-display">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
-              <p class="price-info">Hinta: {{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</p>
+              <p class="price-info">Energian hinta: <strong>{{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</strong></p>
+              <p class="cost-info">Pesun hinta: <strong>{{ calculateWashCost(state.data.tomorrow) | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-info" *ngIf="calculatePotentialSavings(state.data.tomorrow) as savings">
+                <strong>Arvioitu säästö vs. nyt:</strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              </p>
+              <p class="optimal-info" *ngIf="!calculatePotentialSavings(state.data.tomorrow)">
+                <strong>💡 Optimaalinen aika:</strong> Paras saatavilla oleva edullinen aika
+              </p>
             </div>
           </ng-template>
         </div>
@@ -134,7 +149,8 @@
         <ul>
           <li>Suomen nykyiset sähkön spot-hinnat</li>
           <li>2 tunnin pesujakson kesto</li>
-          <li>Kustannusoptimointianalyysi</li>
+          <li>1,5 kWh energiankulutus</li>
+          <li>Kustannusoptimointianalyysi ja säästölaskurit</li>
         </ul>
 
         <button
@@ -146,15 +162,33 @@
         </button>
       </div>
 
-      <!-- Refresh button when data is loaded -->
-      <div *ngIf="state.data && !state.loading" class="refresh-container">
-        <button
-          type="button"
-          class="refresh-button"
-          data-test-id="refresh-forecast-button"
-          (click)="getForecast()">
-          Päivitä ennuste
-        </button>
+
+      <!-- Tips Section -->
+      <div class="tips-section">
+        <div class="tips-content">
+
+          <div class="tip-category">
+            <h4>🔍 MIKSI PIDEMPI OHJELMA EI KULUTA ENEMMÄN:</h4>
+            <ul class="tip-list">
+              <li><strong>Lämmitys syö sähköä</strong> - ei aika! Suurin kulutus tulee veden lämmittämisestä</li>
+              <li><strong>ECO-ohjelmat (2-3h)</strong> käyttävät matalampaa lämpötilaa = säästävät energiaa</li>
+              <li><strong>Pumput ja rumpu</strong> kuluttavat vähän (&lt;10% kokonaiskulutuksesta)</li>
+              <li><strong>Pidempi pesu</strong> = parempi pesutulos matalammassa lämpötilassa</li>
+            </ul>
+          </div>
+
+          <div class="tip-category">
+            <h4>💡 ENERGIANSÄÄSTÖVINKIT:</h4>
+            <ul class="tip-list savings-tips">
+              <li>✅ <strong>Valitse 30-40°C</strong> riittää useimmiten (säästää 50% energiasta)</li>
+              <li>✅ <strong>Käytä ECO-ohjelmia</strong> huolimatta pituudesta</li>
+              <li>✅ <strong>Täytä kone täyteen</strong> mutta älä ahtaa</li>
+              <li>✅ <strong>Ohita esipesu</strong> jos mahdollista</li>
+              <li>✅ <strong>Uudet nestepesuaineet</strong> toimivat kylmässäkin</li>
+            </ul>
+          </div>
+
+        </div>
       </div>
 
     </div>

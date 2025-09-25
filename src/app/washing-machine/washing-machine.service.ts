@@ -9,9 +9,8 @@ export interface OptimalTimeDto {
   endTime: string;
   price: number;
   rank: number;
-  savings: number;
-  savingsPercentage: number;
-  period: 'day' | 'night';
+  potentialSavings?: number;
+  potentialSavingsPercentage?: number;
 }
 
 export interface WashingForecastDto {
@@ -30,18 +29,13 @@ export class WashingMachineService {
   private readonly httpOptions = {
     headers: new HttpHeaders({
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
+      'Content-Type': 'application/json'
     })
   };
 
   getForecast(): Observable<WashingForecastDto> {
     const url = `${this.apiUrl}/forecast?hours=36`;
 
-    console.log(`[WashingMachineService] Fetching forecast from: ${url}`);
-    console.log('[WashingMachineService] User Agent:', navigator.userAgent);
-    console.log('[WashingMachineService] Environment:', environment);
 
     return this.http.get<WashingForecastDto>(url, this.httpOptions).pipe(
       timeout(30000), // 30 second timeout for iOS
@@ -49,22 +43,11 @@ export class WashingMachineService {
         count: 3,
         delay: (error, retryIndex) => {
           const delayMs = Math.min(1000 * Math.pow(2, retryIndex), 10000);
-          console.log(`[WashingMachineService] Retry ${retryIndex} after ${delayMs}ms, error:`, error);
           return timer(delayMs);
         }
       }),
       catchError((error: HttpErrorResponse) => {
-        console.error('[WashingMachineService] HTTP Error Details:', {
-          status: error.status,
-          statusText: error.statusText,
-          message: error.message,
-          error: error.error,
-          url: error.url,
-          headers: error.headers,
-          userAgent: navigator.userAgent,
-          online: navigator.onLine,
-          timestamp: new Date().toISOString()
-        });
+        console.error('[WashingMachineService] Error:', error.status, error.statusText);
 
         let userMessage = 'Ennusteen lataaminen epäonnistui';
 
@@ -76,18 +59,7 @@ export class WashingMachineService {
           userMessage = 'Palvelinvirhe - yritä myöhemmin uudelleen';
         }
 
-        return throwError(() => ({
-          userMessage,
-          technicalDetails: {
-            status: error.status,
-            statusText: error.statusText,
-            message: error.message,
-            url: error.url,
-            userAgent: navigator.userAgent,
-            online: navigator.onLine,
-            timestamp: new Date().toISOString()
-          }
-        }));
+        return throwError(() => ({ userMessage }));
       })
     );
   }

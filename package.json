@@ -7,9 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "github-build": "ng build --base-href /milloin-web/",
     "domain-build": "ng build --base-href /",
-    "github-deploy": "npx angular-cli-ghpages --dir=dist/milloin-web-app/browser",
     "domain-deploy": "npx angular-cli-ghpages --dir=dist/milloin-web-app/browser --cname=milloin.xyz"
   },
   "private": true,
