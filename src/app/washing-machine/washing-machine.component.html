@@ -42,19 +42,19 @@
             <h3>🎉 NYT on täydellinen aika pestä pyykkiä! 🧺✨</h3>
             <div class="current-optimal-time">
               <p class="now-message">⏰ Olet nyt optimaalisessa aikaikkunassa!</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.price) }}">{{ getPriceEmoji(state.data.today.price) }} {{ state.data.today.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.price) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.price) }}">{{ calculateWashCost(state.data.today) | number:'1.2-2' }} senttiä</strong></p>
+              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ getPriceEmoji(state.data.today.priceCategory) }} {{ state.data.today.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.priceCategory) }})</p>
+              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ state.data.today.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
               <p class="action-message">👍 Käynnistä pesukone nyt saadaksesi parhaan hinnan!</p>
             </div>
           </div>
 
           <!-- Message when currently in optimal time but price is not that good -->
           <div *ngIf="isCurrentlyOptimalTime(state.data.today) && !shouldRecommendNow(state.data.today)">
-            <h3 class="{{ getPriceCssClass(state.data.today.price) }}">⚠️ Olet optimaalisessa aikaikkunassa. Hinta ei kuitenkaan ole erityisen halpa vaan lähinnä ~{{ getPriceCategoryText(state.data.today.price) }}</h3>
+            <h3 class="{{ getPriceCssClass(state.data.today.priceCategory) }}">⚠️ Olet optimaalisessa aikaikkunassa. Hinta ei kuitenkaan ole erityisen halpa vaan lähinnä ~{{ getPriceCategoryText(state.data.today.priceCategory) }}</h3>
             <div class="current-optimal-time">
               <p class="now-message">⏰ Tämä on paras saatavilla oleva aika, mutta sähkö on kalliimpaa</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.price) }}">{{ getPriceEmoji(state.data.today.price) }} {{ state.data.today.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.price) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.price) }}">{{ calculateWashCost(state.data.today) | number:'1.2-2' }} senttiä</strong></p>
+              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ getPriceEmoji(state.data.today.priceCategory) }} {{ state.data.today.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.priceCategory) }})</p>
+              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ state.data.today.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
               <p class="action-message">🤔 Harkitse odottamaan halvempaa aikaa, jos mahdollista</p>
             </div>
           </div>
@@ -64,20 +64,20 @@
             <h3>🟢 Paras aika pestä pyykkiä on tänään</h3>
             <div class="primary-time">
               <p class="time-display">{{ state.data.today.startTime | date:'HH:mm' }} - {{ state.data.today.endTime | date:'HH:mm' }}</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.price) }}">{{ getPriceEmoji(state.data.today.price) }} {{ state.data.today.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.price) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.price) }}">{{ calculateWashCost(state.data.today) | number:'1.2-2' }} senttiä</strong></p>
-              <p class="savings-info" *ngIf="calculatePotentialSavings(state.data.today) as savings">
-                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ getPriceEmoji(state.data.today.priceCategory) }} {{ state.data.today.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.priceCategory) }})</p>
+              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ state.data.today.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-info" *ngIf="state.data.today.potentialSavings != null && state.data.today.potentialSavingsPercentage != null">
+                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ state.data.today.potentialSavings | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.today.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
               </p>
-              <div *ngIf="!calculatePotentialSavings(state.data.today)">
-                <p class="optimal-info" *ngIf="getPriceCategory(state.data.today.price) === 'VERY_CHEAP' || getPriceCategory(state.data.today.price) === 'CHEAP'">
-                  <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.today.price) }}
+              <div *ngIf="state.data.today.potentialSavings == null || state.data.today.potentialSavingsPercentage == null">
+                <p class="optimal-info" *ngIf="state.data.today.priceCategory === 'VERY_CHEAP' || state.data.today.priceCategory === 'CHEAP'">
+                  <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.today.priceCategory) }}
                 </p>
-                <p class="optimal-info" *ngIf="getPriceCategory(state.data.today.price) === 'NORMAL'">
-                  <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.today.price) }}
+                <p class="optimal-info" *ngIf="state.data.today.priceCategory === 'NORMAL'">
+                  <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.today.priceCategory) }}
                 </p>
-                <p class="optimal-info" *ngIf="getPriceCategory(state.data.today.price) === 'EXPENSIVE' || getPriceCategory(state.data.today.price) === 'VERY_EXPENSIVE'">
-                  <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.today.price) }}, harkitse odottamista
+                <p class="optimal-info" *ngIf="state.data.today.priceCategory === 'EXPENSIVE' || state.data.today.priceCategory === 'VERY_EXPENSIVE'">
+                  <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.today.priceCategory) }}, harkitse odottamista
                 </p>
               </div>
             </div>
@@ -92,20 +92,20 @@
           <div *ngIf="state.data.tonight; else tomorrowFallback" class="primary-time">
             <p class="period-label">Tänä yönä</p>
             <p class="time-display">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
-            <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ getPriceEmoji(state.data.tonight.price) }} {{ state.data.tonight.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.price) }})</p>
-            <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ calculateWashCost(state.data.tonight) | number:'1.2-2' }} senttiä</strong></p>
-            <p class="savings-info" *ngIf="calculatePotentialSavings(state.data.tonight) as savings">
-              <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+            <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ getPriceEmoji(state.data.tonight.priceCategory) }} {{ state.data.tonight.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.priceCategory) }})</p>
+            <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+            <p class="savings-info" *ngIf="state.data.tonight.potentialSavings != null && state.data.tonight.potentialSavingsPercentage != null">
+              <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ state.data.tonight.potentialSavings | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.tonight.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
             </p>
-            <div *ngIf="!calculatePotentialSavings(state.data.tonight)">
-              <p class="optimal-info" *ngIf="getPriceCategory(state.data.tonight.price) === 'VERY_CHEAP' || getPriceCategory(state.data.tonight.price) === 'CHEAP'">
-                <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.price) }}
+            <div *ngIf="state.data.tonight.potentialSavings == null || state.data.tonight.potentialSavingsPercentage == null">
+              <p class="optimal-info" *ngIf="state.data.tonight.priceCategory === 'VERY_CHEAP' || state.data.tonight.priceCategory === 'CHEAP'">
+                <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.priceCategory) }}
               </p>
-              <p class="optimal-info" *ngIf="getPriceCategory(state.data.tonight.price) === 'NORMAL'">
-                <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.price) }}
+              <p class="optimal-info" *ngIf="state.data.tonight.priceCategory === 'NORMAL'">
+                <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.priceCategory) }}
               </p>
-              <p class="optimal-info" *ngIf="getPriceCategory(state.data.tonight.price) === 'EXPENSIVE' || getPriceCategory(state.data.tonight.price) === 'VERY_EXPENSIVE'">
-                <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.price) }}, harkitse odottamista
+              <p class="optimal-info" *ngIf="state.data.tonight.priceCategory === 'EXPENSIVE' || state.data.tonight.priceCategory === 'VERY_EXPENSIVE'">
+                <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.priceCategory) }}, harkitse odottamista
               </p>
             </div>
           </div>
@@ -114,20 +114,20 @@
             <div *ngIf="state.data.tomorrow" class="primary-time">
               <p class="period-label">Huomenna</p>
               <p class="time-display">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ getPriceEmoji(state.data.tomorrow.price) }} {{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.price) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ calculateWashCost(state.data.tomorrow) | number:'1.2-2' }} senttiä</strong></p>
-              <p class="savings-info" *ngIf="calculatePotentialSavings(state.data.tomorrow) as savings">
-                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ getPriceEmoji(state.data.tomorrow.priceCategory) }} {{ state.data.tomorrow.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.priceCategory) }})</p>
+              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-info" *ngIf="state.data.tomorrow.potentialSavings != null && state.data.tomorrow.potentialSavingsPercentage != null">
+                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ state.data.tomorrow.potentialSavings | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.tomorrow.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
               </p>
-              <div *ngIf="!calculatePotentialSavings(state.data.tomorrow)">
-                <p class="optimal-info" *ngIf="getPriceCategory(state.data.tomorrow.price) === 'VERY_CHEAP' || getPriceCategory(state.data.tomorrow.price) === 'CHEAP'">
-                  <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.price) }}
+              <div *ngIf="state.data.tomorrow.potentialSavings == null || state.data.tomorrow.potentialSavingsPercentage == null">
+                <p class="optimal-info" *ngIf="state.data.tomorrow.priceCategory === 'VERY_CHEAP' || state.data.tomorrow.priceCategory === 'CHEAP'">
+                  <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }}
                 </p>
-                <p class="optimal-info" *ngIf="getPriceCategory(state.data.tomorrow.price) === 'NORMAL'">
-                  <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.price) }}
+                <p class="optimal-info" *ngIf="state.data.tomorrow.priceCategory === 'NORMAL'">
+                  <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }}
                 </p>
-                <p class="optimal-info" *ngIf="getPriceCategory(state.data.tomorrow.price) === 'EXPENSIVE' || getPriceCategory(state.data.tomorrow.price) === 'VERY_EXPENSIVE'">
-                  <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.price) }}, harkitse odottamista
+                <p class="optimal-info" *ngIf="state.data.tomorrow.priceCategory === 'EXPENSIVE' || state.data.tomorrow.priceCategory === 'VERY_EXPENSIVE'">
+                  <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }}, harkitse odottamista
                 </p>
               </div>
             </div>
@@ -142,14 +142,14 @@
           <div *ngIf="state.data.tonight && state.data.today" class="time-slot alternative">
             <h5>... jos pyykin pesu yöllä kiinnostaa niin se voisi kannattaa</h5>
             <div class="alternative-details">
-              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</strong></p>
-              <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ getPriceEmoji(state.data.tonight.price) }} {{ state.data.tonight.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.price) }})</p>
-              <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ calculateWashCost(state.data.tonight) | number:'1.2-2' }} senttiä</strong></p>
-              <p class="savings-comparison" *ngIf="calculatePotentialSavings(state.data.tonight) as savings">
-                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</strong></p>
+              <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ getPriceEmoji(state.data.tonight.priceCategory) }} {{ state.data.tonight.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.priceCategory) }})</p>
+              <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-comparison" *ngIf="state.data.tonight.potentialSavings != null && state.data.tonight.potentialSavingsPercentage != null">
+                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ state.data.tonight.potentialSavings | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.tonight.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
               </p>
-              <p class="optimal-info" *ngIf="!calculatePotentialSavings(state.data.tonight)">
-                <strong>💡</strong> Vaihtoehtoinen {{ getPriceCategoryText(state.data.tonight.price) }} aika
+              <p class="optimal-info" *ngIf="state.data.tonight.potentialSavings == null || state.data.tonight.potentialSavingsPercentage == null">
+                <strong>💡</strong> Vaihtoehtoinen {{ getPriceCategoryText(state.data.tonight.priceCategory) }} aika
               </p>
             </div>
           </div>
@@ -158,14 +158,14 @@
           <div *ngIf="state.data.tomorrow && (state.data.today || (!state.data.today && state.data.tonight))" class="time-slot alternative">
             <h5>... jos huomiseen voit säästää, niin se voisi kannattaa</h5>
             <div class="alternative-details">
-              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</strong></p>
-              <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ getPriceEmoji(state.data.tomorrow.price) }} {{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.price) }})</p>
-              <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ calculateWashCost(state.data.tomorrow) | number:'1.2-2' }} senttiä</strong></p>
-              <p class="savings-comparison" *ngIf="calculatePotentialSavings(state.data.tomorrow) as savings">
-                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ savings.savingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ savings.savingsPercentage | number:'1.1-1' }}%</strong>)
+              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</strong></p>
+              <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ getPriceEmoji(state.data.tomorrow.priceCategory) }} {{ state.data.tomorrow.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.priceCategory) }})</p>
+              <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-comparison" *ngIf="state.data.tomorrow.potentialSavings != null && state.data.tomorrow.potentialSavingsPercentage != null">
+                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ state.data.tomorrow.potentialSavings | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.tomorrow.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
               </p>
-              <p class="optimal-info" *ngIf="!calculatePotentialSavings(state.data.tomorrow)">
-                <strong>💡</strong> Vaihtoehtoinen {{ getPriceCategoryText(state.data.tomorrow.price) }} aika
+              <p class="optimal-info" *ngIf="state.data.tomorrow.potentialSavings == null || state.data.tomorrow.potentialSavingsPercentage == null">
+                <strong>💡</strong> Vaihtoehtoinen {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }} aika
               </p>
             </div>
           </div>

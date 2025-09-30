@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { WashingMachineService, WashingForecastDto } from './washing-machine.service';
+import { ChargeEvService, ChargeForecastDto } from './charge-ev.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, map, catchError, startWith } from 'rxjs/operators';
 import { PriceUtilitiesService } from '../shared/services/price-utilities.service';
@@ -7,27 +7,27 @@ import { PriceCategory, OptimalTimeDto } from '../shared/models/price.model';
 
 interface ForecastState {
   loading: boolean;
-  data: WashingForecastDto | null;
+  data: ChargeForecastDto | null;
   error: string | null;
 }
 
 @Component({
-  selector: 'app-washing-machine',
+  selector: 'app-charge-ev',
   standalone: false,
-  templateUrl: './washing-machine.component.html',
-  styleUrl: './washing-machine.component.scss'
+  templateUrl: './charge-ev.component.html',
+  styleUrl: './charge-ev.component.scss'
 })
-export class WashingMachineComponent {
-  private readonly washingMachineService = inject(WashingMachineService);
+export class ChargeEvComponent {
+  private readonly chargeEvService = inject(ChargeEvService);
   private readonly priceUtilities = inject(PriceUtilitiesService);
   private readonly trigger$ = new BehaviorSubject<void>(undefined);
 
   forecast$: Observable<ForecastState> = this.trigger$.pipe(
     switchMap(() =>
-      this.washingMachineService.getForecast().pipe(
+      this.chargeEvService.getForecast().pipe(
         map((data): ForecastState => ({ loading: false, data, error: null })),
         catchError((err): Observable<ForecastState> => {
-          console.error('[WashingMachineComponent] Error fetching forecast:', err);
+          console.error('[ChargeEvComponent] Error fetching forecast:', err);
 
           const errorMessage = err.userMessage || 'Ennusteen lataaminen epäonnistui';
 

@@ -1,0 +1,135 @@
+<div appCard>
+  <div appCardHeader
+       title="on paras hetki ladata auto?"
+       subtitle="Saa AI-avusteiset suositukset sähkön hinnan perusteella"
+       [showBackButton]="true"
+       backButtonTestId="charge-ev-back-button"
+       [showRefreshButton]="true"
+       refreshButtonTestId="refresh-forecast-button"
+       (refreshClicked)="getForecast()">
+  </div>
+  <div appCardContent>
+    <div class="charge-ev-content" *ngIf="forecast$ | async as state">
+
+      <!-- Loading State -->
+      <div *ngIf="state.loading" class="loading-container">
+        <p>Ladataan optimaalisia latausaikoja...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="state.error && !state.loading" appCardContentHighlighted class="error-container">
+        <p><strong>Virhe:</strong> {{ state.error }}</p>
+
+        <div class="error-actions">
+          <button
+            type="button"
+            class="retry-button"
+            data-test-id="retry-forecast-button"
+            (click)="getForecast()">
+            Yritä uudelleen
+          </button>
+        </div>
+      </div>
+
+      <!-- Success State with Forecast Data -->
+      <div *ngIf="state.data && !state.loading && !state.error" class="forecast-container">
+
+        <!-- Primary Recommendation: Next 12 Hours (Highlighted) -->
+        <div *ngIf="state.data.next12Hours" class="primary-recommendation" appCardContentHighlighted>
+
+          <!-- Special message when currently in optimal time AND price is actually good -->
+          <div *ngIf="shouldRecommendNow(state.data.next12Hours)">
+            <h3>🎉 NYT on täydellinen aika ladata auto! 🔌⚡</h3>
+            <div class="current-optimal-time">
+              <p class="now-message">⏰ Olet nyt optimaalisessa aikaikkunassa!</p>
+              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.next12Hours.priceCategory) }}">{{ getPriceEmoji(state.data.next12Hours.priceCategory) }} {{ state.data.next12Hours.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.next12Hours.priceCategory) }})</p>
+              <p class="cost-info">Latauksen hinta: <strong class="{{ getPriceCssClass(state.data.next12Hours.priceCategory) }}">{{ state.data.next12Hours.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="action-message">👍 Käynnistä lataus nyt saadaksesi parhaan hinnan!</p>
+            </div>
+          </div>
+
+          <!-- Message when currently in optimal time but price is not that good -->
+          <div *ngIf="isCurrentlyOptimalTime(state.data.next12Hours) && !shouldRecommendNow(state.data.next12Hours)">
+            <h3 class="{{ getPriceCssClass(state.data.next12Hours.priceCategory) }}">⚠️ Olet optimaalisessa aikaikkunassa. Hinta ei kuitenkaan ole erityisen halpa vaan lähinnä ~{{ getPriceCategoryText(state.data.next12Hours.priceCategory) }}</h3>
+            <div class="current-optimal-time">
+              <p class="now-message">⏰ Tämä on paras saatavilla oleva aika, mutta sähkö on kalliimpaa</p>
+              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.next12Hours.priceCategory) }}">{{ getPriceEmoji(state.data.next12Hours.priceCategory) }} {{ state.data.next12Hours.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.next12Hours.priceCategory) }})</p>
+              <p class="cost-info">Latauksen hinta: <strong class="{{ getPriceCssClass(state.data.next12Hours.priceCategory) }}">{{ state.data.next12Hours.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="action-message">🤔 Harkitse odottamaan halvempaa aikaa, jos mahdollista</p>
+            </div>
+          </div>
+
+          <!-- Normal message when optimal time is not now -->
+          <div *ngIf="!isCurrentlyOptimalTime(state.data.next12Hours)">
+            <h3>🟢 Paras aika ladata auto</h3>
+            <div class="primary-time">
+              <p class="time-display">{{ state.data.next12Hours.startTime | date:'HH:mm' }} - {{ state.data.next12Hours.endTime | date:'HH:mm' }}</p>
+              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.next12Hours.priceCategory) }}">{{ getPriceEmoji(state.data.next12Hours.priceCategory) }} {{ state.data.next12Hours.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.next12Hours.priceCategory) }})</p>
+              <p class="cost-info">Latauksen hinta: <strong class="{{ getPriceCssClass(state.data.next12Hours.priceCategory) }}">{{ state.data.next12Hours.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-info" *ngIf="state.data.next12Hours.potentialSavings != null && state.data.next12Hours.potentialSavingsPercentage != null">
+                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ state.data.next12Hours.potentialSavings | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.next12Hours.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
+              </p>
+              <div *ngIf="state.data.next12Hours.potentialSavings == null || state.data.next12Hours.potentialSavingsPercentage == null">
+                <p class="optimal-info" *ngIf="state.data.next12Hours.priceCategory === 'VERY_CHEAP' || state.data.next12Hours.priceCategory === 'CHEAP'">
+                  <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.next12Hours.priceCategory) }}
+                </p>
+                <p class="optimal-info" *ngIf="state.data.next12Hours.priceCategory === 'NORMAL'">
+                  <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.next12Hours.priceCategory) }}
+                </p>
+                <p class="optimal-info" *ngIf="state.data.next12Hours.priceCategory === 'EXPENSIVE' || state.data.next12Hours.priceCategory === 'VERY_EXPENSIVE'">
+                  <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.next12Hours.priceCategory) }}, harkitse odottamista
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alternative Option: Extended Time (Regular styling) -->
+        <div *ngIf="state.data.extended" class="alternatives-section">
+          <h4>Vaihtoehtoinen aika</h4>
+
+          <div class="time-slot alternative">
+            <h5>...jos pystyt siirtämään latausta niin säästäisit</h5>
+            <div class="alternative-details">
+              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.extended.priceCategory) }}">{{ state.data.extended.startTime | date:'HH:mm' }} - {{ state.data.extended.endTime | date:'HH:mm' }}</strong></p>
+              <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.extended.priceCategory) }}">{{ getPriceEmoji(state.data.extended.priceCategory) }} {{ state.data.extended.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.extended.priceCategory) }})</p>
+              <p><strong>Latauksen hinta: </strong> <strong class="{{ getPriceCssClass(state.data.extended.priceCategory) }}">{{ state.data.extended.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="savings-comparison" *ngIf="state.data.extended.potentialSavings != null && state.data.extended.potentialSavingsPercentage != null">
+                <strong>Arvioitu säästö vs. nyt: </strong> <strong>{{ state.data.extended.potentialSavings | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.extended.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
+              </p>
+              <p class="optimal-info" *ngIf="state.data.extended.potentialSavings == null || state.data.extended.potentialSavingsPercentage == null">
+                <strong>💡</strong> Vaihtoehtoinen {{ getPriceCategoryText(state.data.extended.priceCategory) }} aika
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- No recommendations message -->
+        <div *ngIf="!state.data.next12Hours" appCardContentHighlighted>
+          <p><strong>Optimaalisia aikoja ei ole saatavilla</strong></p>
+          <p>Kaikissa saatavilla olevissa aikaväleissä on samankaltainen hinnoittelu. Voit ladata autosi milloin vain sopii.</p>
+        </div>
+      </div>
+
+      <!-- Initial State - Show Get Forecast Button -->
+      <div *ngIf="!state.loading && !state.data && !state.error" class="initial-state">
+        <p>Napsauta alla olevaa painiketta saadaksesi AI-avusteiset suositukset optimaaliselle latausajalle perustuen:</p>
+        <ul>
+          <li>Suomen nykyiset sähkön spot-hinnat</li>
+          <li>12 tunnin latausjakson kesto</li>
+          <li>11 kWh energiankulutus</li>
+          <li>Kustannusoptimointianalyysi ja säästölaskurit</li>
+        </ul>
+
+        <button
+          type="button"
+          class="get-forecast-button"
+          data-test-id="get-forecast-button"
+          (click)="getForecast()">
+          Hae parhaat latausajat
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

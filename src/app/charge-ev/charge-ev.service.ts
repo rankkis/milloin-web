@@ -7,19 +7,18 @@ import { PriceCategory, OptimalTimeDto, ForecastDefaultsDto } from '../shared/mo
 
 export type { PriceCategory, OptimalTimeDto, ForecastDefaultsDto };
 
-export interface WashingForecastDto {
-  today?: OptimalTimeDto;
-  tonight?: OptimalTimeDto;
-  tomorrow?: OptimalTimeDto;
+export interface ChargeForecastDto {
+  next12Hours: OptimalTimeDto;
+  extended?: OptimalTimeDto;
   defaults: ForecastDefaultsDto;
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class WashingMachineService {
+export class ChargeEvService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/washing-machine`;
+  private readonly apiUrl = `${environment.apiUrl}/charge-ev`;
 
   private readonly httpOptions = {
     headers: new HttpHeaders({
@@ -28,11 +27,10 @@ export class WashingMachineService {
     })
   };
 
-  getForecast(): Observable<WashingForecastDto> {
-    const url = `${this.apiUrl}/forecast?hours=36`;
+  getForecast(): Observable<ChargeForecastDto> {
+    const url = `${this.apiUrl}/forecast`;
 
-
-    return this.http.get<WashingForecastDto>(url, this.httpOptions).pipe(
+    return this.http.get<ChargeForecastDto>(url, this.httpOptions).pipe(
       timeout(30000), // 30 second timeout for iOS
       retry({
         count: 3,
@@ -42,7 +40,7 @@ export class WashingMachineService {
         }
       }),
       catchError((error: HttpErrorResponse) => {
-        console.error('[WashingMachineService] Error:', error.status, error.statusText);
+        console.error('[ChargeEvService] Error:', error.status, error.statusText);
 
         let userMessage = 'Ennusteen lataaminen epäonnistui';
 

@@ -7,5 +7,9 @@ export const routes: Routes = [
     path: 'washing-machine',
     loadChildren: () => import('./washing-machine/washing-machine.module').then(m => m.WashingMachineModule)
   },
+  {
+    path: 'charge-ev',
+    loadChildren: () => import('./charge-ev/charge-ev.module').then(m => m.ChargeEvModule)
+  },
   { path: '**', redirectTo: '' }
 ];

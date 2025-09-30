@@ -1,0 +1,273 @@
+.charge-ev-content {
+
+  ul {
+    margin: 1rem 0;
+
+    li {
+      color: var(--spotify-text-light);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  p {
+    color: var(--spotify-text-light);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  // Loading state
+  .loading-container {
+    text-align: center;
+    padding: 2rem;
+
+    p {
+      color: var(--spotify-green);
+      font-weight: 500;
+    }
+  }
+
+  // Error state
+  .error-container {
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+
+      .retry-button {
+        background: var(--spotify-green);
+        color: var(--spotify-black);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 0.9rem;
+
+        &:hover {
+          background: var(--spotify-green-hover);
+        }
+      }
+    }
+
+  }
+
+  // Forecast container
+  .forecast-container {
+    // Primary recommendation (highlighted)
+    .primary-recommendation {
+      margin-bottom: 2rem;
+
+      h3 {
+        color: var(--spotify-green);
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .primary-time {
+        text-align: center;
+
+        .period-label {
+          color: var(--spotify-text-light);
+          font-size: 0.9rem;
+          margin-bottom: 0.25rem;
+          text-transform: uppercase;
+          font-weight: 500;
+        }
+
+        .time-display {
+          color: var(--spotify-white);
+          font-size: 2rem;
+          font-weight: 700;
+          font-family: 'Montserrat', sans-serif;
+          margin-bottom: 0.5rem;
+          line-height: 1.2;
+        }
+
+        .price-info {
+          color: var(--spotify-text-light);
+          font-size: 1rem;
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    // Alternatives section
+    .alternatives-section {
+      margin-top: 1.5rem;
+
+      h4 {
+        color: var(--spotify-white);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .time-slot.alternative {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        h5 {
+          color: var(--spotify-text-light);
+          font-size: 1rem;
+          font-weight: 600;
+          margin-bottom: 0.75rem;
+          text-transform: uppercase;
+          font-size: 0.9rem;
+          letter-spacing: 0.5px;
+        }
+
+        .alternative-details {
+          p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+          }
+
+          .prop {
+            color: var(--spotify-text-light);
+          }
+
+          .savings-comparison {
+            color: var(--spotify-green);
+          }
+        }
+      }
+    }
+  }
+
+  // Initial state
+  .initial-state {
+    text-align: center;
+
+    .get-forecast-button {
+      background: var(--spotify-green);
+      color: var(--spotify-black);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: var(--spotify-green-hover);
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  // Refresh container
+  .refresh-container {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    .refresh-button {
+      background: transparent;
+      color: var(--spotify-green);
+      border: 1px solid var(--spotify-green);
+      padding: 0.5rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: var(--spotify-green);
+        color: var(--spotify-black);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .charge-ev-content {
+    ul li {
+      font-size: 0.9rem;
+    }
+
+    .initial-state .get-forecast-button {
+      padding: 0.875rem 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .forecast-container {
+      .primary-recommendation {
+        h3 {
+          font-size: 1.25rem;
+        }
+
+        .primary-time {
+          .time-display {
+            font-size: 1.5rem;
+          }
+
+          .price-info {
+            font-size: 0.9rem;
+          }
+        }
+      }
+
+      .alternatives-section {
+        h4 {
+          font-size: 1rem;
+        }
+
+        .time-slot.alternative {
+          padding: 0.75rem;
+
+          h5 {
+            font-size: 0.8rem;
+          }
+
+          .alternative-details p {
+            font-size: 0.85rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Price category colors
+.price-very-cheap {
+  color: #00ff00 !important; // Bright green
+  font-weight: 600;
+}
+
+.price-cheap {
+  color: var(--spotify-green) !important; // Spotify green
+  font-weight: 600;
+}
+
+.price-normal {
+  color: var(--spotify-white) !important; // Normal white
+  font-weight: 500;
+}
+
+.price-expensive {
+  color: #ff6b6b !important; // Light red
+  font-weight: 600;
+}
+
+.price-very-expensive {
+  color: #ff3333 !important; // Bright red
+  font-weight: 700;
+}
