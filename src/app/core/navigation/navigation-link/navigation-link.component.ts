@@ -19,4 +19,5 @@ export class NavigationLinkComponent {
   @Input() icon!: string;
   @Input() text!: string;
   @Input() routerLink!: string;
+  @Input() badgeIcon?: string;
 }

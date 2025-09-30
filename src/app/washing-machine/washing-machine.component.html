@@ -142,7 +142,7 @@
           <div *ngIf="state.data.tonight && state.data.today" class="time-slot alternative">
             <h5>... jos pyykin pesu yöllä kiinnostaa niin se voisi kannattaa</h5>
             <div class="alternative-details">
-              <p><strong>Aika: </strong> {{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
+              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</strong></p>
               <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ getPriceEmoji(state.data.tonight.price) }} {{ state.data.tonight.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.price) }})</p>
               <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.price) }}">{{ calculateWashCost(state.data.tonight) | number:'1.2-2' }} senttiä</strong></p>
               <p class="savings-comparison" *ngIf="calculatePotentialSavings(state.data.tonight) as savings">
@@ -158,7 +158,7 @@
           <div *ngIf="state.data.tomorrow && (state.data.today || (!state.data.today && state.data.tonight))" class="time-slot alternative">
             <h5>... jos huomiseen voit säästää, niin se voisi kannattaa</h5>
             <div class="alternative-details">
-              <p><strong>Aika: </strong> {{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
+              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</strong></p>
               <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ getPriceEmoji(state.data.tomorrow.price) }} {{ state.data.tomorrow.price | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.price) }})</p>
               <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.price) }}">{{ calculateWashCost(state.data.tomorrow) | number:'1.2-2' }} senttiä</strong></p>
               <p class="savings-comparison" *ngIf="calculatePotentialSavings(state.data.tomorrow) as savings">

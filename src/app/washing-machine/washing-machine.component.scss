@@ -135,19 +135,14 @@
           p {
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
+          }
 
-            strong {
-              color: var(--spotify-white);
-            }
+          .prop {
+            color: var(--spotify-text-light);
           }
 
           .savings-comparison {
             color: var(--spotify-green);
-
-            span {
-              color: var(--spotify-text-light);
-              font-size: 0.85rem;
-            }
           }
         }
       }

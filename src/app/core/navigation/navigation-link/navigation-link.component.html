@@ -4,6 +4,11 @@
       <div class="background-icon">
         <mat-icon>{{ icon }}</mat-icon>
       </div>
+      @if (badgeIcon) {
+        <div class="badge-icon">
+          <mat-icon>{{ badgeIcon }}</mat-icon>
+        </div>
+      }
       <div class="navigation-link-text">
         {{ text }}
       </div>
