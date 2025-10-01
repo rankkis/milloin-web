@@ -55,7 +55,7 @@
   }
 
   // Forecast container
-  .forecast-container {
+  .schedule-container {
     // Primary recommendation (highlighted)
     .primary-recommendation {
       margin-bottom: 2rem;
@@ -153,7 +153,7 @@
   .initial-state {
     text-align: center;
 
-    .get-forecast-button {
+    .get-schedule-button {
       background: var(--spotify-green);
       color: var(--spotify-black);
       border: none;
@@ -208,7 +208,7 @@
       font-size: 0.9rem;
     }
 
-    .forecast-container {
+    .schedule-container {
       .primary-recommendation {
         h3 {
           font-size: 1.25rem;

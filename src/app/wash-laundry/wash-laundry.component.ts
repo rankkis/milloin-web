@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { WashLaundryService, WashingForecastDto } from './wash-laundry.service';
+import { WashLaundryService, WashLaundryOptimalScheduleDto } from './wash-laundry.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, map, catchError, startWith } from 'rxjs/operators';
 import { PriceUtilitiesService } from '../shared/services/price-utilities.service';
@@ -12,17 +12,17 @@ interface EnhancedOptimalTimeDto extends OptimalTimeDto {
   potentialSavingsPercentage: number;
 }
 
-interface EnhancedForecastDto {
+interface EnhancedOptimalScheduleDto {
   now?: EnhancedOptimalTimeDto;
   today?: EnhancedOptimalTimeDto;
   tonight?: EnhancedOptimalTimeDto;
   tomorrow?: EnhancedOptimalTimeDto;
-  defaults: WashingForecastDto['defaults'];
+  defaults: WashLaundryOptimalScheduleDto['defaults'];
 }
 
-interface ForecastState {
+interface OptimalScheduleState {
   loading: boolean;
-  data: EnhancedForecastDto | null;
+  data: EnhancedOptimalScheduleDto | null;
   error: string | null;
 }
 
@@ -38,17 +38,17 @@ export class WashLaundryComponent {
   private readonly priceCalculation = inject(PriceCalculationService);
   private readonly trigger$ = new BehaviorSubject<void>(undefined);
 
-  forecast$: Observable<ForecastState> = this.trigger$.pipe(
+  optimalSchedule$: Observable<OptimalScheduleState> = this.trigger$.pipe(
     switchMap(() =>
-      this.washLaundryService.getForecast().pipe(
-        map((apiData): ForecastState => {
+      this.washLaundryService.getOptimalSchedule().pipe(
+        map((apiData): OptimalScheduleState => {
           // First, calculate the "now" price to use as reference for savings
           const nowPrice = apiData.now
             ? this.priceCalculation.calculateEstimatedTotalPrice(apiData.now.pricePoints, apiData.defaults)
             : 0;
 
           // Enhance the API response with calculated prices and savings
-          const enhancedData: EnhancedForecastDto = {
+          const enhancedData: EnhancedOptimalScheduleDto = {
             defaults: apiData.defaults
           };
 
@@ -84,10 +84,10 @@ export class WashLaundryComponent {
 
           return { loading: false, data: enhancedData, error: null };
         }),
-        catchError((err): Observable<ForecastState> => {
-          console.error('[WashLaundryComponent] Error fetching forecast:', err);
+        catchError((err): Observable<OptimalScheduleState> => {
+          console.error('[WashLaundryComponent] Error fetching optimal schedule:', err);
 
-          const errorMessage = err.userMessage || 'Ennusteen lataaminen epäonnistui';
+          const errorMessage = err.userMessage || 'Aikataulun lataaminen epäonnistui';
 
           return of({
             loading: false,
@@ -100,7 +100,7 @@ export class WashLaundryComponent {
     )
   );
 
-  getForecast(): void {
+  getOptimalSchedule(): void {
     this.trigger$.next();
   }
 

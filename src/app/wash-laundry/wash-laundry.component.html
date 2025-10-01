@@ -5,11 +5,11 @@
        [showBackButton]="true"
        backButtonTestId="wash-laundry-back-button"
        [showRefreshButton]="true"
-       refreshButtonTestId="refresh-forecast-button"
-       (refreshClicked)="getForecast()">
+       refreshButtonTestId="refresh-schedule-button"
+       (refreshClicked)="getOptimalSchedule()">
   </div>
   <div appCardContent>
-    <div class="wash-laundry-content" *ngIf="forecast$ | async as state">
+    <div class="wash-laundry-content" *ngIf="optimalSchedule$ | async as state">
 
       <!-- Loading State -->
       <div *ngIf="state.loading" class="loading-container">
@@ -24,15 +24,15 @@
           <button
             type="button"
             class="retry-button"
-            data-test-id="retry-forecast-button"
-            (click)="getForecast()">
+            data-test-id="retry-schedule-button"
+            (click)="getOptimalSchedule()">
             Yritä uudelleen
           </button>
         </div>
       </div>
 
-      <!-- Success State with Forecast Data -->
-      <div *ngIf="state.data && !state.loading && !state.error" class="forecast-container">
+      <!-- Success State with Schedule Data -->
+      <div *ngIf="state.data && !state.loading && !state.error" class="schedule-container">
 
         <!-- Primary Recommendation: Today's Best Time (Highlighted) -->
         <div *ngIf="state.data.today" class="primary-recommendation" appCardContentHighlighted>
@@ -91,7 +91,7 @@
             <p class="period-label">Tänä yönä</p>
             <p class="time-display">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
             <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ getPriceEmoji(state.data.tonight.priceCategory) }} {{ state.data.tonight.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.priceCategory) }})</p>
-            <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+            <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
             <p class="optimal-info" *ngIf="state.data.tonight.priceCategory === 'VERY_CHEAP' || state.data.tonight.priceCategory === 'CHEAP'">
               <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.priceCategory) }}
             </p>
@@ -108,7 +108,7 @@
               <p class="period-label">Huomenna</p>
               <p class="time-display">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
               <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ getPriceEmoji(state.data.tomorrow.priceCategory) }} {{ state.data.tomorrow.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.priceCategory) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.estimatedTotalPrice | number:'1.2-2' }} senttiä</strong></p>
+              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
               <p class="optimal-info" *ngIf="state.data.tomorrow.priceCategory === 'VERY_CHEAP' || state.data.tomorrow.priceCategory === 'CHEAP'">
                 <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }}
               </p>
@@ -166,7 +166,7 @@
         </div>
       </div>
 
-      <!-- Initial State - Show Get Forecast Button -->
+      <!-- Initial State - Show Get Schedule Button -->
       <div *ngIf="!state.loading && !state.data && !state.error" class="initial-state">
         <p>Napsauta alla olevaa painiketta saadaksesi AI-avusteiset suositukset optimaaliselle pyykinpesuajalle perustuen:</p>
         <ul>
@@ -178,9 +178,9 @@
 
         <button
           type="button"
-          class="get-forecast-button"
-          data-test-id="get-forecast-button"
-          (click)="getForecast()">
+          class="get-schedule-button"
+          data-test-id="get-schedule-button"
+          (click)="getOptimalSchedule()">
           Hae parhaat pesuajat
         </button>
       </div>

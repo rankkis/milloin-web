@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { OptimalTimeDto, ForecastDefaultsDto, PricePointDto } from '../models/price.model';
+import { OptimalTimeDto, OptimalScheduleDefaultsDto, PricePointDto } from '../models/price.model';
 
 /**
  * Service for calculating prices for electricity consumption operations.
@@ -25,7 +25,7 @@ export class PriceCalculationService {
    */
   calculateEstimatedTotalPrice(
     pricePoints: PricePointDto[],
-    defaults: ForecastDefaultsDto
+    defaults: OptimalScheduleDefaultsDto
   ): number {
     if (!pricePoints || pricePoints.length === 0) {
       return 0;
@@ -81,7 +81,7 @@ export class PriceCalculationService {
    */
   addEstimatedTotalPrice(
     optimalTime: OptimalTimeDto,
-    defaults: ForecastDefaultsDto
+    defaults: OptimalScheduleDefaultsDto
   ): OptimalTimeDto & { estimatedTotalPriceCents: number } {
     const estimatedTotalPriceCents = this.calculateEstimatedTotalPrice(
       optimalTime.pricePoints,
@@ -105,7 +105,7 @@ export class PriceCalculationService {
    */
   addEstimatedPriceWithSavings(
     optimalTime: OptimalTimeDto,
-    defaults: ForecastDefaultsDto,
+    defaults: OptimalScheduleDefaultsDto,
     nowPrice: number
   ): OptimalTimeDto & {
     estimatedTotalPriceCents: number;

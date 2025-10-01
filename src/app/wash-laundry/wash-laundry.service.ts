@@ -3,16 +3,16 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError, timer } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { PriceCategory, OptimalTimeDto, ForecastDefaultsDto } from '../shared/models/price.model';
+import { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto } from '../shared/models/price.model';
 
-export type { PriceCategory, OptimalTimeDto, ForecastDefaultsDto };
+export type { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto };
 
-export interface WashingForecastDto {
+export interface WashLaundryOptimalScheduleDto {
   now?: OptimalTimeDto;
   today?: OptimalTimeDto;
   tonight?: OptimalTimeDto;
   tomorrow?: OptimalTimeDto;
-  defaults: ForecastDefaultsDto;
+  defaults: OptimalScheduleDefaultsDto;
 }
 
 @Injectable({
@@ -29,11 +29,11 @@ export class WashLaundryService {
     })
   };
 
-  getForecast(): Observable<WashingForecastDto> {
+  getOptimalSchedule(): Observable<WashLaundryOptimalScheduleDto> {
     const url = this.apiUrl;
 
 
-    return this.http.get<WashingForecastDto>(url, this.httpOptions).pipe(
+    return this.http.get<WashLaundryOptimalScheduleDto>(url, this.httpOptions).pipe(
       timeout(30000), // 30 second timeout for iOS
       retry({
         count: 3,
@@ -45,7 +45,7 @@ export class WashLaundryService {
       catchError((error: HttpErrorResponse) => {
         console.error('[WashLaundryService] Error:', error.status, error.statusText);
 
-        let userMessage = 'Ennusteen lataaminen epäonnistui';
+        let userMessage = 'Aikataulun lataaminen epäonnistui';
 
         if (error.status === 0) {
           userMessage = 'Verkkoyhteysvirhe - tarkista internetyhteys';

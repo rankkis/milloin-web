@@ -14,7 +14,7 @@ export interface OptimalTimeDto {
   pricePoints: PricePointDto[];
 }
 
-export interface ForecastDefaultsDto {
+export interface OptimalScheduleDefaultsDto {
   exchangeTariffCentsKwh: number;
   marginTariffCentsKwh: number;
   powerConsumptionKwh: number;

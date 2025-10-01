@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ChargeEvService, ChargeForecastDto } from './charge-ev.service';
+import { ChargeEvService, ChargeOptimalScheduleDto } from './charge-ev.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, map, catchError, startWith } from 'rxjs/operators';
 import { PriceUtilitiesService } from '../shared/services/price-utilities.service';
@@ -12,16 +12,16 @@ interface EnhancedOptimalTimeDto extends OptimalTimeDto {
   potentialSavingsPercentage: number;
 }
 
-interface EnhancedForecastDto {
+interface EnhancedOptimalScheduleDto {
   now: EnhancedOptimalTimeDto;
   next12Hours: EnhancedOptimalTimeDto;
   extended?: EnhancedOptimalTimeDto;
-  defaults: ChargeForecastDto['defaults'];
+  defaults: ChargeOptimalScheduleDto['defaults'];
 }
 
-interface ForecastState {
+interface OptimalScheduleState {
   loading: boolean;
-  data: EnhancedForecastDto | null;
+  data: EnhancedOptimalScheduleDto | null;
   error: string | null;
 }
 
@@ -37,10 +37,10 @@ export class ChargeEvComponent {
   private readonly priceCalculation = inject(PriceCalculationService);
   private readonly trigger$ = new BehaviorSubject<void>(undefined);
 
-  forecast$: Observable<ForecastState> = this.trigger$.pipe(
+  optimalSchedule$: Observable<OptimalScheduleState> = this.trigger$.pipe(
     switchMap(() =>
-      this.chargeEvService.getForecast().pipe(
-        map((apiData): ForecastState => {
+      this.chargeEvService.getOptimalSchedule().pipe(
+        map((apiData): OptimalScheduleState => {
           // First, calculate the "now" price to use as reference for savings
           const nowPrice = this.priceCalculation.calculateEstimatedTotalPrice(
             apiData.now.pricePoints,
@@ -48,7 +48,7 @@ export class ChargeEvComponent {
           );
 
           // Enhance the API response with calculated prices and savings
-          const enhancedData: EnhancedForecastDto = {
+          const enhancedData: EnhancedOptimalScheduleDto = {
             now: this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.now,
               apiData.defaults,
@@ -73,10 +73,10 @@ export class ChargeEvComponent {
 
           return { loading: false, data: enhancedData, error: null };
         }),
-        catchError((err): Observable<ForecastState> => {
-          console.error('[ChargeEvComponent] Error fetching forecast:', err);
+        catchError((err): Observable<OptimalScheduleState> => {
+          console.error('[ChargeEvComponent] Error fetching optimal schedule:', err);
 
-          const errorMessage = err.userMessage || 'Ennusteen lataaminen epäonnistui';
+          const errorMessage = err.userMessage || 'Aikataulun lataaminen epäonnistui';
 
           return of({
             loading: false,
@@ -89,7 +89,7 @@ export class ChargeEvComponent {
     )
   );
 
-  getForecast(): void {
+  getOptimalSchedule(): void {
     this.trigger$.next();
   }
 

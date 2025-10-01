@@ -3,15 +3,15 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError, timer } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { PriceCategory, OptimalTimeDto, ForecastDefaultsDto } from '../shared/models/price.model';
+import { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto } from '../shared/models/price.model';
 
-export type { PriceCategory, OptimalTimeDto, ForecastDefaultsDto };
+export type { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto };
 
-export interface ChargeForecastDto {
+export interface ChargeOptimalScheduleDto {
   now: OptimalTimeDto;
   next12Hours: OptimalTimeDto;
   extended?: OptimalTimeDto;
-  defaults: ForecastDefaultsDto;
+  defaults: OptimalScheduleDefaultsDto;
 }
 
 @Injectable({
@@ -28,10 +28,10 @@ export class ChargeEvService {
     })
   };
 
-  getForecast(): Observable<ChargeForecastDto> {
+  getOptimalSchedule(): Observable<ChargeOptimalScheduleDto> {
     const url = this.apiUrl;
 
-    return this.http.get<ChargeForecastDto>(url, this.httpOptions).pipe(
+    return this.http.get<ChargeOptimalScheduleDto>(url, this.httpOptions).pipe(
       timeout(30000), // 30 second timeout for iOS
       retry({
         count: 3,
