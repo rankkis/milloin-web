@@ -8,6 +8,7 @@ import { PriceCategory, OptimalTimeDto, ForecastDefaultsDto } from '../shared/mo
 export type { PriceCategory, OptimalTimeDto, ForecastDefaultsDto };
 
 export interface ChargeForecastDto {
+  now: OptimalTimeDto;
   next12Hours: OptimalTimeDto;
   extended?: OptimalTimeDto;
   defaults: ForecastDefaultsDto;
@@ -18,7 +19,7 @@ export interface ChargeForecastDto {
 })
 export class ChargeEvService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/charge-ev`;
+  private readonly apiUrl = `${environment.apiUrl}/charge-ev/optimal-schedule`;
 
   private readonly httpOptions = {
     headers: new HttpHeaders({
@@ -28,7 +29,7 @@ export class ChargeEvService {
   };
 
   getForecast(): Observable<ChargeForecastDto> {
-    const url = `${this.apiUrl}/forecast`;
+    const url = this.apiUrl;
 
     return this.http.get<ChargeForecastDto>(url, this.httpOptions).pipe(
       timeout(30000), // 30 second timeout for iOS

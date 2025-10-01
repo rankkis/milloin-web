@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { WashingMachineComponent } from './washing-machine.component';
-import { WashingMachineService } from './washing-machine.service';
+import { WashLaundryComponent } from './wash-laundry.component';
+import { WashLaundryService } from './wash-laundry.service';
 import { SharedModule } from '../shared/shared.module';
 
 const routes: Routes = [
-  { path: '', component: WashingMachineComponent }
+  { path: '', component: WashLaundryComponent }
 ];
 
 @NgModule({
   declarations: [
-    WashingMachineComponent
+    WashLaundryComponent
   ],
   imports: [
     CommonModule,
@@ -19,7 +19,7 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
   providers: [
-    WashingMachineService
+    WashLaundryService
   ]
 })
-export class WashingMachineModule { }
+export class WashLaundryModule { }

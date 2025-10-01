@@ -8,6 +8,7 @@ import { PriceCategory, OptimalTimeDto, ForecastDefaultsDto } from '../shared/mo
 export type { PriceCategory, OptimalTimeDto, ForecastDefaultsDto };
 
 export interface WashingForecastDto {
+  now?: OptimalTimeDto;
   today?: OptimalTimeDto;
   tonight?: OptimalTimeDto;
   tomorrow?: OptimalTimeDto;
@@ -17,9 +18,9 @@ export interface WashingForecastDto {
 @Injectable({
   providedIn: 'root'
 })
-export class WashingMachineService {
+export class WashLaundryService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/washing-machine`;
+  private readonly apiUrl = `${environment.apiUrl}/wash-laundry/optimal-schedule`;
 
   private readonly httpOptions = {
     headers: new HttpHeaders({
@@ -29,7 +30,7 @@ export class WashingMachineService {
   };
 
   getForecast(): Observable<WashingForecastDto> {
-    const url = `${this.apiUrl}/forecast?hours=36`;
+    const url = this.apiUrl;
 
 
     return this.http.get<WashingForecastDto>(url, this.httpOptions).pipe(
@@ -42,7 +43,7 @@ export class WashingMachineService {
         }
       }),
       catchError((error: HttpErrorResponse) => {
-        console.error('[WashingMachineService] Error:', error.status, error.statusText);
+        console.error('[WashLaundryService] Error:', error.status, error.statusText);
 
         let userMessage = 'Ennusteen lataaminen epäonnistui';
 

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ChargeEvService, ChargeForecastDto } from './charge-ev.service';
+import { WashLaundryService, WashingForecastDto } from './wash-laundry.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, map, catchError, startWith } from 'rxjs/operators';
 import { PriceUtilitiesService } from '../shared/services/price-utilities.service';
@@ -13,10 +13,11 @@ interface EnhancedOptimalTimeDto extends OptimalTimeDto {
 }
 
 interface EnhancedForecastDto {
-  now: EnhancedOptimalTimeDto;
-  next12Hours: EnhancedOptimalTimeDto;
-  extended?: EnhancedOptimalTimeDto;
-  defaults: ChargeForecastDto['defaults'];
+  now?: EnhancedOptimalTimeDto;
+  today?: EnhancedOptimalTimeDto;
+  tonight?: EnhancedOptimalTimeDto;
+  tomorrow?: EnhancedOptimalTimeDto;
+  defaults: WashingForecastDto['defaults'];
 }
 
 interface ForecastState {
@@ -26,46 +27,56 @@ interface ForecastState {
 }
 
 @Component({
-  selector: 'app-charge-ev',
+  selector: 'app-wash-laundry',
   standalone: false,
-  templateUrl: './charge-ev.component.html',
-  styleUrl: './charge-ev.component.scss'
+  templateUrl: './wash-laundry.component.html',
+  styleUrl: './wash-laundry.component.scss'
 })
-export class ChargeEvComponent {
-  private readonly chargeEvService = inject(ChargeEvService);
+export class WashLaundryComponent {
+  private readonly washLaundryService = inject(WashLaundryService);
   private readonly priceUtilities = inject(PriceUtilitiesService);
   private readonly priceCalculation = inject(PriceCalculationService);
   private readonly trigger$ = new BehaviorSubject<void>(undefined);
 
   forecast$: Observable<ForecastState> = this.trigger$.pipe(
     switchMap(() =>
-      this.chargeEvService.getForecast().pipe(
+      this.washLaundryService.getForecast().pipe(
         map((apiData): ForecastState => {
           // First, calculate the "now" price to use as reference for savings
-          const nowPrice = this.priceCalculation.calculateEstimatedTotalPrice(
-            apiData.now.pricePoints,
-            apiData.defaults
-          );
+          const nowPrice = apiData.now
+            ? this.priceCalculation.calculateEstimatedTotalPrice(apiData.now.pricePoints, apiData.defaults)
+            : 0;
 
           // Enhance the API response with calculated prices and savings
           const enhancedData: EnhancedForecastDto = {
-            now: this.priceCalculation.addEstimatedPriceWithSavings(
-              apiData.now,
-              apiData.defaults,
-              nowPrice
-            ),
-            next12Hours: this.priceCalculation.addEstimatedPriceWithSavings(
-              apiData.next12Hours,
-              apiData.defaults,
-              nowPrice
-            ),
             defaults: apiData.defaults
           };
 
-          // Add extended time if it exists
-          if (apiData.extended) {
-            enhancedData.extended = this.priceCalculation.addEstimatedPriceWithSavings(
-              apiData.extended,
+          // Add estimated total price and savings to each time slot if it exists
+          if (apiData.now) {
+            enhancedData.now = this.priceCalculation.addEstimatedPriceWithSavings(
+              apiData.now,
+              apiData.defaults,
+              nowPrice
+            );
+          }
+          if (apiData.today) {
+            enhancedData.today = this.priceCalculation.addEstimatedPriceWithSavings(
+              apiData.today,
+              apiData.defaults,
+              nowPrice
+            );
+          }
+          if (apiData.tonight) {
+            enhancedData.tonight = this.priceCalculation.addEstimatedPriceWithSavings(
+              apiData.tonight,
+              apiData.defaults,
+              nowPrice
+            );
+          }
+          if (apiData.tomorrow) {
+            enhancedData.tomorrow = this.priceCalculation.addEstimatedPriceWithSavings(
+              apiData.tomorrow,
               apiData.defaults,
               nowPrice
             );
@@ -74,7 +85,7 @@ export class ChargeEvComponent {
           return { loading: false, data: enhancedData, error: null };
         }),
         catchError((err): Observable<ForecastState> => {
-          console.error('[ChargeEvComponent] Error fetching forecast:', err);
+          console.error('[WashLaundryComponent] Error fetching forecast:', err);
 
           const errorMessage = err.userMessage || 'Ennusteen lataaminen epäonnistui';
 
