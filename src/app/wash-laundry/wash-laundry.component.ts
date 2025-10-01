@@ -127,13 +127,4 @@ export class WashLaundryComponent {
   getPriceEmoji(category: PriceCategory): string {
     return this.priceUtilities.getPriceEmoji(category);
   }
-
-  /**
-   * Converts cents to euros
-   * @param cents - Price in cents
-   * @returns Price in euros
-   */
-  centsToEuros(cents: number): number {
-    return cents / 100;
-  }
 }
