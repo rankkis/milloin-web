@@ -41,23 +41,18 @@ export class ChargeEvComponent {
     switchMap(() =>
       this.chargeEvService.getOptimalSchedule().pipe(
         map((apiData): OptimalScheduleState => {
-          // First, calculate the "now" price to use as reference for savings
-          const nowPrice = this.priceCalculation.calculateEstimatedTotalPrice(
-            apiData.now.pricePoints,
-            apiData.defaults
-          );
-
           // Enhance the API response with calculated prices and savings
+          // All comparisons are against the "now" OptimalTimeDto
           const enhancedData: EnhancedOptimalScheduleDto = {
             now: this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.now,
               apiData.defaults,
-              nowPrice
+              apiData.now
             ),
             next12Hours: this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.next12Hours,
               apiData.defaults,
-              nowPrice
+              apiData.now
             ),
             defaults: apiData.defaults
           };
@@ -67,7 +62,7 @@ export class ChargeEvComponent {
             enhancedData.extended = this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.extended,
               apiData.defaults,
-              nowPrice
+              apiData.now
             );
           }
 

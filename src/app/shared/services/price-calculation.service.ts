@@ -100,13 +100,13 @@ export class PriceCalculationService {
    *
    * @param optimalTime - The optimal time object from API
    * @param defaults - Configuration with tariffs and power consumption
-   * @param nowPrice - The estimated price if starting now (for savings comparison)
+   * @param nowOptimalTime - The "now" optimal time object for savings comparison
    * @returns New object with all calculated fields added
    */
   addEstimatedPriceWithSavings(
     optimalTime: OptimalTimeDto,
     defaults: OptimalScheduleDefaultsDto,
-    nowPrice: number
+    nowOptimalTime: OptimalTimeDto
   ): OptimalTimeDto & {
     estimatedTotalPriceCents: number;
     potentialSavingsCents: number;
@@ -114,6 +114,12 @@ export class PriceCalculationService {
   } {
     const estimatedTotalPriceCents = this.calculateEstimatedTotalPrice(
       optimalTime.pricePoints,
+      defaults
+    );
+
+    // Calculate the "now" price from the nowOptimalTime
+    const nowPrice = this.calculateEstimatedTotalPrice(
+      nowOptimalTime.pricePoints,
       defaults
     );
 

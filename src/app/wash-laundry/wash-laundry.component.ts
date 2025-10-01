@@ -42,12 +42,16 @@ export class WashLaundryComponent {
     switchMap(() =>
       this.washLaundryService.getOptimalSchedule().pipe(
         map((apiData): OptimalScheduleState => {
-          // First, calculate the "now" price to use as reference for savings
-          const nowPrice = apiData.now
-            ? this.priceCalculation.calculateEstimatedTotalPrice(apiData.now.pricePoints, apiData.defaults)
-            : 0;
-
           // Enhance the API response with calculated prices and savings
+          // All comparisons are against the "now" OptimalTimeDto if available
+          // Otherwise, use the first available time slot as reference
+          const referenceTime = apiData.now || apiData.today || apiData.tonight || apiData.tomorrow;
+
+          if (!referenceTime) {
+            // If no time slots available, return empty data
+            return { loading: false, data: { defaults: apiData.defaults }, error: null };
+          }
+
           const enhancedData: EnhancedOptimalScheduleDto = {
             defaults: apiData.defaults
           };
@@ -57,28 +61,28 @@ export class WashLaundryComponent {
             enhancedData.now = this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.now,
               apiData.defaults,
-              nowPrice
+              referenceTime
             );
           }
           if (apiData.today) {
             enhancedData.today = this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.today,
               apiData.defaults,
-              nowPrice
+              referenceTime
             );
           }
           if (apiData.tonight) {
             enhancedData.tonight = this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.tonight,
               apiData.defaults,
-              nowPrice
+              referenceTime
             );
           }
           if (apiData.tomorrow) {
             enhancedData.tomorrow = this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.tomorrow,
               apiData.defaults,
-              nowPrice
+              referenceTime
             );
           }
 
