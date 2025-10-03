@@ -184,10 +184,13 @@ export class OverviewComponent {
         }
       },
       y: {
+        min: 0,
+        suggestedMax: 15,  // Scale shows at least 0-15c/kWh, extends higher if needed
         grid: {
           color: 'rgba(255, 255, 255, 0.08)'  // Subtle horizontal grid
         },
         ticks: {
+          stepSize: 5,  // Show ticks at 0, 5, 10, 15
           color: '#b3b3b3',
           font: {
             size: 11
