@@ -3,6 +3,8 @@
 ## Project Overview
 Angular web application for the Milloin project. Milloin translates to When in english. This service is web application where user may ask different type of pre defined questions like When to use washing machine. By clicking the button this web applications calls to backend which is using Claude AI and electric spot prices to figure out when is cheapest time to start the washing machine.
 
+Goal for the site is saving money by running high-consumption tasks during optimal time windows.
+
 ## Technology Stack
 - **Angular**: 19.2.0
 - **Angular CLI**: 19.2.17
@@ -137,6 +139,64 @@ src/
 5. Build: `ng build`
 6. Commit and push changes
 7. Create pull request
+
+## SEO & Analytics
+
+### Google Analytics
+- **Tracking ID**: G-4J2DJ7V1SE
+- Google Analytics script is in `src/index.html` (lines 4-11)
+- Tracks page views and user behavior automatically
+
+### SEO Meta Tags
+All SEO meta tags are defined in `src/index.html`:
+- **Title**: "Milloin - When to Save Money on Electricity"
+- **Description**: Optimized for search engines with relevant keywords
+- **Keywords**: electricity prices, spot prices, EV charging, energy savings, AI assistant, washing machine, dishwasher
+- **Open Graph Tags**: For social media sharing (Facebook, LinkedIn)
+- **Twitter Card Tags**: For Twitter/X sharing
+
+**Important**: When adding new features or pages:
+1. Update meta description to reflect new content
+2. Add new routes to `src/sitemap.xml`
+3. Keep heading hierarchy coherent (h1 → h2 → h3 → h4)
+4. Update sitemap lastmod date when making significant changes
+
+### Sitemap
+- Located at `src/sitemap.xml`
+- Automatically included in builds via `angular.json`
+- Available at https://milloin.xyz/sitemap.xml
+- Update when adding/removing routes
+
+### Heading Hierarchy
+Maintain proper heading structure for SEO:
+- **h1**: Page title (in app.component.html)
+- **h2-h6**: Section headings in components
+- Never skip heading levels (e.g., h1 → h3)
+- Use semantic HTML elements
+
+### Robots.txt
+- Located at `public/robots.txt`
+- Automatically included in builds
+- Available at https://milloin.xyz/robots.txt
+- Controls search engine crawling behavior
+- Points to sitemap location
+
+### Structured Data (JSON-LD)
+Rich snippets and search result enhancements via Schema.org structured data:
+- **Location**: `src/index.html` (lines 36-85)
+- **Type**: WebApplication schema
+- **Purpose**: Helps search engines understand the app and display rich results
+- **Features Listed**: AI optimization, spot price analysis, EV charging, washing machine, dishwasher, cost calculator
+
+**When to Update**:
+- Adding new features → update `featureList` array
+- Changing app description → update `description` field
+- Major updates → update `dateModified` and `softwareVersion`
+- Company/creator changes → update `creator` object
+
+**Testing Structured Data**:
+- Google Rich Results Test: https://search.google.com/test/rich-results
+- Schema.org Validator: https://validator.schema.org/
 
 ## Important Notes
 - This is an Angular 19 project

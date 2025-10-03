@@ -1,0 +1,94 @@
+<div appCard>
+  <div appCardHeader
+       title="sähkö on halpaa?"
+       subtitle="Näe nykyinen sähkön spot-hinta ja hintatrendi"
+       [showBackButton]="true"
+       backButtonTestId="overview-back-button"
+       [showRefreshButton]="true"
+       refreshButtonTestId="refresh-overview-button"
+       (refreshClicked)="getOverview()">
+  </div>
+  <div appCardContent>
+    <div class="overview-content" *ngIf="overview$ | async as state">
+
+      <!-- Loading State -->
+      <div *ngIf="state.loading" class="loading-container">
+        <p>Ladataan sähkön hintoja...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="state.error && !state.loading" appCardContentHighlighted class="error-container">
+        <p><strong>Virhe:</strong> {{ state.error }}</p>
+
+        <div class="error-actions">
+          <button
+            type="button"
+            class="retry-button"
+            data-test-id="retry-overview-button"
+            (click)="getOverview()">
+            Yritä uudelleen
+          </button>
+        </div>
+      </div>
+
+      <!-- Success State with Overview Data -->
+      <div *ngIf="state.data && !state.loading && !state.error" class="overview-container">
+
+        <!-- Current Price (Jumbo Highlighted) -->
+        <div *ngIf="state.data.current" class="current-price-jumbo" appCardContentHighlighted>
+          <h3 class="jumbo-title">Nykyinen hinta</h3>
+
+          <div class="price-display">
+            <div class="emoji-icon">{{ getPriceEmoji(state.data.current.priceCategory) }}</div>
+            <div class="price-value {{ getPriceCssClass(state.data.current.priceCategory) }}">
+              {{ state.data.current.price | number:'1.2-2' }}
+              <span class="price-unit">c/kWh</span>
+            </div>
+          </div>
+
+          <div class="price-category {{ getPriceCssClass(state.data.current.priceCategory) }}">
+            {{ getPriceCategoryText(state.data.current.priceCategory) }}
+          </div>
+
+          <p class="price-description">
+            {{ getCurrentPriceDescription(state.data.current.priceCategory) }}
+          </p>
+        </div>
+
+        <!-- Price Trend Chart -->
+        <div *ngIf="lineChartData.datasets.length > 0" class="chart-container">
+          <h4>Hintatrendi</h4>
+          <div class="chart-wrapper">
+            <canvas
+              baseChart
+              [data]="lineChartData"
+              [options]="lineChartOptions"
+              [type]="lineChartType"
+              [plugins]="lineChartPlugins"
+              data-test-id="price-trend-chart">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Initial State - Show Get Overview Button -->
+      <div *ngIf="!state.loading && !state.data && !state.error" class="initial-state">
+        <p>Napsauta alla olevaa painiketta nähdäksesi:</p>
+        <ul>
+          <li>Tämänhetkinen sähkön spot-hinta</li>
+          <li>Seuraavien 12 tunnin hintatilanne</li>
+          <li>Kaikki saatavilla oleva hintadata</li>
+        </ul>
+
+        <button
+          type="button"
+          class="get-overview-button"
+          data-test-id="get-overview-button"
+          (click)="getOverview()">
+          Näytä hinnat
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

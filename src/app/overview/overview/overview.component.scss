@@ -1,0 +1,299 @@
+.overview-content {
+
+  ul {
+    margin: 1rem 0;
+
+    li {
+      color: var(--spotify-text-light);
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  p {
+    color: var(--spotify-text-light);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  // Loading state
+  .loading-container {
+    text-align: center;
+    padding: 2rem;
+
+    p {
+      color: var(--spotify-green);
+      font-weight: 500;
+    }
+  }
+
+  // Error state
+  .error-container {
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+
+      .retry-button {
+        background: var(--spotify-green);
+        color: var(--spotify-black);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 0.9rem;
+
+        &:hover {
+          background: var(--spotify-green-hover);
+        }
+      }
+    }
+  }
+
+  // Overview container
+  .overview-container {
+    // Current price jumbo display
+    .current-price-jumbo {
+      margin-bottom: 2rem;
+      text-align: center;
+
+      .jumbo-title {
+        color: var(--spotify-green);
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .price-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+
+        .emoji-icon {
+          font-size: 4rem;
+          line-height: 1;
+        }
+
+        .price-value {
+          font-size: 4rem;
+          font-weight: 800;
+          font-family: 'Montserrat', sans-serif;
+          line-height: 1;
+
+          .price-unit {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+          }
+        }
+      }
+
+      .price-category {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .price-description {
+        font-size: 1.1rem;
+        color: var(--spotify-text-light);
+        margin-bottom: 0;
+        font-weight: 500;
+      }
+    }
+
+    // Chart container
+    .chart-container {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+
+      h4 {
+        color: var(--spotify-white);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .chart-wrapper {
+        width: 100%;
+        position: relative;
+        padding: 1rem 0;
+
+        canvas {
+          max-width: 100%;
+          height: auto !important;
+        }
+      }
+    }
+
+    // Time summaries
+    .time-summary {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+
+      h4 {
+        color: var(--spotify-white);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .summary-details {
+        p {
+          margin-bottom: 0.5rem;
+          font-size: 0.95rem;
+
+          strong {
+            color: var(--spotify-text-light);
+          }
+
+          span {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  // Initial state
+  .initial-state {
+    text-align: center;
+
+    .get-overview-button {
+      background: var(--spotify-green);
+      color: var(--spotify-black);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: var(--spotify-green-hover);
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Hide chart on mobile portrait view
+@media (max-width: 768px) and (orientation: portrait) {
+  .overview-content {
+    .overview-container {
+      .chart-container {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-content {
+    ul li {
+      font-size: 0.9rem;
+    }
+
+    .initial-state .get-overview-button {
+      padding: 0.875rem 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .overview-container {
+      .current-price-jumbo {
+        .jumbo-title {
+          font-size: 1.1rem;
+        }
+
+        .price-display {
+          .emoji-icon {
+            font-size: 3rem;
+          }
+
+          .price-value {
+            font-size: 3rem;
+
+            .price-unit {
+              font-size: 1.2rem;
+            }
+          }
+        }
+
+        .price-category {
+          font-size: 1.2rem;
+        }
+
+        .price-description {
+          font-size: 1rem;
+        }
+      }
+
+      .chart-container {
+        padding: 0.75rem;
+
+        h4 {
+          font-size: 0.9rem;
+        }
+      }
+
+      .time-summary {
+        padding: 0.75rem;
+
+        h4 {
+          font-size: 0.9rem;
+        }
+
+        .summary-details p {
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+}
+
+// Price category colors
+.price-very-cheap {
+  color: #00ff00 !important; // Bright green
+  font-weight: 600;
+}
+
+.price-cheap {
+  color: var(--spotify-green) !important; // Spotify green
+  font-weight: 600;
+}
+
+.price-normal {
+  color: var(--spotify-white) !important; // Normal white
+  font-weight: 500;
+}
+
+.price-expensive {
+  color: #ff6b6b !important; // Light red
+  font-weight: 600;
+}
+
+.price-very-expensive {
+  color: #ff3333 !important; // Bright red
+  font-weight: 700;
+}

@@ -1,15 +1,22 @@
 <app-navigation>
   <app-navigation-link
+    icon="bolt"
+    text="...sähkö on halpaa?"
+    [routerLink]="'/' + paths.OVERVIEW"
+    badgeIcon="power"
+    [attr.data-test-id]="'overview-card'"
+    />
+  <app-navigation-link
     icon="local_laundry_service"
     text="...kannattaa pestä pyykkiä?"
-    routerLink="/wash-laundry"
+    [routerLink]="'/' + paths.WASH_LAUNDRY"
     badgeIcon="power"
     [attr.data-test-id]="'wash-laundry-card'"
     />
   <app-navigation-link
     icon="directions_car"
     text="...kannattaa ladata auto?"
-    routerLink="/charge-ev"
+    [routerLink]="'/' + paths.CHARGE_EV"
     badgeIcon="power"
     [attr.data-test-id]="'charge-ev-card'"
     />
