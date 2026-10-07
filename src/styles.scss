@@ -60,11 +60,11 @@ html, body {
 
 // Update Material buttons to use Spotify green
 .mat-mdc-raised-button.mat-primary {
-  --mdc-protected-button-container-color: var(--spotify-green) !important;
-  --mdc-protected-button-label-text-color: var(--spotify-black) !important;
+  --mat-button-protected-container-color: var(--spotify-green) !important;
+  --mat-button-protected-label-text-color: var(--spotify-black) !important;
 }
 
 .mat-mdc-raised-button.mat-primary:hover {
-  --mdc-protected-button-container-color: var(--spotify-green-hover) !important;
+  --mat-button-protected-container-color: var(--spotify-green-hover) !important;
 }
 
