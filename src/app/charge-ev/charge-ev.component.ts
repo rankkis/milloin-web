@@ -30,6 +30,7 @@ interface OptimalScheduleState {
   // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 4
   standalone: false,
   templateUrl: './charge-ev.component.html',
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection -- state is set in subscriptions; rewritten in redesign step 4
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './charge-ev.component.scss',
 })

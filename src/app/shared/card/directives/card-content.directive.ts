@@ -1,13 +1,17 @@
-import { Directive, ElementRef, Renderer2, OnInit } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Renderer2,
+  OnInit,
+  inject,
+} from '@angular/core';
 
 @Directive({
-  selector: '[appCardContent]'
+  selector: '[appCardContent]',
 })
 export class CardContentDirective implements OnInit {
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2
-  ) {}
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
 
   ngOnInit() {
     // Apply card content styling classes

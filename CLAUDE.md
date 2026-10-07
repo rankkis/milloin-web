@@ -6,11 +6,11 @@ Angular web application for the Milloin project. Milloin translates to When in e
 Goal for the site is saving money by running high-consumption tasks during optimal time windows.
 
 ## Technology Stack
-- **Angular**: 19.2.0
-- **Angular CLI**: 19.2.17
-- **Node.js**: 22 (see `.nvmrc`)
+- **Angular**: 22
+- **Angular CLI**: 22
+- **Node.js**: 24 (see `.nvmrc`; Angular 22 needs 22.22.3+ or 24.15+)
 - **Package Manager**: npm
-- **TypeScript**: 5.7.2
+- **TypeScript**: 6.0
 - **Styling**: SCSS
 - **Routing**: Enabled
 - **Testing**: Jasmine + Karma
@@ -77,7 +77,7 @@ npm run domain-deploy   # Deploy to milloin.xyz (creates gh-pages branch with CN
 **Important Notes:**
 - Deployment creates/updates `gh-pages` branch automatically with CNAME file
 - Base href is set to `/` for root domain
-- **Angular 19 Build Structure:** Files are built to `dist/milloin-web-app/browser/` (note the `/browser` subdirectory)
+- **Angular Build Structure:** Files are built to `dist/milloin-web-app/browser/` (note the `/browser` subdirectory)
 - Deployment script correctly uses `--dir=dist/milloin-web-app/browser` for proper file structure
 - CNAME file is automatically created pointing to milloin.xyz
 - First deployment may take a few minutes to become available
@@ -125,7 +125,7 @@ src/
 - **Spotify-Inspired Design**: Dark theme with Spotify green accents and modern typography
 
 ### UI Framework
-- **Angular Material 19**: Complete Material Design component library
+- **Angular Material 22**: Complete Material Design component library
 - **Spotify Theme**: Dark theme with Spotify green (#1db954) and gray (#121212) color scheme
 - **Typography**: Montserrat and Inter fonts for modern, clean appearance
 - **Material Icons**: Google Material Icons for consistent iconography
@@ -203,7 +203,7 @@ Rich snippets and search result enhancements via Schema.org structured data:
 - Schema.org Validator: https://validator.schema.org/
 
 ## Important Notes
-- This is an Angular 19 project
+- This is an Angular 22 project; components default to OnPush change detection
 - Uses SCSS for styling
 - Routing is enabled
 - Follow Angular style guide for code conventions

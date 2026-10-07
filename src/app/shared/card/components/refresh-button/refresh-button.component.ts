@@ -3,7 +3,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,7 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-refresh-button',
   imports: [MatButtonModule, MatIconModule],
   templateUrl: './refresh-button.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './refresh-button.component.scss',
 })
 export class RefreshButtonComponent {

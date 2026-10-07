@@ -1,11 +1,29 @@
-import { Directive, ElementRef, Renderer2, OnInit, Input, ViewContainerRef, ComponentRef, Injector, Output, EventEmitter, OnDestroy } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Renderer2,
+  OnInit,
+  Input,
+  ViewContainerRef,
+  ComponentRef,
+  Injector,
+  Output,
+  EventEmitter,
+  OnDestroy,
+  inject,
+} from '@angular/core';
 import { BackButtonComponent } from '../components/back-button/back-button.component';
 import { RefreshButtonComponent } from '../components/refresh-button/refresh-button.component';
 
 @Directive({
-  selector: '[appCardHeader]'
+  selector: '[appCardHeader]',
 })
 export class CardHeaderDirective implements OnInit, OnDestroy {
+  private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private viewContainer = inject(ViewContainerRef);
+  private injector = inject(Injector);
+
   @Input() title = '';
   @Input() subtitle?: string;
   @Input() showBackButton = true;
@@ -16,13 +34,6 @@ export class CardHeaderDirective implements OnInit, OnDestroy {
 
   private backButtonRef?: ComponentRef<BackButtonComponent>;
   private refreshButtonRef?: ComponentRef<RefreshButtonComponent>;
-
-  constructor(
-    private el: ElementRef,
-    private renderer: Renderer2,
-    private viewContainer: ViewContainerRef,
-    private injector: Injector
-  ) {}
 
   ngOnInit() {
     // Apply card header styling class
@@ -50,14 +61,20 @@ export class CardHeaderDirective implements OnInit, OnDestroy {
       this.renderer.addClass(backButtonContainer, 'back-button-container');
 
       // Create back button component
-      this.backButtonRef = this.viewContainer.createComponent(BackButtonComponent, {
-        injector: this.injector
-      });
+      this.backButtonRef = this.viewContainer.createComponent(
+        BackButtonComponent,
+        {
+          injector: this.injector,
+        },
+      );
 
       this.backButtonRef.instance.testId = this.backButtonTestId;
       this.backButtonRef.instance.ariaLabel = 'Go back to previous page';
 
-      this.renderer.appendChild(backButtonContainer, this.backButtonRef.location.nativeElement);
+      this.renderer.appendChild(
+        backButtonContainer,
+        this.backButtonRef.location.nativeElement,
+      );
       this.renderer.appendChild(leftActions, backButtonContainer);
     }
 
@@ -92,12 +109,18 @@ export class CardHeaderDirective implements OnInit, OnDestroy {
     // Add refresh button if enabled
     if (this.showRefreshButton) {
       const refreshButtonContainer = this.renderer.createElement('div');
-      this.renderer.addClass(refreshButtonContainer, 'refresh-button-container');
+      this.renderer.addClass(
+        refreshButtonContainer,
+        'refresh-button-container',
+      );
 
       // Create refresh button component
-      this.refreshButtonRef = this.viewContainer.createComponent(RefreshButtonComponent, {
-        injector: this.injector
-      });
+      this.refreshButtonRef = this.viewContainer.createComponent(
+        RefreshButtonComponent,
+        {
+          injector: this.injector,
+        },
+      );
 
       this.refreshButtonRef.instance.testId = this.refreshButtonTestId;
       this.refreshButtonRef.instance.ariaLabel = 'Refresh data';
@@ -107,7 +130,10 @@ export class CardHeaderDirective implements OnInit, OnDestroy {
         this.refreshClicked.emit();
       });
 
-      this.renderer.appendChild(refreshButtonContainer, this.refreshButtonRef.location.nativeElement);
+      this.renderer.appendChild(
+        refreshButtonContainer,
+        this.refreshButtonRef.location.nativeElement,
+      );
       this.renderer.appendChild(rightActions, refreshButtonContainer);
     }
 

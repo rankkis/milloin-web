@@ -34,6 +34,7 @@ interface OptimalScheduleState {
   // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 3
   standalone: false,
   templateUrl: './wash-laundry.component.html',
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection -- state is set in subscriptions; rewritten in redesign step 3
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './wash-laundry.component.scss',
 })
