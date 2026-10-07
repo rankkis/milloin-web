@@ -1,14 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+// Global styles and design tokens
 
-// Import shared card styles (must be at top for @use)
 @use 'colors';
-@use 'app/shared/card/styles/card';
-@use 'app/shared/card/styles/card-header';
-@use 'app/shared/card/styles/card-content';
-@use 'app/shared/card/styles/card-content-highlighted';
-
-// Import Material Icons (removed with Angular Material in redesign step 5)
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 // IBM Plex Sans for text, IBM Plex Mono for prices and times
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
@@ -50,28 +42,3 @@ html, body {
   background-color: var(--color-bg);
   color: var(--color-text);
 }
-
-// Material overrides (removed with Angular Material in redesign step 5)
-.mat-app-background {
-  background-color: var(--color-bg) !important;
-}
-
-.mat-mdc-card {
-  background-color: var(--color-surface) !important;
-  color: var(--color-text) !important;
-  border-radius: var(--radius) !important;
-}
-
-.mat-mdc-card:hover {
-  background-color: var(--color-border) !important;
-}
-
-.mat-mdc-raised-button.mat-primary {
-  --mat-button-protected-container-color: var(--color-accent) !important;
-  --mat-button-protected-label-text-color: var(--color-on-accent) !important;
-}
-
-.mat-mdc-raised-button.mat-primary:hover {
-  --mat-button-protected-container-color: var(--color-accent) !important;
-}
-

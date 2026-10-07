@@ -20,7 +20,6 @@ Goal for the site is saving money by running high-consumption tasks during optim
 - **Core**: @angular/core, @angular/common, @angular/router
 - **Forms**: @angular/forms
 - **HTTP**: @angular/common/http (add when needed)
-- **UI**: @angular/material, @angular/cdk, @angular/animations (Material Design)
 - **Testing**: jasmine-core, karma, karma-chrome-launcher
 - **Deployment**: angular-cli-ghpages (GitHub Pages deployment)
 
@@ -109,8 +108,7 @@ src/
 │   │   ├── hourly-chart/         # Today's hourly price bars
 │   │   ├── icon/                 # Inline SVG icons
 │   │   ├── models/               # API DTOs
-│   │   ├── services/             # API services
-│   │   └── theme/                # Colors for TypeScript
+│   │   └── services/             # API services
 │   ├── app.component.*           # Root component (router outlet)
 │   ├── app.config.ts             # Application configuration
 │   ├── app.paths.ts              # Route paths
@@ -126,16 +124,11 @@ src/
 - **Question pages**: laundry answers with a timer delay (Nyt, +1 … +5 h) and the cost of each; EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now.
 - Clock times are shown in Finnish time (`shared/format/format.ts`).
 
-### UI Framework
-- **Angular Material 22**: Complete Material Design component library
-- **Spotify Theme**: Dark theme with Spotify green (#1db954) and gray (#121212) color scheme
-- **Typography**: Montserrat and Inter fonts for modern, clean appearance
-- **Material Icons**: Google Material Icons for consistent iconography
-- **Responsive Design**: Mobile-first approach with Material's responsive components
-- **3-Column Grid Layout**: Responsive grid that adapts to screen sizes (3→2→1 columns)
-- **Content Projection**: Flexible component architecture using `<ng-content>` slots
-- **Material Navigation Links**: Elevated navigation link cards with Spotify-inspired styling and hover effects
-- **Gradient Text Effects**: Modern gradient overlays on text elements
+### UI
+- No UI component library. Plain HTML and SCSS with design tokens as CSS custom properties in `src/styles.scss` (fonts, radius, spacing, tap size) and colors in `src/styles/_colors.scss`.
+- **Look**: dark background, one green accent (`accent`), IBM Plex Sans for text and IBM Plex Mono for prices and times.
+- **Icons**: inline SVG through `IconComponent` (`shared/icon`); no icon fonts, no emoji.
+- **Layout**: mobile first; the home screen widens to price and chart side by side (720 px) and a question table (960 px). Question pages are a single column up to 560 px.
 
 ## Development Workflow
 1. Create feature branch from main
@@ -207,7 +200,7 @@ Rich snippets and search result enhancements via Schema.org structured data:
 ## Important Notes
 - This is an Angular 22 project; components default to OnPush change detection
 - Uses SCSS for styling
-- Colors are defined only in `src/styles/_colors.scss`. In SCSS, `@use 'colors' as *` and use `color(accent)` or `alpha(accent, 10%)`, or the `--color-*` custom properties; never hex or rgba values. In TypeScript (canvas charts), use `color()` from `src/app/shared/theme/colors.ts`
+- Colors are defined only in `src/styles/_colors.scss`. In SCSS, `@use 'colors' as *` and use `color(accent)` or `alpha(accent, 10%)`, or the `--color-*` custom properties; never hex or rgba values.
 - Routing is enabled
 - Follow Angular style guide for code conventions
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests
