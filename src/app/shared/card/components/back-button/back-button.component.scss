@@ -1,9 +1,11 @@
+@use 'colors' as *;
+
 .back-button {
   color: var(--color-accent);
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: rgba(46, 224, 111, 0.1);
+    background-color: alpha(accent, 10%);
     transform: scale(1.1);
   }
 

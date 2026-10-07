@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 // Import shared card styles (must be at top for @use)
+@use 'colors';
 @use 'app/shared/card/styles/card';
 @use 'app/shared/card/styles/card-header';
 @use 'app/shared/card/styles/card-content';
@@ -14,17 +15,8 @@
 
 // Design tokens
 :root {
-  // Colors
-  --color-bg: #0b0e0c;
-  --color-surface: #131815;
-  --color-border: #232b26;
-  --color-border-strong: #3a463f;
-  --color-bar-past: #1e2622;
-  --color-text: #e9f1eb;
-  --color-text-muted: #93a69a;
-  --color-accent: #2ee06f;
-  --color-accent-soft: rgba(46, 224, 111, 0.12);
-  --color-on-accent: #0b0e0c;
+  // Colors, from src/styles/_colors.scss
+  @include colors.tokens;
 
   // Typography
   --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;

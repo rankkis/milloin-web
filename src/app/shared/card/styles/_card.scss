@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 // Base card styles
 .app-card {
   display: block;
@@ -6,10 +8,10 @@
   margin: 2rem auto;
   background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg) 100%);
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid alpha(text, 10%);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px alpha(bg, 15%);
 }
 
 @media (max-width: 768px) {

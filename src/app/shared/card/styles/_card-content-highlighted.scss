@@ -1,9 +1,11 @@
+@use 'colors' as *;
+
 // Highlighted card content styles
 .app-card-content-highlighted {
-  background: linear-gradient(135deg, rgba(46, 224, 111, 0.1) 0%, transparent 100%);
+  background: linear-gradient(135deg, alpha(accent, 10%) 0%, transparent 100%);
   padding: .5rem 1rem;
   border-radius: 8px;
-  border: 1px solid rgba(46, 224, 111, 0.2);
+  border: 1px solid alpha(accent, 20%);
   margin-bottom: 1rem;
 
   p {

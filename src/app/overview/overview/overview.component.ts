@@ -15,6 +15,7 @@ import { PriceUtilitiesService } from '../../shared/services/price-utilities.ser
 import { PriceCategory } from '../../shared/models/price.model';
 import { ChartConfiguration, ChartType, Plugin } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { color } from '../../shared/theme/colors';
 
 interface OverviewState {
   loading: boolean;
@@ -62,10 +63,10 @@ export class OverviewComponent {
 
         // Calculate time markers: +2h, +6h, +12h, +24h from first data point
         const markers = [
-          { hours: 2, label: '+2h', color: 'rgba(255, 255, 255, 0.5)' },
-          { hours: 6, label: '+6h', color: 'rgba(255, 255, 255, 0.6)' },
-          { hours: 12, label: '+12h', color: 'rgba(255, 255, 255, 0.7)' },
-          { hours: 24, label: '+24h', color: 'rgba(255, 255, 255, 0.8)' },
+          { hours: 2, label: '+2h', color: color('text', 0.5) },
+          { hours: 6, label: '+6h', color: color('text', 0.6) },
+          { hours: 12, label: '+12h', color: color('text', 0.7) },
+          { hours: 24, label: '+24h', color: color('text', 0.8) },
         ];
 
         const labels = chart.data.labels as string[];
@@ -138,7 +139,7 @@ export class OverviewComponent {
           const padding = 4;
 
           // Draw background rectangle
-          ctx.fillStyle = 'rgba(11, 14, 12, 0.8)';
+          ctx.fillStyle = color('bg', 0.8);
           ctx.fillRect(
             x - textWidth / 2 - padding,
             yAxis.top - 20,
@@ -174,10 +175,10 @@ export class OverviewComponent {
         display: false,
       },
       tooltip: {
-        backgroundColor: 'rgba(11, 14, 12, 0.9)',
-        titleColor: '#2ee06f',
-        bodyColor: '#e9f1eb',
-        borderColor: '#2ee06f',
+        backgroundColor: color('bg', 0.9),
+        titleColor: color('accent'),
+        bodyColor: color('text'),
+        borderColor: color('accent'),
         borderWidth: 1,
         padding: 12,
         displayColors: false,
@@ -191,7 +192,7 @@ export class OverviewComponent {
     scales: {
       x: {
         grid: {
-          color: 'rgba(255, 255, 255, 0.05)', // Very subtle grid
+          color: color('text', 0.05), // Very subtle grid
           drawTicks: false,
         },
         ticks: {
@@ -205,11 +206,11 @@ export class OverviewComponent {
         min: 0,
         suggestedMax: 15, // Scale shows at least 0-15c/kWh, extends higher if needed
         grid: {
-          color: 'rgba(255, 255, 255, 0.08)', // Subtle horizontal grid
+          color: color('text', 0.08), // Subtle horizontal grid
         },
         ticks: {
           stepSize: 5, // Show ticks at 0, 5, 10, 15
-          color: '#93a69a',
+          color: color('text-muted'),
           font: {
             size: 11,
           },
@@ -306,12 +307,12 @@ export class OverviewComponent {
         {
           data: data,
           label: 'Sähkön hinta',
-          borderColor: '#2ee06f',
-          backgroundColor: 'rgba(46, 224, 111, 0.2)',
-          pointBackgroundColor: '#2ee06f',
-          pointBorderColor: '#2ee06f',
-          pointHoverBackgroundColor: '#2ee06f',
-          pointHoverBorderColor: '#2ee06f',
+          borderColor: color('accent'),
+          backgroundColor: color('accent', 0.2),
+          pointBackgroundColor: color('accent'),
+          pointBorderColor: color('accent'),
+          pointHoverBackgroundColor: color('accent'),
+          pointHoverBorderColor: color('accent'),
           pointRadius: 0, // Hide points by default
           pointHoverRadius: 6, // Show point on hover
           pointHitRadius: 10, // Larger hit area for hover
