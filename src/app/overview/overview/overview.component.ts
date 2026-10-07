@@ -27,6 +27,7 @@ interface OverviewState {
   // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 2
   standalone: false,
   templateUrl: './overview.component.html',
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection -- state is set in subscriptions; rewritten in redesign step 2
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './overview.component.scss',
 })
