@@ -4,9 +4,7 @@
   }
 </div>
 <div class="axis" aria-hidden="true">
-  <span>00</span>
-  <span>06</span>
-  <span>12</span>
-  <span>18</span>
-  <span>24</span>
+  @for (label of axisLabels(); track $index) {
+    <span>{{ label }}</span>
+  }
 </div>
