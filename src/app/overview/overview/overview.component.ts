@@ -15,6 +15,7 @@ interface OverviewState {
 
 @Component({
   selector: 'app-overview',
+  // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 2
   standalone: false,
   templateUrl: './overview.component.html',
   styleUrl: './overview.component.scss'
@@ -165,7 +166,7 @@ export class OverviewComponent {
         displayColors: false,
         callbacks: {
           label: (context) => {
-            return `${context.parsed.y.toFixed(2)} c/kWh`;
+            return `${(context.parsed.y ?? 0).toFixed(2)} c/kWh`;
           }
         }
       }

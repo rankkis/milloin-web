@@ -8,12 +8,13 @@ Goal for the site is saving money by running high-consumption tasks during optim
 ## Technology Stack
 - **Angular**: 19.2.0
 - **Angular CLI**: 19.2.17
-- **Node.js**: 18.20.5
-- **Package Manager**: npm 10.8.2
+- **Node.js**: 22 (see `.nvmrc`)
+- **Package Manager**: npm
 - **TypeScript**: 5.7.2
 - **Styling**: SCSS
 - **Routing**: Enabled
 - **Testing**: Jasmine + Karma
+- **Linting**: ESLint (angular-eslint)
 
 ## Dependencies
 - **Core**: @angular/core, @angular/common, @angular/router
@@ -49,13 +50,16 @@ npm run watch       # Build and watch for changes
 ```bash
 npm test            # Run unit tests (same as ng test)
 ng test             # Run unit tests with Karma
-ng test --watch=false --browsers=ChromeHeadless  # Run tests once
+npm run test:ci      # Run tests once in headless Chrome (also works as root in containers)
 ```
 
 ### Code Quality
 ```bash
-ng lint             # Run linting (if ESLint is configured)
+npm run lint        # Run ESLint (same as ng lint)
 ```
+
+### CI
+`.github/workflows/ci.yml` runs lint, tests and build on every pull request.
 
 ### Deployment to milloin.xyz
 ```bash
@@ -134,8 +138,8 @@ src/
 ## Development Workflow
 1. Create feature branch from main
 2. Implement changes
-3. Run tests: `ng test`
-4. Run linting: `ng lint`
+3. Run tests: `npm run test:ci`
+4. Run linting: `npm run lint`
 5. Build: `ng build`
 6. Commit and push changes
 7. Create pull request

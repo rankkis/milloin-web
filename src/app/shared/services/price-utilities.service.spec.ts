@@ -22,7 +22,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.5,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 10
+        pricePoints: []
       };
 
       expect(service.isCurrentlyOptimalTime(timeSlot, now)).toBe(true);
@@ -35,7 +35,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.5,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 10
+        pricePoints: []
       };
 
       expect(service.isCurrentlyOptimalTime(timeSlot, now)).toBe(false);
@@ -48,7 +48,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.5,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 10
+        pricePoints: []
       };
 
       expect(service.isCurrentlyOptimalTime(timeSlot, now)).toBe(false);
@@ -61,7 +61,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.5,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 10
+        pricePoints: []
       };
 
       expect(service.isCurrentlyOptimalTime(timeSlot, now)).toBe(true);
@@ -74,7 +74,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.5,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 10
+        pricePoints: []
       };
 
       expect(service.isCurrentlyOptimalTime(timeSlot, now)).toBe(true);
@@ -87,7 +87,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.5,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 10
+        pricePoints: []
       };
 
       expect(service.isCurrentlyOptimalTime(timeSlot, now)).toBe(false);
@@ -100,7 +100,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '',
         priceAvg: 5.5,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 10
+        pricePoints: []
       };
 
       expect(service.isCurrentlyOptimalTime(timeSlot, now)).toBe(false);
@@ -141,7 +141,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 3.0,
         priceCategory: 'VERY_CHEAP',
-        estimatedTotalPrice: 5
+        pricePoints: []
       };
 
       expect(service.shouldRecommendNow(timeSlot, now)).toBe(true);
@@ -154,7 +154,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.0,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 8
+        pricePoints: []
       };
 
       expect(service.shouldRecommendNow(timeSlot, now)).toBe(true);
@@ -167,7 +167,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 7.0,
         priceCategory: 'NORMAL',
-        estimatedTotalPrice: 12
+        pricePoints: []
       };
 
       expect(service.shouldRecommendNow(timeSlot, now)).toBe(false);
@@ -180,7 +180,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 10.0,
         priceCategory: 'EXPENSIVE',
-        estimatedTotalPrice: 18
+        pricePoints: []
       };
 
       expect(service.shouldRecommendNow(timeSlot, now)).toBe(false);
@@ -193,7 +193,7 @@ describe('PriceUtilitiesService', () => {
         endTime: '2025-01-15T14:00:00Z',
         priceAvg: 5.0,
         priceCategory: 'CHEAP',
-        estimatedTotalPrice: 8
+        pricePoints: []
       };
 
       expect(service.shouldRecommendNow(timeSlot, now)).toBe(false);

@@ -10,8 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './back-button.component.scss'
 })
 export class BackButtonComponent {
-  @Input() testId: string = 'back-button';
-  @Input() ariaLabel: string = 'Go back to previous page';
+  @Input() testId = 'back-button';
+  @Input() ariaLabel = 'Go back to previous page';
 
   constructor(private location: Location) {}
 
