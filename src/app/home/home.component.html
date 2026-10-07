@@ -1,23 +1,88 @@
-<app-navigation>
-  <app-navigation-link
-    icon="bolt"
-    text="...sähkö on halpaa?"
-    [routerLink]="'/' + paths.OVERVIEW"
-    badgeIcon="power"
-    [attr.data-test-id]="'overview-card'"
-    />
-  <app-navigation-link
-    icon="local_laundry_service"
-    text="...kannattaa pestä pyykkiä?"
-    [routerLink]="'/' + paths.WASH_LAUNDRY"
-    badgeIcon="power"
-    [attr.data-test-id]="'wash-laundry-card'"
-    />
-  <app-navigation-link
-    icon="directions_car"
-    text="...kannattaa ladata auto?"
-    [routerLink]="'/' + paths.CHARGE_EV"
-    badgeIcon="power"
-    [attr.data-test-id]="'charge-ev-card'"
-    />
-</app-navigation>
+<div class="page">
+  <header class="header">
+    <h1 class="title">Milloin<span class="accent">…</span></h1>
+    <p class="clock">{{ date() }}</p>
+  </header>
+
+  <div class="price-and-chart">
+    <section class="now" aria-label="Sähkön hinta nyt">
+      <div class="now__label-row">
+        <h2 class="label">Sähkö nyt</h2>
+        @if (current(); as current) {
+          <span class="pill">{{ current.category }}</span>
+        }
+      </div>
+
+      @if (overview.error(); as error) {
+        <div class="error" role="alert">
+          <p>{{ errorMessage(error) }}</p>
+          <button type="button" class="retry" data-test-id="home-retry" (click)="reload()">
+            <app-icon name="refresh" [size]="18" />
+            Yritä uudelleen
+          </button>
+        </div>
+      } @else {
+        <p class="now__price" [attr.aria-busy]="overview.isLoading()">
+          <span class="now__value">{{ current()?.price ?? '–' }}</span>
+          <span class="now__unit">c/kWh</span>
+        </p>
+
+        @if (cheapestWindow(); as window) {
+          <div class="window">
+            <div class="window__text">
+              <p class="window__label">{{ window.label }}</p>
+              <p class="window__time">{{ window.time }}</p>
+            </div>
+            <p class="window__price">{{ window.price }} <span class="unit">c/kWh</span></p>
+          </div>
+        }
+      }
+    </section>
+
+    @if (overviewData(); as data) {
+      <section class="chart" aria-labelledby="chart-title">
+        <div class="chart__labels">
+          <h2 id="chart-title" class="label">Tänään tunneittain</h2>
+          <span class="label">c/kWh</span>
+        </div>
+        <app-hourly-chart [hours]="data.today ?? []" [now]="now()" [highlight]="data.cheapestWindow" />
+      </section>
+    }
+  </div>
+
+  <nav class="questions" aria-labelledby="questions-title">
+    <div class="questions__head">
+      <h2 id="questions-title" class="label questions__col-question">Milloin…</h2>
+      <span class="label questions__col-answer" aria-hidden="true">Vastaus</span>
+      <span class="label questions__col-detail" aria-hidden="true">Tarkemmin</span>
+      <span class="label questions__col-price" aria-hidden="true">Hinta</span>
+    </div>
+
+    <a class="question" [routerLink]="'/' + paths.WASH_LAUNDRY" data-test-id="home-wash-laundry">
+      <span class="question__text">
+        <app-icon class="question__icon" name="washer" />
+        …kannattaa pestä pyykkiä?
+      </span>
+      <ng-container *ngTemplateOutlet="answer; context: { $implicit: laundryAnswer(), loading: laundry.isLoading() }" />
+    </a>
+
+    <a class="question" [routerLink]="'/' + paths.CHARGE_EV" data-test-id="home-charge-ev">
+      <span class="question__text">
+        <app-icon class="question__icon" name="car" />
+        …kannattaa ladata auto?
+      </span>
+      <ng-container *ngTemplateOutlet="answer; context: { $implicit: evAnswer(), loading: ev.isLoading() }" />
+    </a>
+  </nav>
+
+  <footer class="footer">© 2025 hurlumhei Oy</footer>
+</div>
+
+<ng-template #answer let-answer let-loading="loading">
+  <span class="question__answer" [class.accent]="answer?.highlight">{{ answer?.value ?? (loading ? '…' : '–') }}</span>
+  @if (answer) {
+    <span class="question__short">{{ answer.short }} · {{ answer.price }}</span>
+    <span class="question__detail">{{ answer.detail }}</span>
+    <span class="question__price">{{ answer.price }}</span>
+  }
+</ng-template>

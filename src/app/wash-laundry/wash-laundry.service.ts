@@ -3,15 +3,17 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError, timer } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto } from '../shared/models/price.model';
+import { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto, StartDelayDto } from '../shared/models/price.model';
 
-export type { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto };
+export type { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto, StartDelayDto };
 
 export interface WashLaundryOptimalScheduleDto {
   now?: OptimalTimeDto;
   today?: OptimalTimeDto;
   tonight?: OptimalTimeDto;
   tomorrow?: OptimalTimeDto;
+  /** Cost of starting now or after a 1-5 hour timer delay */
+  startDelays?: StartDelayDto[];
   defaults: OptimalScheduleDefaultsDto;
 }
 

@@ -20,3 +20,21 @@ export interface OptimalScheduleDefaultsDto {
   powerConsumptionKwh: number;
   periodHours: number;
 }
+
+/** Average price of one hour on today's chart */
+export interface HourlyPriceDto {
+  startTime: string;
+  endTime: string;
+  priceAvg: number;
+  priceCategory: PriceCategory;
+}
+
+/** Cost of starting a program now or after a timer delay */
+export interface StartDelayDto {
+  delayHours: number;
+  startTime: string;
+  endTime: string;
+  priceAvg: number;
+  costCents: number;
+  isBest: boolean;
+}

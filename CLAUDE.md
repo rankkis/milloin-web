@@ -99,30 +99,30 @@ ng generate pipe <name>          # Generate pipe
 ```
 src/
 ├── app/                           # Application source code
-│   ├── core/                     # Core shared module
-│   │   ├── navigation/           # Generic navigation/grid component
-│   │   │   ├── navigation-link/  # Generic navigation link component
-│   │   │   └── navigation.component.* # Navigation layout component
-│   │   └── core.module.ts        # Core module for shared components
-│   ├── app.component.*           # Root application component
-│   ├── app.config.ts            # Application configuration
-│   └── app.routes.ts            # Application routing
-├── assets/                       # Static assets
+│   ├── home/                     # Home: current price, today's chart, questions
+│   ├── wash-laundry/             # When to wash laundry
+│   ├── charge-ev/                # When to charge the EV
+│   ├── shared/
+│   │   ├── format/               # Finnish number, clock and duration formatting
+│   │   ├── hourly-chart/         # Today's hourly price bars
+│   │   ├── icon/                 # Inline SVG icons
+│   │   ├── models/               # API DTOs
+│   │   ├── services/             # API services
+│   │   └── theme/                # Colors for TypeScript
+│   ├── app.component.*           # Root component (router outlet)
+│   ├── app.config.ts             # Application configuration
+│   ├── app.paths.ts              # Route paths
+│   └── app.routes.ts             # Application routing
 ├── environments/                 # Environment configurations
-└── styles.scss                 # Global styles
+├── styles/_colors.scss           # The only place colors are defined
+└── styles.scss                   # Global styles and design tokens
 ```
 
 ## Features
 
-### Core Components
-- `NavigationComponent`: Generic standalone component with content projection for 3-column responsive grid layout
-- `NavigationLinkComponent`: Reusable navigation link component with icon and text inputs, featuring Spotify-themed styling
-- `CoreModule`: Shared module for reusable components and utilities
-
-### Application Features
-- **Interactive Navigation Links**: Displays user-friendly navigation link cards for asking Claude AI questions
-- **Responsive Grid Layout**: 3-column grid that adapts to screen sizes (3→2→1 columns)
-- **Spotify-Inspired Design**: Dark theme with Spotify green accents and modern typography
+- **Home**: current price and its category, the cheapest 2-hour window, today's hourly prices as bars (past hours dimmed, current hour highlighted, cheapest window in accent), and one row per question with its answer. Data loads on open and again when the tab returns after 15 minutes.
+- **Question pages**: laundry (start delay) and EV charging (clock-time window).
+- Clock times are shown in Finnish time (`shared/format/format.ts`).
 
 ### UI Framework
 - **Angular Material 22**: Complete Material Design component library
