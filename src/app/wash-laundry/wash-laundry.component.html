@@ -1,219 +1,651 @@
 <div appCard>
-  <div appCardHeader
-       title="on paras hetki pestä pyykkiä?"
-       subtitle="Saa AI-avusteiset suositukset sähkön hinnan ja aikataulun perusteella"
-       [showBackButton]="true"
-       backButtonTestId="wash-laundry-back-button"
-       [showRefreshButton]="true"
-       refreshButtonTestId="refresh-schedule-button"
-       (refreshClicked)="getOptimalSchedule()">
-  </div>
+  <div
+    appCardHeader
+    title="on paras hetki pestä pyykkiä?"
+    subtitle="Saa AI-avusteiset suositukset sähkön hinnan ja aikataulun perusteella"
+    [showBackButton]="true"
+    backButtonTestId="wash-laundry-back-button"
+    [showRefreshButton]="true"
+    refreshButtonTestId="refresh-schedule-button"
+    (refreshClicked)="getOptimalSchedule()"
+  ></div>
   <div appCardContent>
-    <div class="wash-laundry-content" *ngIf="optimalSchedule$ | async as state">
-
-      <!-- Loading State -->
-      <div *ngIf="state.loading" class="loading-container">
-        <p>Ladataan optimaalisia pesuaikoja...</p>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="state.error && !state.loading" appCardContentHighlighted class="error-container">
-        <p><strong>Virhe:</strong> {{ state.error }}</p>
-
-        <div class="error-actions">
-          <button
-            type="button"
-            class="retry-button"
-            data-test-id="retry-schedule-button"
-            (click)="getOptimalSchedule()">
-            Yritä uudelleen
-          </button>
-        </div>
-      </div>
-
-      <!-- Success State with Schedule Data -->
-      <div *ngIf="state.data && !state.loading && !state.error" class="schedule-container">
-
-        <!-- Primary Recommendation: Today's Best Time (Highlighted) -->
-        <div *ngIf="state.data.today" class="primary-recommendation" appCardContentHighlighted>
-
-          <!-- Special message when currently in optimal time AND price is actually good -->
-          <div *ngIf="shouldRecommendNow(state.data.today)">
-            <h3>🎉 NYT on täydellinen aika pestä pyykkiä! 🧺✨</h3>
-            <div class="current-optimal-time">
-              <p class="now-message">⏰ Olet nyt optimaalisessa aikaikkunassa!</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ getPriceEmoji(state.data.today.priceCategory) }} {{ state.data.today.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.priceCategory) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ state.data.today.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
-              <p class="action-message">👍 Käynnistä pesukone nyt saadaksesi parhaan hinnan!</p>
+    @if (optimalSchedule$ | async; as state) {
+      <div class="wash-laundry-content">
+        <!-- Loading State -->
+        @if (state.loading) {
+          <div class="loading-container">
+            <p>Ladataan optimaalisia pesuaikoja...</p>
+          </div>
+        }
+        <!-- Error State -->
+        @if (state.error && !state.loading) {
+          <div appCardContentHighlighted class="error-container">
+            <p><strong>Virhe:</strong> {{ state.error }}</p>
+            <div class="error-actions">
+              <button
+                type="button"
+                class="retry-button"
+                data-test-id="retry-schedule-button"
+                (click)="getOptimalSchedule()"
+              >
+                Yritä uudelleen
+              </button>
             </div>
           </div>
-
-          <!-- Message when currently in optimal time but price is not that good -->
-          <div *ngIf="isCurrentlyOptimalTime(state.data.today) && !shouldRecommendNow(state.data.today)">
-            <h3 class="{{ getPriceCssClass(state.data.today.priceCategory) }}">⚠️ Olet optimaalisessa aikaikkunassa. Hinta ei kuitenkaan ole erityisen halpa vaan lähinnä ~{{ getPriceCategoryText(state.data.today.priceCategory) }}</h3>
-            <div class="current-optimal-time">
-              <p class="now-message">⏰ Tämä on paras saatavilla oleva aika, mutta sähkö on kalliimpaa</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ getPriceEmoji(state.data.today.priceCategory) }} {{ state.data.today.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.priceCategory) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ state.data.today.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
-              <p class="action-message">🤔 Harkitse odottamaan halvempaa aikaa, jos mahdollista</p>
-            </div>
+        }
+        <!-- Success State with Schedule Data -->
+        @if (state.data && !state.loading && !state.error) {
+          <div class="schedule-container">
+            <!-- Primary Recommendation: Today's Best Time (Highlighted) -->
+            @if (state.data.today) {
+              <div class="primary-recommendation" appCardContentHighlighted>
+                <!-- Special message when currently in optimal time AND price is actually good -->
+                @if (shouldRecommendNow(state.data.today)) {
+                  <div>
+                    <h3>🎉 NYT on täydellinen aika pestä pyykkiä! 🧺✨</h3>
+                    <div class="current-optimal-time">
+                      <p class="now-message">
+                        ⏰ Olet nyt optimaalisessa aikaikkunassa!
+                      </p>
+                      <p class="price-info">
+                        Spot-hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.today.priceCategory)
+                          }}"
+                          >{{ getPriceEmoji(state.data.today.priceCategory) }}
+                          {{
+                            state.data.today.priceAvg | number: "1.2-2"
+                          }}
+                          c/kWh</strong
+                        >
+                        ({{
+                          getPriceCategoryText(state.data.today.priceCategory)
+                        }})
+                      </p>
+                      <p class="cost-info">
+                        Pesun hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.today.priceCategory)
+                          }}"
+                          >{{
+                            state.data.today.estimatedTotalPriceCents
+                              | number: "1.2-2"
+                          }}
+                          senttiä</strong
+                        >
+                      </p>
+                      <p class="action-message">
+                        👍 Käynnistä pesukone nyt saadaksesi parhaan hinnan!
+                      </p>
+                    </div>
+                  </div>
+                }
+                <!-- Message when currently in optimal time but price is not that good -->
+                @if (
+                  isCurrentlyOptimalTime(state.data.today) &&
+                  !shouldRecommendNow(state.data.today)
+                ) {
+                  <div>
+                    <h3
+                      class="{{
+                        getPriceCssClass(state.data.today.priceCategory)
+                      }}"
+                    >
+                      ⚠️ Olet optimaalisessa aikaikkunassa. Hinta ei kuitenkaan
+                      ole erityisen halpa vaan lähinnä ~{{
+                        getPriceCategoryText(state.data.today.priceCategory)
+                      }}
+                    </h3>
+                    <div class="current-optimal-time">
+                      <p class="now-message">
+                        ⏰ Tämä on paras saatavilla oleva aika, mutta sähkö on
+                        kalliimpaa
+                      </p>
+                      <p class="price-info">
+                        Spot-hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.today.priceCategory)
+                          }}"
+                          >{{ getPriceEmoji(state.data.today.priceCategory) }}
+                          {{
+                            state.data.today.priceAvg | number: "1.2-2"
+                          }}
+                          c/kWh</strong
+                        >
+                        ({{
+                          getPriceCategoryText(state.data.today.priceCategory)
+                        }})
+                      </p>
+                      <p class="cost-info">
+                        Pesun hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.today.priceCategory)
+                          }}"
+                          >{{
+                            state.data.today.estimatedTotalPriceCents
+                              | number: "1.2-2"
+                          }}
+                          senttiä</strong
+                        >
+                      </p>
+                      <p class="action-message">
+                        🤔 Harkitse odottamaan halvempaa aikaa, jos mahdollista
+                      </p>
+                    </div>
+                  </div>
+                }
+                <!-- Normal message when optimal time is not now -->
+                @if (!isCurrentlyOptimalTime(state.data.today)) {
+                  <div>
+                    <h3>🟢 Paras aika pestä pyykkiä on tänään</h3>
+                    <div class="primary-time">
+                      <p class="time-display">
+                        {{ state.data.today.startTime | date: "HH:mm" }} -
+                        {{ state.data.today.endTime | date: "HH:mm" }}
+                      </p>
+                      <p class="price-info">
+                        Spot-hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.today.priceCategory)
+                          }}"
+                          >{{ getPriceEmoji(state.data.today.priceCategory) }}
+                          {{
+                            state.data.today.priceAvg | number: "1.2-2"
+                          }}
+                          c/kWh</strong
+                        >
+                        ({{
+                          getPriceCategoryText(state.data.today.priceCategory)
+                        }})
+                      </p>
+                      <p class="cost-info">
+                        Pesun hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.today.priceCategory)
+                          }}"
+                          >{{
+                            state.data.today.estimatedTotalPriceCents
+                              | number: "1.2-2"
+                          }}
+                          senttiä</strong
+                        >
+                      </p>
+                      @if (state.data.today.potentialSavingsCents > 0) {
+                        <p class="savings-info">
+                          <strong>💰 Säästö vs. nyt: </strong>
+                          <strong class="price-cheap"
+                            >{{
+                              state.data.today.potentialSavingsCents
+                                | number: "1.2-2"
+                            }}
+                            senttiä</strong
+                          >
+                          (<strong
+                            >{{
+                              state.data.today.potentialSavingsPercentage
+                                | number: "1.1-1"
+                            }}%</strong
+                          >)
+                        </p>
+                      }
+                      @if (
+                        state.data.today.priceCategory === "VERY_CHEAP" ||
+                        state.data.today.priceCategory === "CHEAP"
+                      ) {
+                        <p class="optimal-info">
+                          <strong>💡 Erinomainen aika: </strong> Sähkö on
+                          {{
+                            getPriceCategoryText(state.data.today.priceCategory)
+                          }}
+                        </p>
+                      }
+                      @if (state.data.today.priceCategory === "NORMAL") {
+                        <p class="optimal-info">
+                          <strong>💡 Normaali aika: </strong> Sähkö on
+                          {{
+                            getPriceCategoryText(state.data.today.priceCategory)
+                          }}
+                        </p>
+                      }
+                      @if (
+                        state.data.today.priceCategory === "EXPENSIVE" ||
+                        state.data.today.priceCategory === "VERY_EXPENSIVE"
+                      ) {
+                        <p class="optimal-info">
+                          <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on
+                          {{
+                            getPriceCategoryText(
+                              state.data.today.priceCategory
+                            )
+                          }}, harkitse odottamista
+                        </p>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+            <!-- Fallback: No Today Available - Highlight Best Available -->
+            @if (
+              !state.data.today && (state.data.tonight || state.data.tomorrow)
+            ) {
+              <div class="primary-recommendation" appCardContentHighlighted>
+                <h3>🟢 Paras saatavilla oleva aika</h3>
+                <!-- Show tonight if available, otherwise tomorrow -->
+                @if (state.data.tonight) {
+                  <div class="primary-time">
+                    <p class="period-label">Tänä yönä</p>
+                    <p class="time-display">
+                      {{ state.data.tonight.startTime | date: "HH:mm" }} -
+                      {{ state.data.tonight.endTime | date: "HH:mm" }}
+                    </p>
+                    <p class="price-info">
+                      Spot-hinta:
+                      <strong
+                        class="{{
+                          getPriceCssClass(state.data.tonight.priceCategory)
+                        }}"
+                        >{{ getPriceEmoji(state.data.tonight.priceCategory) }}
+                        {{
+                          state.data.tonight.priceAvg | number: "1.2-2"
+                        }}
+                        c/kWh</strong
+                      >
+                      ({{
+                        getPriceCategoryText(state.data.tonight.priceCategory)
+                      }})
+                    </p>
+                    <p class="cost-info">
+                      Pesun hinta:
+                      <strong
+                        class="{{
+                          getPriceCssClass(state.data.tonight.priceCategory)
+                        }}"
+                        >{{
+                          state.data.tonight.estimatedTotalPriceCents
+                            | number: "1.2-2"
+                        }}
+                        senttiä</strong
+                      >
+                    </p>
+                    @if (
+                      state.data.tonight.priceCategory === "VERY_CHEAP" ||
+                      state.data.tonight.priceCategory === "CHEAP"
+                    ) {
+                      <p class="optimal-info">
+                        <strong>💡 Erinomainen aika: </strong> Sähkö on
+                        {{
+                          getPriceCategoryText(state.data.tonight.priceCategory)
+                        }}
+                      </p>
+                    }
+                    @if (state.data.tonight.priceCategory === "NORMAL") {
+                      <p class="optimal-info">
+                        <strong>💡 Normaali aika: </strong> Sähkö on
+                        {{
+                          getPriceCategoryText(state.data.tonight.priceCategory)
+                        }}
+                      </p>
+                    }
+                    @if (
+                      state.data.tonight.priceCategory === "EXPENSIVE" ||
+                      state.data.tonight.priceCategory === "VERY_EXPENSIVE"
+                    ) {
+                      <p class="optimal-info">
+                        <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on
+                        {{
+                          getPriceCategoryText(
+                            state.data.tonight.priceCategory
+                          )
+                        }}, harkitse odottamista
+                      </p>
+                    }
+                  </div>
+                } @else {
+                  @if (state.data.tomorrow) {
+                    <div class="primary-time">
+                      <p class="period-label">Huomenna</p>
+                      <p class="time-display">
+                        {{ state.data.tomorrow.startTime | date: "HH:mm" }} -
+                        {{ state.data.tomorrow.endTime | date: "HH:mm" }}
+                      </p>
+                      <p class="price-info">
+                        Spot-hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.tomorrow.priceCategory)
+                          }}"
+                          >{{
+                            getPriceEmoji(state.data.tomorrow.priceCategory)
+                          }}
+                          {{
+                            state.data.tomorrow.priceAvg | number: "1.2-2"
+                          }}
+                          c/kWh</strong
+                        >
+                        ({{
+                          getPriceCategoryText(
+                            state.data.tomorrow.priceCategory
+                          )
+                        }})
+                      </p>
+                      <p class="cost-info">
+                        Pesun hinta:
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.tomorrow.priceCategory)
+                          }}"
+                          >{{
+                            state.data.tomorrow.estimatedTotalPriceCents
+                              | number: "1.2-2"
+                          }}
+                          senttiä</strong
+                        >
+                      </p>
+                      @if (
+                        state.data.tomorrow.priceCategory === "VERY_CHEAP" ||
+                        state.data.tomorrow.priceCategory === "CHEAP"
+                      ) {
+                        <p class="optimal-info">
+                          <strong>💡 Erinomainen aika: </strong> Sähkö on
+                          {{
+                            getPriceCategoryText(
+                              state.data.tomorrow.priceCategory
+                            )
+                          }}
+                        </p>
+                      }
+                      @if (state.data.tomorrow.priceCategory === "NORMAL") {
+                        <p class="optimal-info">
+                          <strong>💡 Normaali aika: </strong> Sähkö on
+                          {{
+                            getPriceCategoryText(
+                              state.data.tomorrow.priceCategory
+                            )
+                          }}
+                        </p>
+                      }
+                      @if (
+                        state.data.tomorrow.priceCategory === "EXPENSIVE" ||
+                        state.data.tomorrow.priceCategory === "VERY_EXPENSIVE"
+                      ) {
+                        <p class="optimal-info">
+                          <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on
+                          {{
+                            getPriceCategoryText(
+                              state.data.tomorrow.priceCategory
+                            )
+                          }}, harkitse odottamista
+                        </p>
+                      }
+                    </div>
+                  }
+                }
+              </div>
+            }
+            <!-- Alternative Options: Tonight/Tomorrow (Regular styling) - Only show alternatives that are NOT already the primary recommendation -->
+            @if (
+              (state.data.tonight && state.data.today) ||
+              (state.data.tomorrow &&
+                (state.data.today || (!state.data.today && state.data.tonight)))
+            ) {
+              <div class="alternatives-section">
+                <h4>Vaihtoehtoiset ajat</h4>
+                <!-- Tonight's Alternative - Only show if today exists (so tonight isn't the primary) -->
+                @if (state.data.tonight && state.data.today) {
+                  <div class="time-slot alternative">
+                    <h5>
+                      ... jos pyykin pesu yöllä kiinnostaa niin se voisi
+                      kannattaa
+                    </h5>
+                    <div class="alternative-details">
+                      <p>
+                        <strong>Aika: </strong
+                        ><strong
+                          class="{{
+                            getPriceCssClass(state.data.tonight.priceCategory)
+                          }}"
+                          >{{ state.data.tonight.startTime | date: "HH:mm" }} -
+                          {{
+                            state.data.tonight.endTime | date: "HH:mm"
+                          }}</strong
+                        >
+                      </p>
+                      <p>
+                        <strong>Spot-hinta: </strong>
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.tonight.priceCategory)
+                          }}"
+                          >{{ getPriceEmoji(state.data.tonight.priceCategory) }}
+                          {{
+                            state.data.tonight.priceAvg | number: "1.2-2"
+                          }}
+                          c/kWh</strong
+                        >
+                        ({{
+                          getPriceCategoryText(
+                            state.data.tonight.priceCategory
+                          )
+                        }})
+                      </p>
+                      <p>
+                        <strong>Pesun hinta: </strong>
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.tonight.priceCategory)
+                          }}"
+                          >{{
+                            state.data.tonight.estimatedTotalPriceCents
+                              | number: "1.2-2"
+                          }}
+                          senttiä</strong
+                        >
+                      </p>
+                      @if (state.data.tonight.potentialSavingsCents > 0) {
+                        <p class="savings-comparison">
+                          <strong>💰 Säästö vs. nyt: </strong>
+                          <strong class="price-cheap"
+                            >{{
+                              state.data.tonight.potentialSavingsCents
+                                | number: "1.2-2"
+                            }}
+                            senttiä</strong
+                          >
+                          (<strong
+                            >{{
+                              state.data.tonight.potentialSavingsPercentage
+                                | number: "1.1-1"
+                            }}%</strong
+                          >)
+                        </p>
+                      }
+                      <p class="optimal-info">
+                        <strong>💡</strong> Vaihtoehtoinen
+                        {{
+                          getPriceCategoryText(state.data.tonight.priceCategory)
+                        }}
+                        aika
+                      </p>
+                    </div>
+                  </div>
+                }
+                <!-- Tomorrow's Alternative - Only show if it's not the primary recommendation -->
+                @if (
+                  state.data.tomorrow &&
+                  (state.data.today ||
+                    (!state.data.today && state.data.tonight))
+                ) {
+                  <div class="time-slot alternative">
+                    <h5>
+                      ... jos huomiseen voit säästää, niin se voisi kannattaa
+                    </h5>
+                    <div class="alternative-details">
+                      <p>
+                        <strong>Aika: </strong
+                        ><strong
+                          class="{{
+                            getPriceCssClass(state.data.tomorrow.priceCategory)
+                          }}"
+                          >{{ state.data.tomorrow.startTime | date: "HH:mm" }} -
+                          {{
+                            state.data.tomorrow.endTime | date: "HH:mm"
+                          }}</strong
+                        >
+                      </p>
+                      <p>
+                        <strong>Spot-hinta: </strong>
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.tomorrow.priceCategory)
+                          }}"
+                          >{{
+                            getPriceEmoji(state.data.tomorrow.priceCategory)
+                          }}
+                          {{
+                            state.data.tomorrow.priceAvg | number: "1.2-2"
+                          }}
+                          c/kWh</strong
+                        >
+                        ({{
+                          getPriceCategoryText(
+                            state.data.tomorrow.priceCategory
+                          )
+                        }})
+                      </p>
+                      <p>
+                        <strong>Pesun hinta: </strong>
+                        <strong
+                          class="{{
+                            getPriceCssClass(state.data.tomorrow.priceCategory)
+                          }}"
+                          >{{
+                            state.data.tomorrow.estimatedTotalPriceCents
+                              | number: "1.2-2"
+                          }}
+                          senttiä</strong
+                        >
+                      </p>
+                      @if (state.data.tomorrow.potentialSavingsCents > 0) {
+                        <p class="savings-comparison">
+                          <strong>💰 Säästö vs. nyt: </strong>
+                          <strong class="price-cheap"
+                            >{{
+                              state.data.tomorrow.potentialSavingsCents
+                                | number: "1.2-2"
+                            }}
+                            senttiä</strong
+                          >
+                          (<strong
+                            >{{
+                              state.data.tomorrow.potentialSavingsPercentage
+                                | number: "1.1-1"
+                            }}%</strong
+                          >)
+                        </p>
+                      }
+                      <p class="optimal-info">
+                        <strong>💡</strong> Vaihtoehtoinen
+                        {{
+                          getPriceCategoryText(
+                            state.data.tomorrow.priceCategory
+                          )
+                        }}
+                        aika
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+            <!-- No recommendations message -->
+            @if (
+              !state.data.today && !state.data.tonight && !state.data.tomorrow
+            ) {
+              <div appCardContentHighlighted>
+                <p><strong>Optimaalisia aikoja ei ole saatavilla</strong></p>
+                <p>
+                  Kaikissa saatavilla olevissa aikaväleissä on samankaltainen
+                  hinnoittelu. Voit ajaa pesukoneen milloin vain sopii.
+                </p>
+              </div>
+            }
           </div>
-
-          <!-- Normal message when optimal time is not now -->
-          <div *ngIf="!isCurrentlyOptimalTime(state.data.today)">
-            <h3>🟢 Paras aika pestä pyykkiä on tänään</h3>
-            <div class="primary-time">
-              <p class="time-display">{{ state.data.today.startTime | date:'HH:mm' }} - {{ state.data.today.endTime | date:'HH:mm' }}</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ getPriceEmoji(state.data.today.priceCategory) }} {{ state.data.today.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.today.priceCategory) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.today.priceCategory) }}">{{ state.data.today.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
-              <p class="savings-info" *ngIf="state.data.today.potentialSavingsCents > 0">
-                <strong>💰 Säästö vs. nyt: </strong> <strong class="price-cheap">{{ state.data.today.potentialSavingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.today.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
-              </p>
-              <p class="optimal-info" *ngIf="state.data.today.priceCategory === 'VERY_CHEAP' || state.data.today.priceCategory === 'CHEAP'">
-                <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.today.priceCategory) }}
-              </p>
-              <p class="optimal-info" *ngIf="state.data.today.priceCategory === 'NORMAL'">
-                <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.today.priceCategory) }}
-              </p>
-              <p class="optimal-info" *ngIf="state.data.today.priceCategory === 'EXPENSIVE' || state.data.today.priceCategory === 'VERY_EXPENSIVE'">
-                <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.today.priceCategory) }}, harkitse odottamista
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Fallback: No Today Available - Highlight Best Available -->
-        <div *ngIf="!state.data.today && (state.data.tonight || state.data.tomorrow)" class="primary-recommendation" appCardContentHighlighted>
-          <h3>🟢 Paras saatavilla oleva aika</h3>
-
-          <!-- Show tonight if available, otherwise tomorrow -->
-          <div *ngIf="state.data.tonight; else tomorrowFallback" class="primary-time">
-            <p class="period-label">Tänä yönä</p>
-            <p class="time-display">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</p>
-            <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ getPriceEmoji(state.data.tonight.priceCategory) }} {{ state.data.tonight.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.priceCategory) }})</p>
-            <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
-            <p class="optimal-info" *ngIf="state.data.tonight.priceCategory === 'VERY_CHEAP' || state.data.tonight.priceCategory === 'CHEAP'">
-              <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.priceCategory) }}
+        }
+        <!-- Initial State - Show Get Schedule Button -->
+        @if (!state.loading && !state.data && !state.error) {
+          <div class="initial-state">
+            <p>
+              Napsauta alla olevaa painiketta saadaksesi AI-avusteiset
+              suositukset optimaaliselle pyykinpesuajalle perustuen:
             </p>
-            <p class="optimal-info" *ngIf="state.data.tonight.priceCategory === 'NORMAL'">
-              <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.priceCategory) }}
-            </p>
-            <p class="optimal-info" *ngIf="state.data.tonight.priceCategory === 'EXPENSIVE' || state.data.tonight.priceCategory === 'VERY_EXPENSIVE'">
-              <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.tonight.priceCategory) }}, harkitse odottamista
-            </p>
-          </div>
-
-          <ng-template #tomorrowFallback>
-            <div *ngIf="state.data.tomorrow" class="primary-time">
-              <p class="period-label">Huomenna</p>
-              <p class="time-display">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</p>
-              <p class="price-info">Spot-hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ getPriceEmoji(state.data.tomorrow.priceCategory) }} {{ state.data.tomorrow.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.priceCategory) }})</p>
-              <p class="cost-info">Pesun hinta: <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
-              <p class="optimal-info" *ngIf="state.data.tomorrow.priceCategory === 'VERY_CHEAP' || state.data.tomorrow.priceCategory === 'CHEAP'">
-                <strong>💡 Erinomainen aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }}
-              </p>
-              <p class="optimal-info" *ngIf="state.data.tomorrow.priceCategory === 'NORMAL'">
-                <strong>💡 Normaali aika: </strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }}
-              </p>
-              <p class="optimal-info" *ngIf="state.data.tomorrow.priceCategory === 'EXPENSIVE' || state.data.tomorrow.priceCategory === 'VERY_EXPENSIVE'">
-                <strong>⚠️ Paras saatavilla oleva:</strong> Sähkö on {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }}, harkitse odottamista
-              </p>
-            </div>
-          </ng-template>
-        </div>
-
-        <!-- Alternative Options: Tonight/Tomorrow (Regular styling) - Only show alternatives that are NOT already the primary recommendation -->
-        <div *ngIf="(state.data.tonight && state.data.today) || (state.data.tomorrow && (state.data.today || (!state.data.today && state.data.tonight)))" class="alternatives-section">
-          <h4>Vaihtoehtoiset ajat</h4>
-
-          <!-- Tonight's Alternative - Only show if today exists (so tonight isn't the primary) -->
-          <div *ngIf="state.data.tonight && state.data.today" class="time-slot alternative">
-            <h5>... jos pyykin pesu yöllä kiinnostaa niin se voisi kannattaa</h5>
-            <div class="alternative-details">
-              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.startTime | date:'HH:mm' }} - {{ state.data.tonight.endTime | date:'HH:mm' }}</strong></p>
-              <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ getPriceEmoji(state.data.tonight.priceCategory) }} {{ state.data.tonight.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tonight.priceCategory) }})</p>
-              <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tonight.priceCategory) }}">{{ state.data.tonight.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
-              <p class="savings-comparison" *ngIf="state.data.tonight.potentialSavingsCents > 0">
-                <strong>💰 Säästö vs. nyt: </strong> <strong class="price-cheap">{{ state.data.tonight.potentialSavingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.tonight.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
-              </p>
-              <p class="optimal-info">
-                <strong>💡</strong> Vaihtoehtoinen {{ getPriceCategoryText(state.data.tonight.priceCategory) }} aika
-              </p>
-            </div>
-          </div>
-
-          <!-- Tomorrow's Alternative - Only show if it's not the primary recommendation -->
-          <div *ngIf="state.data.tomorrow && (state.data.today || (!state.data.today && state.data.tonight))" class="time-slot alternative">
-            <h5>... jos huomiseen voit säästää, niin se voisi kannattaa</h5>
-            <div class="alternative-details">
-              <p><strong>Aika: </strong><strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.startTime | date:'HH:mm' }} - {{ state.data.tomorrow.endTime | date:'HH:mm' }}</strong></p>
-              <p><strong>Spot-hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ getPriceEmoji(state.data.tomorrow.priceCategory) }} {{ state.data.tomorrow.priceAvg | number:'1.2-2' }} c/kWh</strong> ({{ getPriceCategoryText(state.data.tomorrow.priceCategory) }})</p>
-              <p><strong>Pesun hinta: </strong> <strong class="{{ getPriceCssClass(state.data.tomorrow.priceCategory) }}">{{ state.data.tomorrow.estimatedTotalPriceCents | number:'1.2-2' }} senttiä</strong></p>
-              <p class="savings-comparison" *ngIf="state.data.tomorrow.potentialSavingsCents > 0">
-                <strong>💰 Säästö vs. nyt: </strong> <strong class="price-cheap">{{ state.data.tomorrow.potentialSavingsCents | number:'1.2-2' }} senttiä</strong> (<strong>{{ state.data.tomorrow.potentialSavingsPercentage | number:'1.1-1' }}%</strong>)
-              </p>
-              <p class="optimal-info">
-                <strong>💡</strong> Vaihtoehtoinen {{ getPriceCategoryText(state.data.tomorrow.priceCategory) }} aika
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- No recommendations message -->
-        <div *ngIf="!state.data.today && !state.data.tonight && !state.data.tomorrow" appCardContentHighlighted>
-          <p><strong>Optimaalisia aikoja ei ole saatavilla</strong></p>
-          <p>Kaikissa saatavilla olevissa aikaväleissä on samankaltainen hinnoittelu. Voit ajaa pesukoneen milloin vain sopii.</p>
-        </div>
-      </div>
-
-      <!-- Initial State - Show Get Schedule Button -->
-      <div *ngIf="!state.loading && !state.data && !state.error" class="initial-state">
-        <p>Napsauta alla olevaa painiketta saadaksesi AI-avusteiset suositukset optimaaliselle pyykinpesuajalle perustuen:</p>
-        <ul>
-          <li>Suomen nykyiset sähkön spot-hinnat</li>
-          <li>2 tunnin pesujakson kesto</li>
-          <li>1,5 kWh energiankulutus</li>
-          <li>Kustannusoptimointianalyysi ja säästölaskurit</li>
-        </ul>
-
-        <button
-          type="button"
-          class="get-schedule-button"
-          data-test-id="get-schedule-button"
-          (click)="getOptimalSchedule()">
-          Hae parhaat pesuajat
-        </button>
-      </div>
-
-
-      <!-- Tips Section -->
-      <div class="tips-section">
-        <div class="tips-content">
-
-          <div class="tip-category">
-            <h4>🔍 MIKSI PIDEMPI OHJELMA EI KULUTA ENEMMÄN:</h4>
-            <ul class="tip-list">
-              <li><strong>Lämmitys syö sähköä</strong> - ei aika! Suurin kulutus tulee veden lämmittämisestä</li>
-              <li><strong>ECO-ohjelmat (2-3h)</strong> käyttävät matalampaa lämpötilaa = säästävät energiaa</li>
-              <li><strong>Pumput ja rumpu</strong> kuluttavat vähän (&lt;10% kokonaiskulutuksesta)</li>
-              <li><strong>Pidempi pesu</strong> = parempi pesutulos matalammassa lämpötilassa</li>
+            <ul>
+              <li>Suomen nykyiset sähkön spot-hinnat</li>
+              <li>2 tunnin pesujakson kesto</li>
+              <li>1,5 kWh energiankulutus</li>
+              <li>Kustannusoptimointianalyysi ja säästölaskurit</li>
             </ul>
+            <button
+              type="button"
+              class="get-schedule-button"
+              data-test-id="get-schedule-button"
+              (click)="getOptimalSchedule()"
+            >
+              Hae parhaat pesuajat
+            </button>
           </div>
-
-          <div class="tip-category">
-            <h4>💡 ENERGIANSÄÄSTÖVINKIT:</h4>
-            <ul class="tip-list savings-tips">
-              <li>✅ <strong>Valitse 30-40°C</strong> riittää useimmiten (säästää 50% energiasta)</li>
-              <li>✅ <strong>Käytä ECO-ohjelmia</strong> huolimatta pituudesta</li>
-              <li>✅ <strong>Täytä kone täyteen</strong> mutta älä ahtaa</li>
-              <li>✅ <strong>Ohita esipesu</strong> jos mahdollista</li>
-              <li>✅ <strong>Uudet nestepesuaineet</strong> toimivat kylmässäkin</li>
-            </ul>
+        }
+        <!-- Tips Section -->
+        <div class="tips-section">
+          <div class="tips-content">
+            <div class="tip-category">
+              <h4>🔍 MIKSI PIDEMPI OHJELMA EI KULUTA ENEMMÄN:</h4>
+              <ul class="tip-list">
+                <li>
+                  <strong>Lämmitys syö sähköä</strong> - ei aika! Suurin kulutus
+                  tulee veden lämmittämisestä
+                </li>
+                <li>
+                  <strong>ECO-ohjelmat (2-3h)</strong> käyttävät matalampaa
+                  lämpötilaa = säästävät energiaa
+                </li>
+                <li>
+                  <strong>Pumput ja rumpu</strong> kuluttavat vähän (&lt;10%
+                  kokonaiskulutuksesta)
+                </li>
+                <li>
+                  <strong>Pidempi pesu</strong> = parempi pesutulos matalammassa
+                  lämpötilassa
+                </li>
+              </ul>
+            </div>
+            <div class="tip-category">
+              <h4>💡 ENERGIANSÄÄSTÖVINKIT:</h4>
+              <ul class="tip-list savings-tips">
+                <li>
+                  ✅ <strong>Valitse 30-40°C</strong> riittää useimmiten
+                  (säästää 50% energiasta)
+                </li>
+                <li>
+                  ✅ <strong>Käytä ECO-ohjelmia</strong> huolimatta pituudesta
+                </li>
+                <li>✅ <strong>Täytä kone täyteen</strong> mutta älä ahtaa</li>
+                <li>✅ <strong>Ohita esipesu</strong> jos mahdollista</li>
+                <li>
+                  ✅ <strong>Uudet nestepesuaineet</strong> toimivat kylmässäkin
+                </li>
+              </ul>
+            </div>
           </div>
-
         </div>
       </div>
-
-    </div>
+    }
   </div>
 </div>
