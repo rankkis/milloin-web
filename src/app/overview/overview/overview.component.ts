@@ -133,12 +133,12 @@ export class OverviewComponent {
           ctx.save();
 
           // Measure text
-          ctx.font = 'bold 12px Inter, sans-serif';
+          ctx.font = '600 12px "IBM Plex Mono", monospace';
           const textWidth = ctx.measureText(marker.label).width;
           const padding = 4;
 
           // Draw background rectangle
-          ctx.fillStyle = 'rgba(18, 18, 18, 0.8)';
+          ctx.fillStyle = 'rgba(11, 14, 12, 0.8)';
           ctx.fillRect(
             x - textWidth / 2 - padding,
             yAxis.top - 20,
@@ -174,10 +174,10 @@ export class OverviewComponent {
         display: false,
       },
       tooltip: {
-        backgroundColor: 'rgba(18, 18, 18, 0.9)',
-        titleColor: '#1db954',
-        bodyColor: '#ffffff',
-        borderColor: '#1db954',
+        backgroundColor: 'rgba(11, 14, 12, 0.9)',
+        titleColor: '#2ee06f',
+        bodyColor: '#e9f1eb',
+        borderColor: '#2ee06f',
         borderWidth: 1,
         padding: 12,
         displayColors: false,
@@ -209,7 +209,7 @@ export class OverviewComponent {
         },
         ticks: {
           stepSize: 5, // Show ticks at 0, 5, 10, 15
-          color: '#b3b3b3',
+          color: '#93a69a',
           font: {
             size: 11,
           },
@@ -306,12 +306,12 @@ export class OverviewComponent {
         {
           data: data,
           label: 'Sähkön hinta',
-          borderColor: '#1db954',
-          backgroundColor: 'rgba(29, 185, 84, 0.2)',
-          pointBackgroundColor: '#1db954',
-          pointBorderColor: '#1db954',
-          pointHoverBackgroundColor: '#1ed760',
-          pointHoverBorderColor: '#1ed760',
+          borderColor: '#2ee06f',
+          backgroundColor: 'rgba(46, 224, 111, 0.2)',
+          pointBackgroundColor: '#2ee06f',
+          pointBorderColor: '#2ee06f',
+          pointHoverBackgroundColor: '#2ee06f',
+          pointHoverBorderColor: '#2ee06f',
           pointRadius: 0, // Hide points by default
           pointHoverRadius: 6, // Show point on hover
           pointHitRadius: 10, // Larger hit area for hover

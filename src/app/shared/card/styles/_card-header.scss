@@ -5,7 +5,7 @@
     align-items: center;
     padding: 1.5rem 2rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, rgba(29, 185, 84, 0.05) 0%, transparent 100%);
+    background: linear-gradient(135deg, rgba(46, 224, 111, 0.05) 0%, transparent 100%);
   }
 
   .back-button-container {
@@ -17,22 +17,22 @@
   }
 
   .header-title {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-sans);
     font-size: 2rem;
     font-weight: 600;
-    color: var(--spotify-white);
+    color: var(--color-text);
     margin: 0;
     line-height: 1.2;
-    background: linear-gradient(135deg, var(--spotify-white) 0%, var(--spotify-text-light) 100%);
+    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .header-subtitle {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     font-size: 1rem;
-    color: var(--spotify-text-light);
+    color: var(--color-text-muted);
     margin: 0.25rem 0 0 0;
     font-weight: 400;
   }

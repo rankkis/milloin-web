@@ -8,17 +8,17 @@
 .app-header {
   text-align: center;
   padding: 2rem 2rem 1rem 2rem;
-  background-color: var(--spotify-dark-gray);
+  background-color: var(--color-bg);
 
   .app-title {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-sans);
     font-size: 3.5rem;
     margin: 0;
     font-weight: 900;
-    color: var(--spotify-white);
+    color: var(--color-text);
     letter-spacing: -0.04em;
-    text-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
-    background: linear-gradient(135deg, var(--spotify-white) 0%, var(--spotify-green) 100%);
+    text-shadow: 0 4px 12px rgba(46, 224, 111, 0.3);
+    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -27,7 +27,7 @@
 
 .app-main {
   flex: 1;
-  background-color: var(--spotify-dark-gray);
+  background-color: var(--color-bg);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -36,16 +36,16 @@
 .app-footer {
   text-align: center;
   padding: 1rem 2rem;
-  background-color: var(--spotify-black);
-  border-top: 1px solid var(--spotify-gray);
+  background-color: var(--color-bg);
+  border-top: 1px solid var(--color-border);
   flex-shrink: 0;
   margin-top: auto;
 
   p {
     margin: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     font-size: 0.875rem;
-    color: var(--spotify-text-light);
+    color: var(--color-text-muted);
   }
 }
 

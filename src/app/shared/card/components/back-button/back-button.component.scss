@@ -1,9 +1,9 @@
 .back-button {
-  color: var(--spotify-green);
+  color: var(--color-accent);
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: rgba(29, 185, 84, 0.1);
+    background-color: rgba(46, 224, 111, 0.1);
     transform: scale(1.1);
   }
 
