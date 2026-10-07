@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-navigation-link',
   imports: [MatCardModule, MatIconModule, RouterModule],
   templateUrl: './navigation-link.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './navigation-link.component.scss',
 })
 export class NavigationLinkComponent {

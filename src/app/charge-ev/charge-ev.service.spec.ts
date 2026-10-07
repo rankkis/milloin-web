@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { ChargeEvService } from './charge-ev.service';
 
 describe('ChargeEvService', () => {
@@ -7,10 +7,7 @@ describe('ChargeEvService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        ChargeEvService,
-        provideHttpClient()
-      ]
+      providers: [ChargeEvService, provideHttpClient(withXhr())],
     });
     service = TestBed.inject(ChargeEvService);
   });

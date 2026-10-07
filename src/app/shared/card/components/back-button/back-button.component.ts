@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Location } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,7 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-back-button',
   imports: [MatButtonModule, MatIconModule],
   templateUrl: './back-button.component.html',
-  styleUrl: './back-button.component.scss'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './back-button.component.scss',
 })
 export class BackButtonComponent {
   @Input() testId = 'back-button';

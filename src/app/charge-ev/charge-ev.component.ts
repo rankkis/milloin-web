@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ChargeEvService, ChargeOptimalScheduleDto } from './charge-ev.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, map, catchError, startWith } from 'rxjs/operators';
@@ -30,7 +30,8 @@ interface OptimalScheduleState {
   // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 4
   standalone: false,
   templateUrl: './charge-ev.component.html',
-  styleUrl: './charge-ev.component.scss'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './charge-ev.component.scss',
 })
 export class ChargeEvComponent {
   private readonly chargeEvService = inject(ChargeEvService);
@@ -48,41 +49,46 @@ export class ChargeEvComponent {
             now: this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.now,
               apiData.defaults,
-              apiData.now
+              apiData.now,
             ),
             next12Hours: this.priceCalculation.addEstimatedPriceWithSavings(
               apiData.next12Hours,
               apiData.defaults,
-              apiData.now
+              apiData.now,
             ),
-            defaults: apiData.defaults
+            defaults: apiData.defaults,
           };
 
           // Add extended time if it exists
           if (apiData.extended) {
-            enhancedData.extended = this.priceCalculation.addEstimatedPriceWithSavings(
-              apiData.extended,
-              apiData.defaults,
-              apiData.now
-            );
+            enhancedData.extended =
+              this.priceCalculation.addEstimatedPriceWithSavings(
+                apiData.extended,
+                apiData.defaults,
+                apiData.now,
+              );
           }
 
           return { loading: false, data: enhancedData, error: null };
         }),
         catchError((err): Observable<OptimalScheduleState> => {
-          console.error('[ChargeEvComponent] Error fetching optimal schedule:', err);
+          console.error(
+            '[ChargeEvComponent] Error fetching optimal schedule:',
+            err,
+          );
 
-          const errorMessage = err.userMessage || 'Aikataulun lataaminen epäonnistui';
+          const errorMessage =
+            err.userMessage || 'Aikataulun lataaminen epäonnistui';
 
           return of({
             loading: false,
             data: null,
-            error: errorMessage
+            error: errorMessage,
           });
         }),
-        startWith({ loading: true, data: null, error: null })
-      )
-    )
+        startWith({ loading: true, data: null, error: null }),
+      ),
+    ),
   );
 
   getOptimalSchedule(): void {
