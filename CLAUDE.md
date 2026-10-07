@@ -103,6 +103,7 @@ src/
 │   ├── wash-laundry/             # When to wash laundry
 │   ├── charge-ev/                # When to charge the EV
 │   ├── shared/
+│   │   ├── answer-header/        # Back link, current price and refresh on question pages
 │   │   ├── format/               # Finnish number, clock and duration formatting
 │   │   ├── hourly-chart/         # Today's hourly price bars
 │   │   ├── icon/                 # Inline SVG icons
@@ -121,7 +122,7 @@ src/
 ## Features
 
 - **Home**: current price and its category, the cheapest 2-hour window, today's hourly prices as bars (past hours dimmed, current hour highlighted, cheapest window in accent), and one row per question with its answer. Data loads on open and again when the tab returns after 15 minutes.
-- **Question pages**: laundry (start delay) and EV charging (clock-time window).
+- **Question pages**: laundry answers with a timer delay (Nyt, +1 … +5 h) and the cost of each; EV charging answers with a clock-time window.
 - Clock times are shown in Finnish time (`shared/format/format.ts`).
 
 ### UI Framework
@@ -173,7 +174,7 @@ All SEO meta tags are defined in `src/index.html`:
 
 ### Heading Hierarchy
 Maintain proper heading structure for SEO:
-- **h1**: Page title (in app.component.html)
+- **h1**: Page title, one per page (home: "Milloin…", question pages: the question)
 - **h2-h6**: Section headings in components
 - Never skip heading levels (e.g., h1 → h3)
 - Use semantic HTML elements
