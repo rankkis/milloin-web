@@ -1,5 +1,14 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import { OverviewService, OverviewDto, PricePointDto } from '../overview.service';
+import {
+  Component,
+  inject,
+  ViewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import {
+  OverviewService,
+  OverviewDto,
+  PricePointDto,
+} from '../overview.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, map, catchError, startWith } from 'rxjs/operators';
 import { PriceUtilitiesService } from '../../shared/services/price-utilities.service';
@@ -18,7 +27,8 @@ interface OverviewState {
   // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 2
   standalone: false,
   templateUrl: './overview.component.html',
-  styleUrl: './overview.component.scss'
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: './overview.component.scss',
 })
 export class OverviewComponent {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
@@ -33,7 +43,7 @@ export class OverviewComponent {
   // Chart.js configuration
   public lineChartData: ChartConfiguration['data'] = {
     datasets: [],
-    labels: []
+    labels: [],
   };
 
   // Custom plugin for vertical reference lines
@@ -54,13 +64,14 @@ export class OverviewComponent {
           { hours: 2, label: '+2h', color: 'rgba(255, 255, 255, 0.5)' },
           { hours: 6, label: '+6h', color: 'rgba(255, 255, 255, 0.6)' },
           { hours: 12, label: '+12h', color: 'rgba(255, 255, 255, 0.7)' },
-          { hours: 24, label: '+24h', color: 'rgba(255, 255, 255, 0.8)' }
+          { hours: 24, label: '+24h', color: 'rgba(255, 255, 255, 0.8)' },
         ];
 
         const labels = chart.data.labels as string[];
 
-        markers.forEach(marker => {
-          const targetTimeMs = this.firstTimestamp!.getTime() + marker.hours * 60 * 60 * 1000;
+        markers.forEach((marker) => {
+          const targetTimeMs =
+            this.firstTimestamp!.getTime() + marker.hours * 60 * 60 * 1000;
 
           // Find closest label index by checking all labels
           let closestIndex = -1;
@@ -70,17 +81,22 @@ export class OverviewComponent {
             if (typeof label !== 'string') return;
 
             // Parse the label time (format: "HH:mm" or "HH.mm" for Finnish locale)
-            const parts = label.split(/[:.]/);  // Split by colon or dot
+            const parts = label.split(/[:.]/); // Split by colon or dot
             if (parts.length !== 2) return;
 
             const [hours, minutes] = parts.map(Number);
             if (isNaN(hours) || isNaN(minutes)) return;
 
             // Create date from first timestamp and set the time
-            const labelDate = new Date(this.firstTimestamp!.getFullYear(),
-                                       this.firstTimestamp!.getMonth(),
-                                       this.firstTimestamp!.getDate(),
-                                       hours, minutes, 0, 0);
+            const labelDate = new Date(
+              this.firstTimestamp!.getFullYear(),
+              this.firstTimestamp!.getMonth(),
+              this.firstTimestamp!.getDate(),
+              hours,
+              minutes,
+              0,
+              0,
+            );
 
             // Handle day rollover - if label time is before first timestamp, it's next day
             if (labelDate.getTime() < this.firstTimestamp!.getTime()) {
@@ -126,7 +142,7 @@ export class OverviewComponent {
             x - textWidth / 2 - padding,
             yAxis.top - 20,
             textWidth + padding * 2,
-            16
+            16,
           );
 
           // Draw text
@@ -136,8 +152,8 @@ export class OverviewComponent {
           ctx.fillText(marker.label, x, yAxis.top - 12);
           ctx.restore();
         });
-      }
-    }
+      },
+    },
   ];
 
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -149,12 +165,12 @@ export class OverviewComponent {
         top: 30,
         bottom: 10,
         left: 10,
-        right: 10
-      }
+        right: 10,
+      },
     },
     plugins: {
       legend: {
-        display: false
+        display: false,
       },
       tooltip: {
         backgroundColor: 'rgba(18, 18, 18, 0.9)',
@@ -167,44 +183,44 @@ export class OverviewComponent {
         callbacks: {
           label: (context) => {
             return `${(context.parsed.y ?? 0).toFixed(2)} c/kWh`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     scales: {
       x: {
         grid: {
-          color: 'rgba(255, 255, 255, 0.05)',  // Very subtle grid
-          drawTicks: false
+          color: 'rgba(255, 255, 255, 0.05)', // Very subtle grid
+          drawTicks: false,
         },
         ticks: {
-          display: false
+          display: false,
         },
         title: {
-          display: false
-        }
+          display: false,
+        },
       },
       y: {
         min: 0,
-        suggestedMax: 15,  // Scale shows at least 0-15c/kWh, extends higher if needed
+        suggestedMax: 15, // Scale shows at least 0-15c/kWh, extends higher if needed
         grid: {
-          color: 'rgba(255, 255, 255, 0.08)'  // Subtle horizontal grid
+          color: 'rgba(255, 255, 255, 0.08)', // Subtle horizontal grid
         },
         ticks: {
-          stepSize: 5,  // Show ticks at 0, 5, 10, 15
+          stepSize: 5, // Show ticks at 0, 5, 10, 15
           color: '#b3b3b3',
           font: {
-            size: 11
+            size: 11,
           },
           callback: (value) => {
             return `${value} c/kWh`;
-          }
+          },
         },
         title: {
-          display: false
-        }
-      }
-    }
+          display: false,
+        },
+      },
+    },
   };
 
   public lineChartType: ChartType = 'line';
@@ -220,17 +236,18 @@ export class OverviewComponent {
         catchError((err): Observable<OverviewState> => {
           console.error('[OverviewComponent] Error fetching overview:', err);
 
-          const errorMessage = err.userMessage || 'Yleiskatsauksen lataaminen epäonnistui';
+          const errorMessage =
+            err.userMessage || 'Yleiskatsauksen lataaminen epäonnistui';
 
           return of({
             loading: false,
             data: null,
-            error: errorMessage
+            error: errorMessage,
           });
         }),
-        startWith({ loading: true, data: null, error: null })
-      )
-    )
+        startWith({ loading: true, data: null, error: null }),
+      ),
+    ),
   );
 
   getOverview(): void {
@@ -272,12 +289,15 @@ export class OverviewComponent {
       this.firstTimestamp = new Date(pricePoints[0].startTime);
     }
 
-    const labels = pricePoints.map(point => {
+    const labels = pricePoints.map((point) => {
       const date = new Date(point.startTime);
-      return date.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleTimeString('fi-FI', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
     });
 
-    const data = pricePoints.map(point => point.price);
+    const data = pricePoints.map((point) => point.price);
 
     this.lineChartData = {
       labels: labels,
@@ -291,14 +311,14 @@ export class OverviewComponent {
           pointBorderColor: '#1db954',
           pointHoverBackgroundColor: '#1ed760',
           pointHoverBorderColor: '#1ed760',
-          pointRadius: 0,              // Hide points by default
-          pointHoverRadius: 6,         // Show point on hover
-          pointHitRadius: 10,          // Larger hit area for hover
+          pointRadius: 0, // Hide points by default
+          pointHoverRadius: 6, // Show point on hover
+          pointHitRadius: 10, // Larger hit area for hover
           fill: true,
-          tension: 0.4,                // Smooth curve
-          borderWidth: 3               // Thicker line for better visibility
-        }
-      ]
+          tension: 0.4, // Smooth curve
+          borderWidth: 3, // Thicker line for better visibility
+        },
+      ],
     };
 
     // Update chart if it exists
