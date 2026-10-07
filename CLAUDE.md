@@ -205,6 +205,7 @@ Rich snippets and search result enhancements via Schema.org structured data:
 ## Important Notes
 - This is an Angular 22 project; components default to OnPush change detection
 - Uses SCSS for styling
+- Colors are defined only in `src/styles/_colors.scss`. In SCSS, `@use 'colors' as *` and use `color(accent)` or `alpha(accent, 10%)`, or the `--color-*` custom properties; never hex or rgba values. In TypeScript (canvas charts), use `color()` from `src/app/shared/theme/colors.ts`
 - Routing is enabled
 - Follow Angular style guide for code conventions
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests

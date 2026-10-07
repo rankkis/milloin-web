@@ -1,0 +1,49 @@
+// Shared colors: the only place where color values are defined.
+//
+// Global styles emit the palette as --color-* custom properties with
+// `@include colors.tokens`. Component styles `@use 'colors' as *` and refer
+// to colors through color() and alpha() instead of hex or rgba values.
+// TypeScript (canvas charts) reads the same custom properties through
+// src/app/shared/theme/colors.ts.
+
+@use 'sass:map';
+
+$palette: (
+  'bg': #0b0e0c,
+  'surface': #131815,
+  'border': #232b26,
+  'border-strong': #3a463f,
+  'bar-past': #1e2622,
+  'text': #e9f1eb,
+  'text-muted': #93a69a,
+  'accent': #2ee06f,
+  'on-accent': #0b0e0c,
+  // Price category text colors
+  'price-very-cheap': #00ff00,
+  'price-expensive': #ff6b6b,
+  'price-very-expensive': #ff3333,
+);
+
+/// Emits every palette color as a --color-* custom property
+@mixin tokens {
+  @each $name, $value in $palette {
+    --color-#{$name}: #{$value};
+  }
+}
+
+@function -check($name) {
+  @if not map.has-key($palette, $name) {
+    @error 'Unknown color "#{$name}". Add it to $palette in _colors.scss.';
+  }
+  @return $name;
+}
+
+/// A palette color, e.g. color(accent)
+@function color($name) {
+  @return var(--color-#{-check($name)});
+}
+
+/// A palette color with transparency, e.g. alpha(accent, 10%)
+@function alpha($name, $opacity) {
+  @return color-mix(in srgb, var(--color-#{-check($name)}) #{$opacity}, transparent);
+}

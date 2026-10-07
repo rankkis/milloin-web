@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 .overview-content {
 
   ul {
@@ -113,8 +115,8 @@
 
     // Chart container
     .chart-container {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: alpha(text, 2%);
+      border: 1px solid alpha(text, 5%);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 2rem;
@@ -125,7 +127,7 @@
         font-weight: 600;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid alpha(text, 10%);
       }
 
       .chart-wrapper {
@@ -142,8 +144,8 @@
 
     // Time summaries
     .time-summary {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: alpha(text, 2%);
+      border: 1px solid alpha(text, 5%);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
@@ -154,7 +156,7 @@
         font-weight: 600;
         margin-bottom: 0.75rem;
         padding-bottom: 0.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid alpha(text, 10%);
       }
 
       .summary-details {
@@ -274,26 +276,26 @@
 
 // Price category colors
 .price-very-cheap {
-  color: #00ff00 !important; // Bright green
+  color: color(price-very-cheap) !important;
   font-weight: 600;
 }
 
 .price-cheap {
-  color: var(--color-accent) !important; // Spotify green
+  color: var(--color-accent) !important;
   font-weight: 600;
 }
 
 .price-normal {
-  color: var(--color-text) !important; // Normal white
+  color: var(--color-text) !important;
   font-weight: 500;
 }
 
 .price-expensive {
-  color: #ff6b6b !important; // Light red
+  color: color(price-expensive) !important;
   font-weight: 600;
 }
 
 .price-very-expensive {
-  color: #ff3333 !important; // Bright red
+  color: color(price-very-expensive) !important;
   font-weight: 700;
 }

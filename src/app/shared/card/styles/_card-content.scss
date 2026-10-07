@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 // Card content styles
 .app-card-content {
   padding: 2rem;
@@ -46,7 +48,7 @@
   }
 
   code {
-    background: rgba(255, 255, 255, 0.1);
+    background: alpha(text, 10%);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-family: var(--font-mono);
@@ -55,7 +57,7 @@
   }
 
   pre {
-    background: rgba(0, 0, 0, 0.3);
+    background: alpha(bg, 30%);
     padding: 1rem;
     border-radius: 8px;
     overflow-x: auto;
@@ -78,10 +80,10 @@
   }
 
   .highlight {
-    background: linear-gradient(135deg, rgba(46, 224, 111, 0.1) 0%, transparent 100%);
+    background: linear-gradient(135deg, alpha(accent, 10%) 0%, transparent 100%);
     padding: 1rem;
     border-radius: 8px;
-    border: 1px solid rgba(46, 224, 111, 0.2);
+    border: 1px solid alpha(accent, 20%);
     margin-bottom: 1rem;
   }
 }

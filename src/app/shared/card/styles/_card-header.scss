@@ -1,11 +1,13 @@
+@use 'colors' as *;
+
 // Card header styles
 .app-card-header {
   .header-container {
     display: flex;
     align-items: center;
     padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, rgba(46, 224, 111, 0.05) 0%, transparent 100%);
+    border-bottom: 1px solid alpha(text, 10%);
+    background: linear-gradient(135deg, alpha(accent, 5%) 0%, transparent 100%);
   }
 
   .back-button-container {

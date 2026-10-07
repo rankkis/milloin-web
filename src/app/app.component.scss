@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 :host {
   display: flex;
   flex-direction: column;
@@ -17,7 +19,7 @@
     font-weight: 900;
     color: var(--color-text);
     letter-spacing: -0.04em;
-    text-shadow: 0 4px 12px rgba(46, 224, 111, 0.3);
+    text-shadow: 0 4px 12px alpha(accent, 30%);
     background: linear-gradient(135deg, var(--color-text) 0%, var(--color-accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

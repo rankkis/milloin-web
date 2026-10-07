@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 a {
   text-decoration: none;
   display: block;
@@ -14,13 +16,13 @@ a {
   overflow: hidden;
   background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface) 100%) !important;
   border-radius: 16px !important;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid alpha(text, 15%);
 
   &:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 16px 40px rgba(46, 224, 111, 0.15), 0 8px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 16px 40px alpha(accent, 15%), 0 8px 16px alpha(bg, 30%);
     background: linear-gradient(135deg, var(--color-border) 0%, var(--color-surface) 100%) !important;
-    border-color: rgba(46, 224, 111, 0.4);
+    border-color: alpha(accent, 40%);
   }
 
   .navigation-link-content {
@@ -54,7 +56,7 @@ a {
       top: 1rem;
       right: 1rem;
       z-index: 3;
-      background: rgba(46, 224, 111, 0.2);
+      background: alpha(accent, 20%);
       border-radius: 50%;
       padding: 0.5rem;
       display: flex;
@@ -78,7 +80,7 @@ a {
       color: var(--color-text);
       line-height: 1.3;
       letter-spacing: -0.02em;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 2px 8px alpha(bg, 30%);
       background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -94,7 +96,7 @@ a {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(46, 224, 111, 0.1) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 50%, alpha(accent, 10%) 0%, transparent 70%);
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
