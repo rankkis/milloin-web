@@ -1,2 +1,432 @@
-// Home component specific styles
-// Currently inheriting all styles from navigation and card components
+@use 'colors' as *;
+
+$wide: 720px;
+$table: 960px;
+
+:host {
+  display: block;
+}
+
+p,
+h1,
+h2 {
+  margin: 0;
+}
+
+.page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.accent {
+  color: color(accent);
+}
+
+.label {
+  font-size: var(--text-label-size);
+  font-weight: 400;
+  letter-spacing: var(--text-label-tracking);
+  text-transform: uppercase;
+  color: color(text-muted);
+}
+
+// Header
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-6);
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.clock {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: color(text-muted);
+}
+
+// Current price and cheapest window
+
+.price-and-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.now {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.now__label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  min-height: 29px;
+}
+
+.pill {
+  padding: 5px 10px;
+  border: 1px solid color(border-strong);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.now__price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-mono);
+}
+
+.now__value {
+  font-size: 84px;
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.now__unit {
+  font-size: 18px;
+  color: color(text-muted);
+}
+
+.window {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-3) 14px;
+  background: color(surface);
+  border: 1px solid color(border);
+  border-radius: var(--radius);
+}
+
+.window__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.window__label {
+  font-size: 13px;
+  color: color(text-muted);
+}
+
+.window__time {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  color: color(accent);
+}
+
+.window__price {
+  font-family: var(--font-mono);
+  font-size: 16px;
+
+  .unit {
+    font-size: 13px;
+    color: color(text-muted);
+  }
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  color: color(text-muted);
+}
+
+.retry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-weight: 500;
+  color: color(text);
+  background: color(surface);
+  border: 1px solid color(border);
+  border-radius: var(--radius);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: color(accent);
+  }
+}
+
+// Chart
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chart__labels {
+  display: none;
+  justify-content: space-between;
+}
+
+// Questions
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+.questions__head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--space-2);
+}
+
+.questions__col-detail,
+.questions__col-price {
+  display: none;
+}
+
+.question {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'text answer'
+    'text short';
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  min-height: var(--tap-min);
+  padding: 14px 0;
+  border-top: 1px solid color(border);
+  color: inherit;
+  text-decoration: none;
+
+  &:last-of-type {
+    border-bottom: 1px solid color(border);
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: color(accent);
+  }
+}
+
+.question__text {
+  grid-area: text;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.question__icon {
+  color: color(text-muted);
+}
+
+.question__answer {
+  grid-area: answer;
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.question__short {
+  grid-area: short;
+  justify-self: end;
+  font-size: 13px;
+  white-space: nowrap;
+  color: color(text-muted);
+}
+
+.question__detail,
+.question__price {
+  display: none;
+}
+
+.footer {
+  font-size: 12px;
+  color: color(text-muted);
+}
+
+// Wider screens: price and chart side by side
+
+@media (min-width: $wide) {
+  .page {
+    padding: var(--space-8) var(--space-6) var(--space-6);
+    gap: var(--space-8);
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .clock {
+    font-size: 14px;
+  }
+
+  .price-and-chart {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 28px 64px;
+  }
+
+  .now {
+    flex: 1 1 340px;
+    min-width: 0;
+    gap: var(--space-3);
+  }
+
+  .now__label-row {
+    justify-content: flex-start;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+
+  .now__value {
+    font-size: 136px;
+    line-height: 0.9;
+  }
+
+  .now__unit {
+    font-size: 22px;
+  }
+
+  .window {
+    gap: var(--space-2) var(--space-5);
+    padding: 14px var(--space-4);
+  }
+
+  .window__label {
+    font-size: 14px;
+  }
+
+  .window__time {
+    font-size: 32px;
+  }
+
+  .window__price {
+    font-size: 18px;
+
+    .unit {
+      font-size: 14px;
+    }
+  }
+
+  .chart {
+    flex: 999 1 480px;
+    min-width: 0;
+  }
+
+  .chart__labels {
+    display: flex;
+
+    .label {
+      font-size: 12px;
+    }
+  }
+
+  .questions {
+    flex-grow: 0;
+  }
+
+  .footer {
+    font-size: 13px;
+  }
+}
+
+// Wide screens: questions as a table
+
+@media (min-width: $table) {
+  .questions__head,
+  .question {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px 190px 130px;
+    grid-template-areas: 'text answer detail price';
+    column-gap: var(--space-6);
+  }
+
+  .questions__head {
+    padding-bottom: 10px;
+
+    .label {
+      font-size: 12px;
+    }
+  }
+
+  .questions__col-detail {
+    display: block;
+  }
+
+  .questions__col-price {
+    display: block;
+    text-align: right;
+  }
+
+  .question {
+    padding: 18px 0;
+  }
+
+  .question__text {
+    gap: var(--space-3);
+    font-size: 20px;
+  }
+
+  .question__answer {
+    justify-self: start;
+    font-size: 36px;
+  }
+
+  .question__short {
+    display: none;
+  }
+
+  .question__detail {
+    display: block;
+    grid-area: detail;
+    font-size: 15px;
+    color: color(text-muted);
+  }
+
+  .question__price {
+    display: block;
+    grid-area: price;
+    justify-self: end;
+    font-family: var(--font-mono);
+    font-size: 16px;
+  }
+}

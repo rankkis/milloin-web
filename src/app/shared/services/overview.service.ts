@@ -2,10 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, timer } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
-import { PriceCategory, PricePointDto } from '../shared/models/price.model';
+import { environment } from '../../../environments/environment';
+import {
+  HourlyPriceDto,
+  OptimalTimeDto,
+  PriceCategory,
+  PricePointDto,
+} from '../models/price.model';
 
-export type { PriceCategory, PricePointDto };
+export type { HourlyPriceDto, OptimalTimeDto, PriceCategory, PricePointDto };
 
 export interface CurrentPriceDto {
   price: number;
@@ -22,6 +27,10 @@ export interface OverviewDto {
   current: CurrentPriceDto;
   next12Hours: FuturePriceSummaryDto;
   future: FuturePriceSummaryDto;
+  /** Hourly prices of the current Finnish day, 00 to 24 */
+  today: HourlyPriceDto[];
+  /** Cheapest 2-hour window that has not ended yet */
+  cheapestWindow?: OptimalTimeDto;
 }
 
 @Injectable({
