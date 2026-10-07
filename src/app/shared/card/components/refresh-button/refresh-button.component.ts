@@ -9,8 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './refresh-button.component.scss'
 })
 export class RefreshButtonComponent {
-  @Input() testId: string = 'refresh-button';
-  @Input() ariaLabel: string = 'Refresh data';
+  @Input() testId = 'refresh-button';
+  @Input() ariaLabel = 'Refresh data';
   @Output() refresh = new EventEmitter<void>();
 
   onRefresh(): void {

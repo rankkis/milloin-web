@@ -28,6 +28,7 @@ interface OptimalScheduleState {
 
 @Component({
   selector: 'app-wash-laundry',
+  // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 3
   standalone: false,
   templateUrl: './wash-laundry.component.html',
   styleUrl: './wash-laundry.component.scss'

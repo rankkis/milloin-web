@@ -1,17 +1,17 @@
-import { Directive, ElementRef, Renderer2, OnInit, Input, ViewContainerRef, ComponentRef, Injector, Output, EventEmitter } from '@angular/core';
+import { Directive, ElementRef, Renderer2, OnInit, Input, ViewContainerRef, ComponentRef, Injector, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { BackButtonComponent } from '../components/back-button/back-button.component';
 import { RefreshButtonComponent } from '../components/refresh-button/refresh-button.component';
 
 @Directive({
   selector: '[appCardHeader]'
 })
-export class CardHeaderDirective implements OnInit {
-  @Input() title: string = '';
+export class CardHeaderDirective implements OnInit, OnDestroy {
+  @Input() title = '';
   @Input() subtitle?: string;
-  @Input() showBackButton: boolean = true;
-  @Input() backButtonTestId: string = 'back-button';
-  @Input() showRefreshButton: boolean = false;
-  @Input() refreshButtonTestId: string = 'refresh-button';
+  @Input() showBackButton = true;
+  @Input() backButtonTestId = 'back-button';
+  @Input() showRefreshButton = false;
+  @Input() refreshButtonTestId = 'refresh-button';
   @Output() refreshClicked = new EventEmitter<void>();
 
   private backButtonRef?: ComponentRef<BackButtonComponent>;

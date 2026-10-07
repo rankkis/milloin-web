@@ -27,6 +27,7 @@ interface OptimalScheduleState {
 
 @Component({
   selector: 'app-charge-ev',
+  // eslint-disable-next-line @angular-eslint/prefer-standalone -- NgModule component, rewritten in redesign step 4
   standalone: false,
   templateUrl: './charge-ev.component.html',
   styleUrl: './charge-ev.component.scss'
