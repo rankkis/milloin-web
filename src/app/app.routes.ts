@@ -10,7 +10,7 @@ export const routes: Routes = [
   },
   {
     path: APP_NAVIGATION_PATHS.CHARGE_EV,
-    loadChildren: () => import('./charge-ev/charge-ev.module').then(m => m.ChargeEvModule)
+    loadComponent: () => import('./charge-ev/charge-ev.component').then(m => m.ChargeEvComponent)
   },
   { path: '**', redirectTo: '' }
 ];

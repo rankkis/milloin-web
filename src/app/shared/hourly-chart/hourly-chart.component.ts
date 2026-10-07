@@ -26,6 +26,10 @@ export class HourlyChartComponent {
   readonly now = input.required<Date>();
   /** Window to highlight, e.g. the cheapest 2 hours */
   readonly highlight = input<{ startTime: string; endTime: string }>();
+  /** Chart name for screen readers */
+  readonly title = input('Tänään tunneittain');
+  /** Labels spread evenly under the bars */
+  readonly axisLabels = input(['00', '06', '12', '18', '24']);
 
   readonly bars = computed<Bar[]>(() => {
     const hours = this.hours();
@@ -52,13 +56,13 @@ export class HourlyChartComponent {
   /** Screen reader summary: cheapest and most expensive hour */
   readonly summary = computed(() => {
     const hours = this.hours();
-    if (hours.length === 0) return 'Tämän päivän hintoja ei ole saatavilla';
+    if (hours.length === 0) return `${this.title()}: hintoja ei ole saatavilla`;
 
     const byPrice = [...hours].sort((a, b) => a.priceAvg - b.priceAvg);
     const cheapest = byPrice[0];
     const priciest = byPrice[byPrice.length - 1];
     return (
-      `Tänään tunneittain. Halvin tunti ${formatClock(cheapest.startTime)}, ` +
+      `${this.title()}. Halvin tunti ${formatClock(cheapest.startTime)}, ` +
       `${formatPrice(cheapest.priceAvg)} c/kWh. Kallein tunti ` +
       `${formatClock(priciest.startTime)}, ${formatPrice(priciest.priceAvg)} c/kWh.`
     );
