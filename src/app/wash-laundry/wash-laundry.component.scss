@@ -1,275 +1,271 @@
 @use 'colors' as *;
 
-.wash-laundry-content {
+:host {
+  display: block;
+}
+
+p,
+h1,
+h2,
+dl,
+dd,
+ol,
+ul {
+  margin: 0;
+}
+
+.page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.accent {
+  color: color(accent);
+}
+
+.label {
+  font-size: var(--text-label-size);
+  font-weight: 400;
+  letter-spacing: var(--text-label-tracking);
+  text-transform: uppercase;
+  color: color(text-muted);
+}
+
+// Answer
+
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.question {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: color(text-muted);
+}
+
+.answer__value {
+  font-family: var(--font-mono);
+  font-size: 96px;
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  color: color(accent);
+}
+
+.answer__value--loading {
+  color: color(text-muted);
+}
+
+.answer__sentence {
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.answer__times {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: color(text-muted);
+}
+
+.message {
+  padding: var(--space-4) 0;
+  font-size: 17px;
+  line-height: 1.4;
+  color: color(text-muted);
+}
+
+// Start delays
+
+.delays {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.delays__labels {
+  display: flex;
+  justify-content: space-between;
+}
+
+.delays__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0;
+  list-style: none;
+}
+
+.delay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px 0;
+  border: 1px solid color(border);
+  border-radius: var(--radius);
+}
+
+.delay__label {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.delay__bar-area {
+  display: flex;
+  align-items: flex-end;
+  height: 64px;
+}
+
+.delay__bar {
+  width: 14px;
+  background: color(border-strong);
+  border-radius: var(--radius-bar);
+}
+
+.delay__cost {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: color(text-muted);
+}
+
+.delay--best {
+  color: color(on-accent);
+  background: color(accent);
+  border-color: color(accent);
+
+  .delay__bar {
+    background: color(on-accent);
+  }
+
+  .delay__cost {
+    font-weight: 600;
+    color: color(on-accent);
+  }
+}
+
+// Stats
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: color(surface);
+  border: 1px solid color(border);
+  border-radius: var(--radius);
+
+  dt,
+  .stat__note {
+    font-size: 12px;
+    color: color(text-muted);
+  }
+}
+
+.stat__value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+// Tips and calculation basis
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.tips {
+  background: color(surface);
+  border: 1px solid color(border);
+  border-radius: var(--radius);
+}
+
+.tips__toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 14px;
+  font-size: 15px;
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: color(accent);
+  }
+}
+
+.tips__arrow {
+  transition: transform 0.15s ease;
+}
+
+.tips[open] .tips__arrow {
+  transform: rotate(90deg);
+}
+
+.tips__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 14px 14px;
+  font-size: 14px;
+  line-height: 1.5;
 
   ul {
-    margin: 1rem 0;
-
-    li {
-      color: var(--color-text-muted);
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
-    }
-  }
-
-  p {
-    color: var(--color-text-muted);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-  }
-
-  // Loading state
-  .loading-container {
-    text-align: center;
-    padding: 2rem;
-
-    p {
-      color: var(--color-accent);
-      font-weight: 500;
-    }
-  }
-
-  // Error state
-  .error-container {
-    .error-actions {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-
-      .retry-button {
-        background: var(--color-accent);
-        color: var(--color-on-accent);
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-        font-size: 0.9rem;
-
-        &:hover {
-          background: var(--color-accent);
-        }
-      }
-    }
-
-  }
-
-  // Forecast container
-  .schedule-container {
-    // Primary recommendation (highlighted)
-    .primary-recommendation {
-      margin-bottom: 2rem;
-
-      h3 {
-        color: var(--color-accent);
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        text-align: center;
-      }
-
-      .primary-time {
-        text-align: center;
-
-        .period-label {
-          color: var(--color-text-muted);
-          font-size: 0.9rem;
-          margin-bottom: 0.25rem;
-          text-transform: uppercase;
-          font-weight: 500;
-        }
-
-        .time-display {
-          color: var(--color-text);
-          font-size: 2rem;
-          font-weight: 700;
-          font-family: var(--font-sans);
-          margin-bottom: 0.5rem;
-          line-height: 1.2;
-        }
-
-        .price-info {
-          color: var(--color-text-muted);
-          font-size: 1rem;
-          margin-bottom: 0;
-        }
-      }
-    }
-
-    // Alternatives section
-    .alternatives-section {
-      margin-top: 1.5rem;
-
-      h4 {
-        color: var(--color-text);
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid alpha(text, 10%);
-      }
-
-      .time-slot.alternative {
-        background: alpha(text, 2%);
-        border: 1px solid alpha(text, 5%);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        transition: background-color 0.2s ease;
-
-        &:hover {
-          background: alpha(text, 5%);
-        }
-
-        h5 {
-          color: var(--color-text-muted);
-          font-size: 1rem;
-          font-weight: 600;
-          margin-bottom: 0.75rem;
-          text-transform: uppercase;
-          font-size: 0.9rem;
-          letter-spacing: 0.5px;
-        }
-
-        .alternative-details {
-          p {
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-          }
-
-          .prop {
-            color: var(--color-text-muted);
-          }
-
-          .savings-comparison {
-            color: var(--color-accent);
-          }
-        }
-      }
-    }
-  }
-
-  // Initial state
-  .initial-state {
-    text-align: center;
-
-    .get-schedule-button {
-      background: var(--color-accent);
-      color: var(--color-on-accent);
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 1.5rem;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background: var(--color-accent);
-        transform: translateY(-1px);
-      }
-    }
-  }
-
-  // Refresh container
-  .refresh-container {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid alpha(text, 10%);
-
-    .refresh-button {
-      background: transparent;
-      color: var(--color-accent);
-      border: 1px solid var(--color-accent);
-      padding: 0.5rem 1.5rem;
-      border-radius: 6px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background: var(--color-accent);
-        color: var(--color-on-accent);
-      }
-    }
+    padding-left: 18px;
+    color: color(text-muted);
   }
 }
 
-@media (max-width: 768px) {
-  .wash-laundry-content {
-    ul li {
-      font-size: 0.9rem;
-    }
-
-    .initial-state .get-forecast-button {
-      padding: 0.875rem 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    .schedule-container {
-      .primary-recommendation {
-        h3 {
-          font-size: 1.25rem;
-        }
-
-        .primary-time {
-          .time-display {
-            font-size: 1.5rem;
-          }
-
-          .price-info {
-            font-size: 0.9rem;
-          }
-        }
-      }
-
-      .alternatives-section {
-        h4 {
-          font-size: 1rem;
-        }
-
-        .time-slot.alternative {
-          padding: 0.75rem;
-
-          h5 {
-            font-size: 0.8rem;
-          }
-
-          .alternative-details p {
-            font-size: 0.85rem;
-          }
-        }
-      }
-    }
-  }
-}
-
-// Price category colors
-.price-very-cheap {
-  color: color(price-very-cheap) !important;
+.tips__title {
+  margin-top: var(--space-2);
+  font-size: 14px;
   font-weight: 600;
 }
 
-.price-cheap {
-  color: var(--color-accent) !important;
-  font-weight: 600;
+.basis {
+  font-size: 12px;
+  line-height: 1.4;
+  color: color(text-muted);
 }
 
-.price-normal {
-  color: var(--color-text) !important;
-  font-weight: 500;
+@media (min-width: 720px) {
+  .page {
+    padding-top: var(--space-8);
+  }
+
+  .delays__grid {
+    gap: var(--space-2);
+  }
 }
 
-.price-expensive {
-  color: color(price-expensive) !important;
-  font-weight: 600;
-}
-
-.price-very-expensive {
-  color: color(price-very-expensive) !important;
-  font-weight: 700;
+@media (prefers-reduced-motion: reduce) {
+  .tips__arrow {
+    transition: none;
+  }
 }

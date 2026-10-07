@@ -6,7 +6,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   {
     path: APP_NAVIGATION_PATHS.WASH_LAUNDRY,
-    loadChildren: () => import('./wash-laundry/wash-laundry.module').then(m => m.WashLaundryModule)
+    loadComponent: () => import('./wash-laundry/wash-laundry.component').then(m => m.WashLaundryComponent)
   },
   {
     path: APP_NAVIGATION_PATHS.CHARGE_EV,

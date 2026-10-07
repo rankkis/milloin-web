@@ -15,22 +15,15 @@ import {
   formatTimeUntil,
   formatWindow,
 } from '../shared/format/format';
-import { PriceCategory } from '../shared/models/price.model';
+import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { OverviewService } from '../shared/services/overview.service';
+import { resourceErrorMessage } from '../shared/resource-error';
 import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
 /** Reload when the page comes back into view with older data than this */
 const STALE_AFTER_MS = 15 * MINUTE_MS;
-
-const CATEGORY_TEXT: Record<PriceCategory, string> = {
-  VERY_CHEAP: 'Erittäin halpa',
-  CHEAP: 'Halpa',
-  NORMAL: 'Normaali',
-  EXPENSIVE: 'Kallis',
-  VERY_EXPENSIVE: 'Erittäin kallis',
-};
 
 interface Answer {
   value: string;
@@ -73,7 +66,7 @@ export class HomeComponent {
     const current = this.overviewData()?.current;
     return current && {
       price: formatPrice(current.price),
-      category: CATEGORY_TEXT[current.priceCategory] ?? CATEGORY_TEXT.NORMAL,
+      category: PRICE_CATEGORY_TEXT[current.priceCategory] ?? PRICE_CATEGORY_TEXT.NORMAL,
     };
   });
 
@@ -149,12 +142,5 @@ export class HomeComponent {
     this.ev.reload();
   }
 
-  /** Finnish message from the service, which resource wraps in an Error */
-  errorMessage(error: unknown): string {
-    const { userMessage, cause } = (error ?? {}) as {
-      userMessage?: string;
-      cause?: { userMessage?: string };
-    };
-    return userMessage ?? cause?.userMessage ?? 'Lataaminen epäonnistui';
-  }
+  readonly errorMessage = resourceErrorMessage;
 }
