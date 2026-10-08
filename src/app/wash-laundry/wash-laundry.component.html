@@ -18,7 +18,7 @@
       }
       <p class="answer__times">{{ answer.times }}</p>
     } @else if (schedule.isLoading()) {
-      <p class="answer__value answer__value--loading" aria-busy="true">…</p>
+      <p class="answer__value answer__value--loading"><app-spinner /></p>
     } @else {
       <p class="message">Hintoja ei ole vielä julkaistu tarpeeksi pitkälle. Kokeile hetken päästä uudelleen.</p>
     }

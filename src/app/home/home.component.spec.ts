@@ -116,6 +116,14 @@ describe('HomeComponent', () => {
     expect(text('.pill')).toBe('Normaali');
   });
 
+  it('shows a spinner in place of the price while it loads', () => {
+    render(new Observable<OverviewDto>());
+
+    const spinner = (fixture.nativeElement as HTMLElement).querySelector('.now__value app-spinner');
+    expect(spinner?.getAttribute('role')).toBe('status');
+    expect(spinner?.textContent?.trim()).toBe('Ladataan hintoja');
+  });
+
   it('charts the hours from now to the last published price', () => {
     render();
 

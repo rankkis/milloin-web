@@ -13,6 +13,7 @@ import {
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
+import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { ChargeEvService } from './charge-ev.service';
 
 /** Hours on the chart */
@@ -23,7 +24,7 @@ const capitalize = (text: string): string => text.charAt(0).toUpperCase() + text
 
 @Component({
   selector: 'app-charge-ev',
-  imports: [AnswerHeaderComponent, HourlyChartComponent],
+  imports: [AnswerHeaderComponent, HourlyChartComponent, SpinnerComponent],
   templateUrl: './charge-ev.component.html',
   styleUrl: './charge-ev.component.scss',
 })

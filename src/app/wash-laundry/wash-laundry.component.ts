@@ -8,6 +8,7 @@ import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { StartDelayDto } from '../shared/models/price.model';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
+import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { RULE_TEXT, recommendDelay } from './laundry-recommendation';
 import { WashLaundryService } from './wash-laundry.service';
 
@@ -44,7 +45,7 @@ const cents = (value: number) => formatNumber(value, 1);
 
 @Component({
   selector: 'app-wash-laundry',
-  imports: [NgTemplateOutlet, AnswerHeaderComponent, IconComponent],
+  imports: [NgTemplateOutlet, AnswerHeaderComponent, IconComponent, SpinnerComponent],
   templateUrl: './wash-laundry.component.html',
   styleUrl: './wash-laundry.component.scss',
   host: {

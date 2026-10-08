@@ -23,7 +23,7 @@
         </div>
       } @else {
         <p class="now__price" [attr.aria-busy]="overview.isLoading()">
-          <span class="now__value">{{ current()?.price ?? '–' }}</span>
+          <span class="now__value">@if (current(); as current) { {{ current.price }} } @else if (overview.isLoading()) { <app-spinner /> } @else { – }</span>
           <span class="now__unit">c/kWh</span>
         </p>
       }
@@ -71,7 +71,7 @@
 </div>
 
 <ng-template #answer let-answer let-loading="loading">
-  <span class="question__answer" [class.accent]="answer?.highlight">{{ answer?.value ?? (loading ? '…' : '–') }}</span>
+  <span class="question__answer" [class.accent]="answer?.highlight">@if (answer) { {{ answer.value }} } @else if (loading) { <app-spinner label="" /> } @else { – }</span>
   @if (answer) {
     <span class="question__short">{{ answer.short }} · {{ answer.price }}</span>
     <span class="question__detail">{{ answer.detail }}</span>

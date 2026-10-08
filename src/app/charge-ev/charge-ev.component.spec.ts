@@ -88,6 +88,12 @@ describe('ChargeEvComponent', () => {
     expect(text('.answer__when')).toBe('ensi yönä · alkaa 11 h 18 min päästä');
   });
 
+  it('shows a spinner while the answer loads', () => {
+    render(new Observable<ChargeOptimalScheduleDto>());
+
+    expect(element().querySelector('.answer__value app-spinner[role="status"]')).not.toBeNull();
+  });
+
   it('uses the later window when it is cheaper', () => {
     // 03:00–07:00 Finnish time the day after tomorrow's night
     render(of(schedule(optimal('2026-10-08T00:00:00.000Z', '2026-10-08T04:00:00.000Z', 1.5))));
