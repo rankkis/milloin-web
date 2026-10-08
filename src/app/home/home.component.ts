@@ -16,12 +16,22 @@ import {
   formatWindow,
 } from '../shared/format/format';
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
+import { PriceCategory } from '../shared/models/price.model';
 import { OverviewService } from '../shared/services/overview.service';
 import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { recommendDelay } from '../wash-laundry/laundry-recommendation';
 import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
+
+/** Color of the current price box, by price category */
+const PRICE_TONE: Record<PriceCategory, string> = {
+  VERY_CHEAP: 'very-cheap',
+  CHEAP: 'cheap',
+  NORMAL: 'normal',
+  EXPENSIVE: 'expensive',
+  VERY_EXPENSIVE: 'very-expensive',
+};
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
@@ -71,6 +81,12 @@ export class HomeComponent {
       price: formatPrice(current.price),
       category: PRICE_CATEGORY_TEXT[current.priceCategory] ?? PRICE_CATEGORY_TEXT.NORMAL,
     };
+  });
+
+  /** Color of the current price box; neutral while loading or after an error */
+  readonly tone = computed(() => {
+    const category = this.overviewData()?.current.priceCategory;
+    return (category && PRICE_TONE[category]) ?? PRICE_TONE.NORMAL;
   });
 
   /** Hourly prices from the current hour on; drops hours that ended since loading */
