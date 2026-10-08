@@ -24,10 +24,11 @@ export class WashLaundryService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/wash-laundry/optimal-schedule`;
 
+  // Only CORS-safelisted headers, so the browser skips the preflight request
+
   private readonly httpOptions = {
     headers: new HttpHeaders({
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      'Accept': 'application/json'
     })
   };
 
