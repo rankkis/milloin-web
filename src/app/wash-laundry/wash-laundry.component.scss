@@ -9,6 +9,19 @@
   letter-spacing: -0.05em;
 }
 
+.answer__instruction {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.answer__reason {
+  font-size: 15px;
+  line-height: 1.45;
+  color: color(text-muted);
+  text-wrap: pretty;
+}
+
 .answer__times {
   font-family: var(--font-mono);
   font-size: 14px;
@@ -28,6 +41,10 @@
   justify-content: space-between;
 }
 
+.delays__strip {
+  position: relative;
+}
+
 .delays__grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -44,6 +61,23 @@
   padding: 10px 0;
   border: 1px solid color(border);
   border-radius: var(--radius);
+}
+
+// The recommended cell is a button that looks like the other cells
+button.delay {
+  width: 100%;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid color(text);
+    outline-offset: 2px;
+  }
+}
+
+.delays__slot {
+  display: flex;
 }
 
 .delay__label {
@@ -70,7 +104,16 @@
   color: color(text-muted);
 }
 
-.delay--best {
+.delay--cheapest {
+  border-style: dashed;
+  border-color: color(accent);
+
+  .delay__cost {
+    color: color(accent);
+  }
+}
+
+.delay--recommended {
   color: color(on-accent);
   background: color(accent);
   border-color: color(accent);
@@ -83,6 +126,74 @@
     font-weight: 600;
     color: color(on-accent);
   }
+}
+
+// Legend under the strip
+
+.legend {
+  display: flex;
+  gap: var(--space-4);
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: color(text-muted);
+}
+
+.legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend__swatch {
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend__swatch--recommended {
+  background: color(accent);
+}
+
+.legend__swatch--cheapest {
+  border: 1px dashed color(accent);
+}
+
+// Rule tooltip of the recommended cell, styled like the price chart tooltip
+
+.tip {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  z-index: 3;
+  box-sizing: border-box;
+  width: 250px;
+  max-width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color(text);
+  color: color(bg);
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 6px 20px alpha(bg, 40%);
+  pointer-events: none;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.tip--start {
+  left: 0;
+}
+
+.tip--center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tip--end {
+  right: 0;
 }
 
 // Tips and calculation basis

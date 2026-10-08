@@ -50,7 +50,7 @@ const delay = (delayHours: number, costCents: number, isBest = false): StartDela
 });
 
 const laundry: WashLaundryOptimalScheduleDto = {
-  startDelays: [delay(0, 5.2), delay(1, 4.02, true), delay(2, 4.5)],
+  startDelays: [delay(0, 9.5), delay(1, 4.02), delay(2, 4.5), delay(3, 4, true)],
   defaults: {
     exchangeTariffCentsKwh: 0,
     marginTariffCentsKwh: 0,
@@ -73,13 +73,16 @@ const ev: ChargeOptimalScheduleDto = {
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
 
-  const render = (overview$: Observable<OverviewDto> = of(overview)) => {
+  const render = (
+    overview$: Observable<OverviewDto> = of(overview),
+    laundrySchedule: WashLaundryOptimalScheduleDto = laundry,
+  ) => {
     TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
         provideRouter([]),
         { provide: OverviewService, useValue: { getOverview: () => overview$ } },
-        { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundry) } },
+        { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundrySchedule) } },
         { provide: ChargeEvService, useValue: { getOptimalSchedule: () => of(ev) } },
       ],
     });
@@ -162,13 +165,30 @@ describe('HomeComponent', () => {
     expect(texts('.tile__change')).toEqual(['+24 % vs. nyt', '−7 % vs. nyt', '−22 % vs. nyt']);
   });
 
-  it('answers the laundry question with the best start delay', () => {
+  it('answers the laundry question with the recommended start delay, not the cheapest', () => {
     render();
 
     const row = '[data-test-id="home-wash-laundry"]';
     expect(text(`${row} .question__answer`)).toBe('+1 h');
     expect(text(`${row} .question__short`)).toBe('ajastus · 4,0 snt');
     expect(text(`${row} .question__detail`)).toBe('ajastus, käynnistyy 14:42');
+  });
+
+  it('says waiting is not worth it when a later start saves too little', () => {
+    render(of(overview), { ...laundry, startDelays: [delay(0, 5.2), delay(1, 4.02, true), delay(2, 4.5)] });
+
+    const row = '[data-test-id="home-wash-laundry"]';
+    expect(text(`${row} .question__answer`)).toBe('Nyt');
+    expect(text(`${row} .question__short`)).toBe('heti · 5,2 snt');
+    expect(text(`${row} .question__detail`)).toBe('odottaminen ei kannata');
+  });
+
+  it('says now is cheapest when no later start is cheaper', () => {
+    render(of(overview), { ...laundry, startDelays: [delay(0, 3, true), delay(1, 4.02), delay(2, 4.5)] });
+
+    const row = '[data-test-id="home-wash-laundry"]';
+    expect(text(`${row} .question__answer`)).toBe('Nyt');
+    expect(text(`${row} .question__detail`)).toBe('nyt on halvinta');
   });
 
   it('answers the EV question with the charging window and its cost', () => {

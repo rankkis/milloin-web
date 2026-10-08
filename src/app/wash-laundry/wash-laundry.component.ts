@@ -1,4 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AnswerHeaderComponent } from '../shared/answer-header/answer-header.component';
 import { IconComponent } from '../shared/icon/icon.component';
@@ -7,6 +8,7 @@ import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { StartDelayDto } from '../shared/models/price.model';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
+import { RULE_TEXT, recommendDelay } from './laundry-recommendation';
 import { WashLaundryService } from './wash-laundry.service';
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -27,15 +29,28 @@ interface DelayOption {
   label: string;
   cost: string;
   barPx: number;
-  isBest: boolean;
+  isRecommended: boolean;
+  isCheapest: boolean;
   ariaLabel: string;
 }
 
+type TipAlign = 'start' | 'center' | 'end';
+
+/** "{k} tunnin päästä", or "tunnin päästä" for one hour */
+const inHours = (hours: number) => (hours === 1 ? 'tunnin päästä' : `${hours} tunnin päästä`);
+
+/** Cents with one decimal, e.g. 3,1 */
+const cents = (value: number) => formatNumber(value, 1);
+
 @Component({
   selector: 'app-wash-laundry',
-  imports: [AnswerHeaderComponent, IconComponent],
+  imports: [NgTemplateOutlet, AnswerHeaderComponent, IconComponent],
   templateUrl: './wash-laundry.component.html',
   styleUrl: './wash-laundry.component.scss',
+  host: {
+    '(document:click)': 'closeTipOutside($event)',
+    '(document:keydown.escape)': 'tipOpen.set(false)',
+  },
 })
 export class WashLaundryComponent {
   private readonly washLaundryService = inject(WashLaundryService);
@@ -48,68 +63,147 @@ export class WashLaundryComponent {
   readonly now = signal(new Date());
 
   readonly errorMessage = resourceErrorMessage;
+  readonly ruleText = RULE_TEXT;
+
+  /** Whether the rule tooltip of the recommended option is shown */
+  readonly tipOpen = signal(false);
+
+  private readonly tipTrigger = viewChild<ElementRef<HTMLElement>>('tipTrigger');
 
   readonly currentPrice = computed(() =>
     this.overview.hasValue() ? formatPrice(this.overview.value().current.price) : undefined,
   );
 
   private readonly delays = computed<StartDelayDto[]>(() =>
-    this.schedule.hasValue() ? (this.schedule.value().startDelays ?? []) : [],
+    [...(this.schedule.hasValue() ? (this.schedule.value().startDelays ?? []) : [])].sort(
+      (a, b) => a.delayHours - b.delayHours,
+    ),
   );
 
-  readonly answer = computed(() => {
-    const best = this.delays().find((delay) => delay.isBest);
-    if (!best) return undefined;
+  readonly recommendation = computed(() => recommendDelay(this.delays()));
 
-    const start = new Date(this.now().getTime() + best.delayHours * HOUR_MS);
+  readonly answer = computed(() => {
+    const recommendation = this.recommendation();
+    if (!recommendation) return undefined;
+    const { recommended, cheapest, saving, extraSavingIfWaitLonger: diff, hours } = recommendation;
+
+    const start = new Date(this.now().getTime() + recommended.delayHours * HOUR_MS);
     const periodHours = this.schedule.value()?.defaults.periodHours ?? 2;
     const end = new Date(start.getTime() + periodHours * HOUR_MS);
-    const isNow = best.delayHours === 0;
+    const times = `käynnistyy ${formatClock(start)} · valmis ${formatClock(end)}`;
+    const cheaperLater = cheapest !== recommended;
 
+    if (recommended.delayHours === 0) {
+      let reason: string | undefined;
+      if (!cheaperLater) {
+        reason =
+          hours > 0
+            ? `${hours === 1 ? 'Seuraavan tunnin' : `Seuraavan ${hours} tunnin`} aikana pesu ei tule halvemmaksi.`
+            : undefined;
+      } else if (diff < 1) {
+        reason =
+          `Hinta pysyy lähes samana ${hours === 1 ? 'seuraavan tunnin' : `seuraavat ${hours} tuntia`}, ` +
+          'joten odottaminen ei kannata.';
+      } else {
+        reason =
+          `Pesu olisi ${inHours(cheapest.delayHours)} ${cents(diff)} senttiä halvempi, ` +
+          'mutta niin pieni säästö ei ole odottamisen arvoinen.';
+      }
+      return { value: 'Nyt', instruction: 'Käynnistä kone nyt.', reason, times };
+    }
+
+    let reason = `Säästät ${cents(saving)} senttiä verrattuna heti käynnistämiseen.`;
+    if (cheaperLater) {
+      reason +=
+        ` Pesu olisi ${inHours(cheapest.delayHours)} vielä ${cents(diff)} senttiä halvempi, ` +
+        'mutta lisäodotus ei kannata.';
+    }
     return {
-      value: isNow ? 'Nyt' : `+${best.delayHours} h`,
-      sentence: isNow
-        ? 'Käynnistä kone heti, nyt on halvinta.'
-        : `Aseta koneen ajastus ${DELAY_WORDS[best.delayHours] ?? `${best.delayHours} tuntiin`}.`,
-      times: `käynnistyy ${formatClock(start)} · valmis ${formatClock(end)}`,
+      value: `+${recommended.delayHours} h`,
+      instruction: `Aseta koneen ajastus ${DELAY_WORDS[recommended.delayHours] ?? `${recommended.delayHours} tuntiin`}.`,
+      reason,
+      times,
     };
   });
 
   readonly options = computed<DelayOption[]>(() => {
     const delays = this.delays();
+    const recommendation = this.recommendation();
     const maxCost = Math.max(...delays.map((delay) => delay.costCents), 0);
 
     return delays.map((delay) => {
       const label = delay.delayHours === 0 ? 'Nyt' : `+${delay.delayHours}`;
-      const cost = formatNumber(delay.costCents, 1);
+      const cost = cents(delay.costCents);
       const ratio = maxCost > 0 ? Math.max(delay.costCents, 0) / maxCost : 0;
+      const isRecommended = delay === recommendation?.recommended;
+      const isCheapest = delay === recommendation?.cheapest;
+      const roles = [isRecommended && 'suositus', isCheapest && 'halvin'].filter(Boolean);
       return {
         label,
         cost,
         barPx: Math.max(Math.round(ratio * BAR_MAX_PX), BAR_MIN_PX),
-        isBest: delay.isBest,
+        isRecommended,
+        isCheapest,
         ariaLabel:
-          `${delay.delayHours === 0 ? 'Nyt' : `${delay.delayHours} tunnin päästä`}: ${cost} senttiä` +
-          (delay.isBest ? ', halvin' : ''),
+          `${delay.delayHours === 0 ? 'Nyt' : inHours(delay.delayHours)}: ${cost} senttiä` +
+          (roles.length ? `, ${roles.join(' ja ')}` : ''),
       };
     });
   });
 
-  readonly stats = computed(() => {
-    const delays = this.delays();
-    const best = delays.find((delay) => delay.isBest);
-    const now = delays.find((delay) => delay.delayHours === 0);
-    if (!best) return undefined;
+  /** Whether the cheapest option is another cell than the recommended one */
+  readonly cheapestDiffers = computed(() => {
+    const recommendation = this.recommendation();
+    return !!recommendation && recommendation.cheapest !== recommendation.recommended;
+  });
 
-    const savedCents = now ? now.costCents - best.costCents : 0;
-    const savedPct = now && now.costCents > 0 ? Math.round((savedCents / now.costCents) * 100) : 0;
+  /** Keeps the tooltip on screen: over the first, middle or last cells */
+  readonly tipAlign = computed<TipAlign>(() => {
+    const options = this.options();
+    const index = options.findIndex((option) => option.isRecommended);
+    const position = (index + 0.5) / options.length;
+    return position < 1 / 3 ? 'start' : position > 2 / 3 ? 'end' : 'center';
+  });
+
+  readonly stats = computed(() => {
+    const recommendation = this.recommendation();
+    if (!recommendation) return undefined;
+    const { recommended, cheapest, saving, extraSavingIfWaitLonger: diff, hours } = recommendation;
+    const now = this.delays()[0];
+
+    let middle: { title: string; value: string; note: string; accent: boolean };
+    if (recommended.delayHours > 0) {
+      const savedPct = now.costCents > 0 ? Math.round((saving / now.costCents) * 100) : 0;
+      middle = {
+        title: 'Säästö vs. nyt',
+        value: `−${savedPct} %`,
+        note: `${cents(saving)} senttiä`,
+        accent: true,
+      };
+    } else if (cheapest !== recommended) {
+      middle = {
+        title: 'Halvin vaihtoehto',
+        value: `+${cheapest.delayHours} h`,
+        note: `${cents(diff)} snt halvempi`,
+        accent: false,
+      };
+    } else {
+      middle = {
+        title: 'Halvin vaihtoehto',
+        value: 'Nyt',
+        note:
+          hours === 0
+            ? 'ainoa vaihtoehto'
+            : `halvin ${hours === 1 ? 'seuraavaan tuntiin' : `seuraaviin ${hours} tuntiin`}`,
+        accent: false,
+      };
+    }
 
     return {
-      cost: formatNumber(best.costCents, 1),
-      savingPct: savedPct > 0 ? `−${savedPct} %` : '0 %',
-      saving: savedCents > 0 ? `${formatNumber(savedCents, 1)} senttiä` : 'nyt on halvin',
-      spot: formatPrice(best.priceAvg),
-      category: PRICE_CATEGORY_TEXT[best.priceCategory]?.toLowerCase(),
+      cost: cents(recommended.costCents),
+      middle,
+      spot: formatPrice(recommended.priceAvg),
+      category: PRICE_CATEGORY_TEXT[recommended.priceCategory]?.toLowerCase(),
     };
   });
 
@@ -119,6 +213,28 @@ export class WashLaundryComponent {
     const kwh = formatNumber(defaults.powerConsumptionKwh, defaults.powerConsumptionKwh % 1 ? 1 : 0);
     return `Laskettu ${defaults.periodHours} tunnin ohjelmalle ja ${kwh} kWh:n kulutukselle.`;
   });
+
+  /** Shows the tooltip for a mouse; touch and pen open it with a tap */
+  hoverTip(open: boolean, event: PointerEvent): void {
+    if (event.pointerType === 'mouse') this.tipOpen.set(open);
+  }
+
+  /** Shows the tooltip when the cell gets keyboard focus */
+  focusTip(event: FocusEvent): void {
+    if ((event.target as HTMLElement).matches(':focus-visible')) this.tipOpen.set(true);
+  }
+
+  /** A tap toggles the tooltip; a mouse click keeps it open, Enter and Space leave it as focus set it */
+  toggleTip(event: MouseEvent): void {
+    if (event.detail === 0) return;
+    if ((event as PointerEvent).pointerType === 'mouse') this.tipOpen.set(true);
+    else this.tipOpen.update((open) => !open);
+  }
+
+  closeTipOutside(event: MouseEvent): void {
+    const trigger = this.tipTrigger()?.nativeElement;
+    if (trigger && !trigger.contains(event.target as Node)) this.tipOpen.set(false);
+  }
 
   refresh(): void {
     this.now.set(new Date());

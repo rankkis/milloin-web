@@ -18,6 +18,7 @@ import {
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { OverviewService } from '../shared/services/overview.service';
 import { resourceErrorMessage } from '../shared/resource-error';
+import { recommendDelay } from '../wash-laundry/laundry-recommendation';
 import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
 
 const MINUTE_MS = 60 * 1000;
@@ -77,16 +78,19 @@ export class HomeComponent {
   });
 
   readonly laundryAnswer = computed<Answer | undefined>(() => {
-    const best = (this.laundry.hasValue() ? this.laundry.value() : undefined)?.startDelays?.find((delay) => delay.isBest);
-    if (!best) return undefined;
+    const delays = (this.laundry.hasValue() ? this.laundry.value() : undefined)?.startDelays ?? [];
+    const recommendation = recommendDelay(delays);
+    if (!recommendation) return undefined;
+    const { recommended, cheapest } = recommendation;
 
-    const price = `${formatNumber(best.costCents, 1)} snt`;
-    if (best.delayHours === 0) {
-      return { value: 'Nyt', short: 'heti', detail: 'käynnistä heti', price, highlight: true };
+    const price = `${formatNumber(recommended.costCents, 1)} snt`;
+    if (recommended.delayHours === 0) {
+      const detail = cheapest !== recommended ? 'odottaminen ei kannata' : 'nyt on halvinta';
+      return { value: 'Nyt', short: 'heti', detail, price, highlight: true };
     }
-    const start = new Date(this.now().getTime() + best.delayHours * HOUR_MS);
+    const start = new Date(this.now().getTime() + recommended.delayHours * HOUR_MS);
     return {
-      value: `+${best.delayHours} h`,
+      value: `+${recommended.delayHours} h`,
       short: 'ajastus',
       detail: `ajastus, käynnistyy ${formatClock(start)}`,
       price,

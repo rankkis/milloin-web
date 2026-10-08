@@ -12,7 +12,10 @@
       <p class="message" role="alert">{{ errorMessage(error) }}</p>
     } @else if (answer(); as answer) {
       <p class="answer__value">{{ answer.value }}</p>
-      <p class="answer__sentence">{{ answer.sentence }}</p>
+      <p class="answer__instruction">{{ answer.instruction }}</p>
+      @if (answer.reason) {
+        <p class="answer__reason">{{ answer.reason }}</p>
+      }
       <p class="answer__times">{{ answer.times }}</p>
     } @else if (schedule.isLoading()) {
       <p class="answer__value answer__value--loading" aria-busy="true">…</p>
@@ -27,17 +30,44 @@
         <h2 id="delays-title" class="label">Aloituksen viive</h2>
         <span class="label" aria-hidden="true">snt / pesu</span>
       </div>
-      <ol class="delays__grid">
-        @for (option of options(); track option.label) {
-          <li class="delay" [class.delay--best]="option.isBest" [attr.aria-label]="option.ariaLabel">
-            <span class="delay__label" aria-hidden="true">{{ option.label }}</span>
-            <span class="delay__bar-area" aria-hidden="true">
-              <span class="delay__bar" [style.height.px]="option.barPx"></span>
-            </span>
-            <span class="delay__cost" aria-hidden="true">{{ option.cost }}</span>
-          </li>
+      <div class="delays__strip">
+        <p id="laundry-rule-tip" role="tooltip" [class]="'tip tip--' + tipAlign()" [hidden]="!tipOpen()">
+          {{ ruleText }}
+        </p>
+        <ol class="delays__grid">
+          @for (option of options(); track option.label) {
+            @if (option.isRecommended) {
+              <li class="delays__slot">
+                <button
+                  #tipTrigger
+                  type="button"
+                  class="delay delay--recommended"
+                  data-test-id="laundry-recommended-delay"
+                  [attr.aria-label]="option.ariaLabel"
+                  aria-describedby="laundry-rule-tip"
+                  (pointerenter)="hoverTip(true, $event)"
+                  (pointerleave)="hoverTip(false, $event)"
+                  (focus)="focusTip($event)"
+                  (blur)="tipOpen.set(false)"
+                  (click)="toggleTip($event)"
+                >
+                  <ng-container *ngTemplateOutlet="cell; context: { $implicit: option }" />
+                </button>
+              </li>
+            } @else {
+              <li class="delay" [class.delay--cheapest]="option.isCheapest" [attr.aria-label]="option.ariaLabel">
+                <ng-container *ngTemplateOutlet="cell; context: { $implicit: option }" />
+              </li>
+            }
+          }
+        </ol>
+      </div>
+      <ul class="legend" aria-hidden="true">
+        <li class="legend__item"><span class="legend__swatch legend__swatch--recommended"></span>suositus</li>
+        @if (cheapestDiffers()) {
+          <li class="legend__item"><span class="legend__swatch legend__swatch--cheapest"></span>halvin</li>
         }
-      </ol>
+      </ul>
     </section>
   }
 
@@ -49,9 +79,9 @@
         <dd class="stat__note">senttiä</dd>
       </div>
       <div class="stat">
-        <dt>Säästö vs. nyt</dt>
-        <dd class="stat__value accent">{{ stats.savingPct }}</dd>
-        <dd class="stat__note">{{ stats.saving }}</dd>
+        <dt>{{ stats.middle.title }}</dt>
+        <dd class="stat__value" [class.accent]="stats.middle.accent">{{ stats.middle.value }}</dd>
+        <dd class="stat__note">{{ stats.middle.note }}</dd>
       </div>
       <div class="stat">
         <dt>Spot-hinta</dt>
@@ -90,3 +120,11 @@
     }
   </div>
 </div>
+
+<ng-template #cell let-option>
+  <span class="delay__label" aria-hidden="true">{{ option.label }}</span>
+  <span class="delay__bar-area" aria-hidden="true">
+    <span class="delay__bar" [style.height.px]="option.barPx"></span>
+  </span>
+  <span class="delay__cost" aria-hidden="true">{{ option.cost }}</span>
+</ng-template>
