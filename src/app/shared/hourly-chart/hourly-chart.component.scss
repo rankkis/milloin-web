@@ -1,26 +1,87 @@
 @use 'colors' as *;
 
 :host {
+  --plot-height: 112px;
+  --bar-gap: 2px;
+  --scale-width: 18px;
+  --scale-gap: 8px;
+  --tip-gap: 6px;
+
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  font-family: var(--font-mono);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+}
+
+.label {
+  margin: 0;
+  font-size: var(--text-label-size);
+  font-weight: 400;
+  letter-spacing: var(--text-label-tracking);
+  text-transform: uppercase;
+  color: color(text-muted);
+}
+
+.body {
+  display: flex;
+  gap: var(--scale-gap);
+}
+
+.plot {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: var(--plot-height);
+  touch-action: pan-y;
+  cursor: pointer;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.gridline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid color(border);
+}
+
+.marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed color(marker);
 }
 
 .bars {
+  position: relative;
   display: flex;
   align-items: flex-end;
-  gap: 3px;
-  height: 120px;
+  gap: var(--bar-gap);
+  height: 100%;
+}
+
+.slot {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
 }
 
 .bar {
-  flex: 1;
+  width: 100%;
   border-radius: var(--radius-bar);
   background: color(border-strong);
-}
-
-.bar--past {
-  background: color(bar-past);
 }
 
 .bar--current {
@@ -31,25 +92,112 @@
   background: color(accent);
 }
 
-.axis {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-mono);
+.bar--future.bar--hovered {
+  background: color(bar-hover);
+}
+
+.tip {
+  position: absolute;
+  z-index: 3;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: color(text);
+  color: color(bg);
   font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tip--start {
+  left: 0;
+}
+
+.tip--center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tip--end {
+  right: 0;
+}
+
+.scale {
+  position: relative;
+  flex: 0 0 var(--scale-width);
+  height: var(--plot-height);
+  font-size: 11px;
+  line-height: 1;
   color: color(text-muted);
 }
 
-@media (min-width: 720px) {
-  .bars {
-    gap: 5px;
-    height: 190px;
+.scale__value {
+  position: absolute;
+  left: 0;
+  transform: translateY(50%);
+}
+
+.axis {
+  position: relative;
+  height: 30px;
+  margin-right: calc(var(--scale-width) + var(--scale-gap));
+  font-size: 11px;
+  color: color(text-muted);
+}
+
+.tick {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tick__label {
+  color: color(text);
+}
+
+.tick--start {
+  left: 0;
+}
+
+.tick--marker {
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.tick--end {
+  right: 0;
+  align-items: flex-end;
+}
+
+@media (min-width: 768px) {
+  :host {
+    --bar-gap: 4px;
+    --scale-width: 20px;
+    --scale-gap: 12px;
+    --tip-gap: 8px;
   }
 
   .bar {
     border-radius: 3px;
   }
 
-  .axis {
+  .tip {
+    padding: 7px 10px;
     font-size: 13px;
+  }
+
+  .scale,
+  .axis {
+    font-size: 12px;
+  }
+
+  .axis {
+    height: 34px;
+  }
+
+  .tick {
+    gap: 3px;
   }
 }

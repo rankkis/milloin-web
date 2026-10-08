@@ -27,10 +27,8 @@ export interface OverviewDto {
   current: CurrentPriceDto;
   next12Hours: FuturePriceSummaryDto;
   future: FuturePriceSummaryDto;
-  /** Hourly prices of the current Finnish day, 00 to 24 */
-  today: HourlyPriceDto[];
-  /** Cheapest 2-hour window that has not ended yet */
-  cheapestWindow?: OptimalTimeDto;
+  /** Hourly prices from the start of the current hour to the last published price */
+  upcomingHours: HourlyPriceDto[];
 }
 
 @Injectable({

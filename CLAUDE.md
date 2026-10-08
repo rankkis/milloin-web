@@ -1,7 +1,7 @@
 # Milloin Web - Angular Project
 
 ## Project Overview
-Angular web application for the Milloin project. Milloin translates to When in english. The home page shows the current spot price, today's hourly prices and the cheapest 2-hour window, and answers pre-defined questions such as when to start the washing machine or charge the EV. The answers come from the milloin-server backend, which calculates them from day-ahead spot prices (ENTSO-E).
+Angular web application for the Milloin project. Milloin translates to When in english. The home page shows the current spot price, hourly prices from now to the last published hour, the average price of the next 6, 12 and 24 hours, and answers pre-defined questions such as when to start the washing machine or charge the EV. The answers come from the milloin-server backend, which calculates them from day-ahead spot prices (ENTSO-E).
 
 Goal for the site is saving money by running high-consumption tasks during optimal time windows.
 
@@ -98,17 +98,18 @@ ng generate pipe <name>          # Generate pipe
 ```
 src/
 ├── app/                           # Application source code
-│   ├── home/                     # Home: current price, today's chart, questions
+│   ├── home/                     # Home: current price, price chart, trend tiles, questions
 │   ├── wash-laundry/             # When to wash laundry
 │   ├── charge-ev/                # When to charge the EV
 │   ├── shared/
 │   │   ├── answer-header/        # Back link, current price and refresh on question pages
 │   │   │                         # (shared question page styles: src/styles/_answer-page.scss)
 │   │   ├── format/               # Finnish number, clock and duration formatting
-│   │   ├── hourly-chart/         # Today's hourly price bars
+│   │   ├── hourly-chart/         # Hourly price bars from now: gridlines, +6/+12/+24 h markers, tooltip
 │   │   ├── icon/                 # Inline SVG icons
 │   │   ├── models/               # API DTOs
-│   │   └── services/             # API services
+│   │   ├── services/             # API services
+│   │   └── trend-tiles/          # Average of the next 6, 12 and 24 hours vs. now
 │   ├── app.component.*           # Root component (router outlet)
 │   ├── app.config.ts             # Application configuration
 │   ├── app.paths.ts              # Route paths
@@ -120,15 +121,15 @@ src/
 
 ## Features
 
-- **Home**: current price and its category, the cheapest 2-hour window, today's hourly prices as bars (past hours dimmed, current hour highlighted, cheapest window in accent), and one row per question with its answer. Data loads on open and again when the tab returns after 15 minutes.
-- **Question pages**: laundry answers with a timer delay (Nyt, +1 … +5 h) and the cost of each; EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now.
+- **Home**: current price and its category (from the backend), hourly price bars from the current hour to the last published price (gridlines every 10 c/kWh, dashed +6/+12/+24 h markers, tooltip on hover or tap), trend tiles with the average of the next 6, 12 and 24 hours vs. now, and one row per question with its answer. On wide screens a dashed slot under the price is reserved for an ad or price analysis. Data loads on open and again when the tab returns after 15 minutes.
+- **Question pages**: laundry answers with a timer delay (Nyt, +1 … +5 h) and the cost of each (2 h program, 1,5 kWh, costed by the backend); EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now.
 - Clock times are shown in Finnish time (`shared/format/format.ts`).
 
 ### UI
 - No UI component library. Plain HTML and SCSS with design tokens as CSS custom properties in `src/styles.scss` (fonts, radius, spacing, tap size) and colors in `src/styles/_colors.scss`.
 - **Look**: dark background, one green accent (`accent`), IBM Plex Sans for text and IBM Plex Mono for prices and times.
 - **Icons**: inline SVG through `IconComponent` (`shared/icon`); no icon fonts, no emoji.
-- **Layout**: mobile first; the home screen widens to price and chart side by side (720 px) and a question table (960 px). Question pages are a single column up to 560 px.
+- **Layout**: mobile first; the home screen widens to price and chart side by side (768 px) and a question table (960 px). Question pages are a single column up to 560 px.
 
 ## Development Workflow
 1. Create feature branch from main
@@ -185,7 +186,7 @@ Rich snippets and search result enhancements via Schema.org structured data:
 - **Location**: `src/index.html` (`<script type="application/ld+json">`)
 - **Type**: WebApplication schema
 - **Purpose**: Helps search engines understand the app and display rich results
-- **Features Listed**: spot price now, today's hourly prices, cheapest 2-hour window, laundry timer and cost, EV cheapest charging time and cost
+- **Features Listed**: spot price now, hourly prices from now on, average of the next 6, 12 and 24 hours, laundry timer and cost, EV cheapest charging time and cost
 
 **When to Update**:
 - Adding new features → update `featureList` array

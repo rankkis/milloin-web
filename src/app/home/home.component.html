@@ -7,7 +7,7 @@
   <div class="price-and-chart">
     <section class="now" aria-label="Sähkön hinta nyt">
       <div class="now__label-row">
-        <h2 class="label">Sähkö nyt</h2>
+        <h2 class="label">Hintataso nyt</h2>
         @if (current(); as current) {
           <span class="pill">{{ current.category }}</span>
         }
@@ -26,27 +26,19 @@
           <span class="now__value">{{ current()?.price ?? '–' }}</span>
           <span class="now__unit">c/kWh</span>
         </p>
-
-        @if (cheapestWindow(); as window) {
-          <div class="window">
-            <div class="window__text">
-              <p class="window__label">{{ window.label }}</p>
-              <p class="window__time">{{ window.time }}</p>
-            </div>
-            <p class="window__price">{{ window.price }} <span class="unit">c/kWh</span></p>
-          </div>
-        }
       }
+
+      <!-- Reserved for an ad or a price analysis on wide screens -->
+      <aside class="reserved" aria-hidden="true"></aside>
     </section>
 
     @if (overviewData(); as data) {
-      <section class="chart" aria-labelledby="chart-title">
-        <div class="chart__labels">
-          <h2 id="chart-title" class="label">Tänään tunneittain</h2>
-          <span class="label">c/kWh</span>
-        </div>
-        <app-hourly-chart [hours]="data.today ?? []" [now]="now()" [highlight]="data.cheapestWindow" />
-      </section>
+      @if (upcoming().length > 0) {
+        <section class="chart">
+          <app-hourly-chart class="chart__plot" [hours]="upcoming()" [now]="now()" />
+          <app-trend-tiles [hours]="upcoming()" [current]="data.current.price" />
+        </section>
+      }
     }
   </div>
 

@@ -14,6 +14,7 @@ const delay = (delayHours: number, costCents: number, isBest = false): StartDela
   startTime: '',
   endTime: '',
   priceAvg: costCents,
+  priceCategory: 'CHEAP',
   costCents,
   isBest,
 });
@@ -23,7 +24,7 @@ const schedule = (startDelays: StartDelayDto[]): WashLaundryOptimalScheduleDto =
   defaults: {
     exchangeTariffCentsKwh: 0,
     marginTariffCentsKwh: 0,
-    powerConsumptionKwh: 1,
+    powerConsumptionKwh: 1.5,
     periodHours: 2,
   },
 });
@@ -99,7 +100,7 @@ describe('WashLaundryComponent', () => {
     expect(values).toEqual(['4,0', '−31 %', '4,02']);
     expect(text('.stat:nth-child(2) .stat__note')).toBe('1,8 senttiä');
     expect(text('.stat:nth-child(3) .stat__note')).toBe('c/kWh · halpa');
-    expect(text('.basis')).toContain('Laskettu 2 tunnin ohjelmalle ja 1 kWh:n kulutukselle.');
+    expect(text('.basis')).toBe('Laskettu 2 tunnin ohjelmalle ja 1,5 kWh:n kulutukselle.');
   });
 
   it('says to start now when now is cheapest', () => {

@@ -69,6 +69,16 @@ export function formatWindow(start: Date | string, end: Date | string): string {
   return `${formatClock(start)}–${formatClock(end)}`;
 }
 
+/** Weekday abbreviation, e.g. to */
+export function formatWeekday(date: Date | string): string {
+  return weekdayFormat.format(new Date(date));
+}
+
+/** True when both moments fall on the same Finnish calendar day */
+export function isSameDay(a: Date | string, b: Date | string): boolean {
+  return dayNumber(helsinkiParts(new Date(a))) === dayNumber(helsinkiParts(new Date(b)));
+}
+
 /** Weekday and date, e.g. ke 7.10. */
 export function formatDate(date: Date): string {
   const { day, month } = helsinkiParts(date);

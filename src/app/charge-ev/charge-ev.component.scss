@@ -19,14 +19,7 @@
 // Next 24 hours
 
 .chart {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.chart__labels {
-  display: flex;
-  justify-content: space-between;
+  --plot-height: 110px;
 }
 
 // Best window compared with charging now
