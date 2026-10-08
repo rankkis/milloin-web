@@ -109,6 +109,7 @@ src/
 │   │   ├── icon/                 # Inline SVG icons
 │   │   ├── models/               # API DTOs
 │   │   ├── services/             # API services
+│   │   ├── spinner/              # Loading spinner shown until prices arrive
 │   │   └── trend-tiles/          # Average of the next 6, 12 and 24 hours vs. now
 │   ├── app.component.*           # Root component (router outlet)
 │   ├── app.config.ts             # Application configuration
