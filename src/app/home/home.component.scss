@@ -236,6 +236,14 @@ h2 {
   color: color(text-muted);
 }
 
+.footer__link {
+  color: inherit;
+
+  &:hover {
+    color: color(text);
+  }
+}
+
 // Wider screens: price and chart side by side
 
 @media (min-width: $wide) {

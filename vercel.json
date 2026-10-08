@@ -11,7 +11,14 @@
       "permanent": true
     }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/api", "destination": "https://milloin-server.vercel.app/api" },
+    { "source": "/api/openapi.json", "destination": "https://milloin-server.vercel.app/api-json" },
+    { "source": "/api/:asset(swagger-ui.*)", "destination": "https://milloin-server.vercel.app/api/:asset" },
+    { "source": "/api/api/:asset(swagger-ui.*)", "destination": "https://milloin-server.vercel.app/api/api/:asset" },
+    { "source": "/api/:path*", "destination": "https://milloin-server.vercel.app/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)\\.(js|css)",

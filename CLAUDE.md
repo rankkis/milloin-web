@@ -211,3 +211,4 @@ Rich snippets and search result enhancements via Schema.org structured data:
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests
 - Use inject from angular/core for dependency injection instead of legacy constructor way
 - Backend api documentation is located here https://milloin-server.vercel.app/api-json
+- **Public API**: `vercel.json` proxies `/api` to the backend's Swagger UI (https://milloin.xyz/api), `/api/openapi.json` to its OpenAPI document and `/api/<endpoint>` to its endpoints, so other developers can use `https://milloin.xyz/api/...`. These rewrites must stay above the `index.html` catch-all. The home footer links to it.
