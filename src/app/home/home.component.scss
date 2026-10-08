@@ -91,6 +91,7 @@ h2 {
 
 .now__price {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 10px;
   font-family: var(--font-mono);
@@ -258,9 +259,10 @@ h2 {
     gap: 28px 64px;
   }
 
+  // As wide as the price needs, so a long price never runs under the chart
   .now {
-    flex: 1 1 340px;
-    min-width: 0;
+    flex: 1 0 auto;
+    min-width: 340px;
     gap: var(--space-3);
   }
 
@@ -281,13 +283,11 @@ h2 {
     font-size: 22px;
   }
 
+  // Invisible slot for a future ad or price analysis: fills the column
+  // beside the chart and takes no space when the chart wraps below
   .reserved {
     display: block;
     flex-grow: 1;
-    min-height: 140px;
-    margin-top: var(--space-4);
-    border: 1px dashed color(border-strong);
-    border-radius: var(--radius);
   }
 
   .chart {
