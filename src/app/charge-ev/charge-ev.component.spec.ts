@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { ChargeEvComponent } from './charge-ev.component';
-import { ChargeEvService, ChargeOptimalScheduleDto } from './charge-ev.service';
+import { ChargeEvService } from './charge-ev.service';
 import { OverviewDto, OverviewService } from '../shared/services/overview.service';
-import { HourlyPriceDto, OptimalTimeDto } from '../shared/models/price.model';
+import { HourlyPriceDto, OptimalTimeDto, OptimalWindowsDto } from '../shared/models/price.model';
 
 // 2026-10-07 13:42 Finnish summer time (UTC+3)
 const NOW = new Date('2026-10-07T10:42:00.000Z');
@@ -17,17 +17,23 @@ const optimal = (startTime: string, endTime: string, priceAvg: number): OptimalT
   pricePoints: [],
 });
 
-const schedule = (extended?: OptimalTimeDto): ChargeOptimalScheduleDto => ({
-  now: optimal('2026-10-07T10:30:00.000Z', '2026-10-07T14:30:00.000Z', 3.36),
-  // 01:00–05:00 Finnish time
-  next12Hours: optimal('2026-10-07T22:00:00.000Z', '2026-10-08T02:00:00.000Z', 2.23),
-  ...(extended && { extended }),
-  defaults: {
-    exchangeTariffCentsKwh: 0,
-    marginTariffCentsKwh: 0,
-    powerConsumptionKwh: 11,
-    periodHours: 4,
-  },
+// 01:00–05:00 Finnish time
+const tonight = optimal('2026-10-07T22:00:00.000Z', '2026-10-08T02:00:00.000Z', 2.23);
+
+const schedule = (
+  windows: OptimalTimeDto[] = [tonight],
+  startNow: OptimalTimeDto | null = optimal(
+    '2026-10-07T10:30:00.000Z',
+    '2026-10-07T14:30:00.000Z',
+    3.36,
+  ),
+): OptimalWindowsDto => ({
+  durationHours: 4,
+  energyKwh: 11,
+  earliestStart: '2026-10-07T10:30:00.000Z',
+  latestEnd: '2026-10-08T21:00:00.000Z',
+  ...(startNow && { startNow }),
+  windows,
 });
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -51,12 +57,12 @@ const overview = {
 describe('ChargeEvComponent', () => {
   let fixture: ComponentFixture<ChargeEvComponent>;
 
-  const render = (schedule$: Observable<ChargeOptimalScheduleDto>) => {
+  const render = (schedule$: Observable<OptimalWindowsDto>) => {
     TestBed.configureTestingModule({
       imports: [ChargeEvComponent],
       providers: [
         provideRouter([]),
-        { provide: ChargeEvService, useValue: { getOptimalSchedule: () => schedule$ } },
+        { provide: ChargeEvService, useValue: { getOptimalWindows: () => schedule$ } },
         { provide: OverviewService, useValue: { getOverview: () => of(overview) } },
       ],
     });
@@ -89,14 +95,14 @@ describe('ChargeEvComponent', () => {
   });
 
   it('shows a spinner while the answer loads', () => {
-    render(new Observable<ChargeOptimalScheduleDto>());
+    render(new Observable<OptimalWindowsDto>());
 
     expect(element().querySelector('.answer__value app-spinner[role="status"]')).not.toBeNull();
   });
 
-  it('uses the later window when it is cheaper', () => {
-    // 03:00–07:00 Finnish time the day after tomorrow's night
-    render(of(schedule(optimal('2026-10-08T00:00:00.000Z', '2026-10-08T04:00:00.000Z', 1.5))));
+  it('answers with the first window, the cheapest', () => {
+    // 03:00–07:00 Finnish time
+    render(of(schedule([optimal('2026-10-08T00:00:00.000Z', '2026-10-08T04:00:00.000Z', 1.5), tonight])));
 
     expect(text('.answer__value')).toBe('03:00–07:00');
   });
@@ -115,6 +121,13 @@ describe('ChargeEvComponent', () => {
     expect(texts('.comparison__label')).toEqual(['Ensi yönä', 'Jos lataat heti']);
     expect(texts('.comparison__window')).toEqual(['01:00–05:00', '13:30–17:30']);
     expect(texts('.comparison__cost')).toEqual(['0,25 €', '0,37 €']);
+  });
+
+  it('leaves charging right away out when prices do not reach far enough', () => {
+    render(of(schedule([tonight], null)));
+
+    expect(texts('.comparison__label')).toEqual(['Ensi yönä']);
+    expect(texts('.stat__value')).toEqual(['0,25 €', '0 %', '2,23']);
   });
 
   it('charts the next 24 hours with the window highlighted', () => {

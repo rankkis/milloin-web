@@ -4,16 +4,9 @@ import { Observable, throwError, timer } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
 import { API_RETRY_COUNT } from '../shared/services/api-retry';
 import { environment } from '../../environments/environment';
-import { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto } from '../shared/models/price.model';
+import { OptimalWindowsDto } from '../shared/models/price.model';
 
-export type { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto };
-
-export interface ChargeOptimalScheduleDto {
-  now: OptimalTimeDto;
-  next12Hours: OptimalTimeDto;
-  extended?: OptimalTimeDto;
-  defaults: OptimalScheduleDefaultsDto;
-}
+export type { OptimalWindowsDto };
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +14,7 @@ export interface ChargeOptimalScheduleDto {
 export class ChargeEvService {
   private readonly http = inject(HttpClient);
   private readonly retryCount = inject(API_RETRY_COUNT);
-  private readonly apiUrl = `${environment.apiUrl}/charge-ev/optimal-schedule`;
+  private readonly apiUrl = `${environment.apiUrl}/optimal-window/presets/charge-ev`;
 
   // Only CORS-safelisted headers, so the browser skips the preflight request
 
@@ -31,10 +24,11 @@ export class ChargeEvService {
     })
   };
 
-  getOptimalSchedule(): Observable<ChargeOptimalScheduleDto> {
+  /** The cheapest 4-hour charging windows in all published prices, cheapest first */
+  getOptimalWindows(): Observable<OptimalWindowsDto> {
     const url = this.apiUrl;
 
-    return this.http.get<ChargeOptimalScheduleDto>(url, this.httpOptions).pipe(
+    return this.http.get<OptimalWindowsDto>(url, this.httpOptions).pipe(
       timeout(30000), // 30 second timeout for iOS
       retry({
         count: this.retryCount,
