@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, afterNextRender, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -17,6 +17,7 @@ import {
 } from '../shared/format/format';
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { OverviewService } from '../shared/services/overview.service';
+import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { recommendDelay } from '../wash-laundry/laundry-recommendation';
@@ -49,7 +50,7 @@ export class HomeComponent {
   private readonly chargeEvService = inject(ChargeEvService);
 
   readonly paths = APP_NAVIGATION_PATHS;
-  readonly now = signal(new Date());
+  readonly now = signal(initialNow());
 
   readonly overview = rxResource({ stream: () => this.overviewService.getOverview() });
   readonly laundry = rxResource({ stream: () => this.washLaundryService.getOptimalSchedule() });
@@ -121,16 +122,20 @@ export class HomeComponent {
   constructor() {
     const destroyRef = inject(DestroyRef);
 
-    const tick = setInterval(() => this.now.set(new Date()), 30 * 1000);
-    destroyRef.onDestroy(() => clearInterval(tick));
+    // Browser only: the clock and reloading when the tab comes back
+    afterNextRender(() => {
+      this.now.set(new Date());
+      const tick = setInterval(() => this.now.set(new Date()), 30 * 1000);
+      destroyRef.onDestroy(() => clearInterval(tick));
 
-    const onVisible = () => {
-      if (document.visibilityState === 'visible' && Date.now() - this.loadedAt > STALE_AFTER_MS) {
-        this.reload();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisible);
-    destroyRef.onDestroy(() => document.removeEventListener('visibilitychange', onVisible));
+      const onVisible = () => {
+        if (document.visibilityState === 'visible' && Date.now() - this.loadedAt > STALE_AFTER_MS) {
+          this.reload();
+        }
+      };
+      document.addEventListener('visibilitychange', onVisible);
+      destroyRef.onDestroy(() => document.removeEventListener('visibilitychange', onVisible));
+    });
   }
 
   reload(): void {

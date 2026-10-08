@@ -60,7 +60,20 @@ npm run lint        # Run ESLint (same as ng lint)
 ### CI
 `.github/workflows/ci.yml` runs lint, tests and build on every pull request.
 
+### Server-side rendering
+Every page is rendered on the server (Angular SSR, `outputMode: server`) so search engines and the first paint get the prices and answers in the HTML.
+- `src/server.ts` is the Express server, `src/app/app.config.server.ts` and `src/app/app.routes.server.ts` the server config and routes (render mode, 404 status, CDN `Cache-Control`: `s-maxage=60, stale-while-revalidate=600`).
+- The browser hydrates the page and reuses the server's API responses (HTTP transfer cache), so it does not fetch them again on first load.
+- Browser-only code (timers, `document`) goes in `afterNextRender`. Components take their first `now` from `initialNow()` (`shared/render-time.ts`), which hands the server's render time to the browser so hydration draws the same content.
+- On the server the API services don't retry (`API_RETRY_COUNT`), and a failed API call marks the page `no-store` so the error page is not cached.
+- Server renders send `x-milloin-ssr-key` from the `SSR_API_KEY` environment variable (set in both Vercel projects) so the API's per-IP rate limit doesn't count them; the key is read only on the server.
+- Hosts allowed to render are listed in `security.allowedHosts` in `angular.json`.
+- Run the production server locally: `npm run build && npm run serve:ssr:milloin-web-app` (http://localhost:4000).
+
 ### Deployment to milloin.xyz
+Vercel builds and deploys `master` to production on every merge, and every pull request gets a preview deployment. `vercel.json` sends every non-file path to the `api/ssr.mjs` function, which runs the Angular server (region `arn1`, Stockholm); static files are served from `dist/milloin-web-app/browser` by the CDN.
+
+Legacy GitHub Pages deployment (fallback until it is turned off):
 ```bash
 npm run domain-build    # Build for production with correct base-href
 npm run domain-deploy   # Deploy to milloin.xyz (creates gh-pages branch with CNAME)
@@ -115,6 +128,8 @@ src/
 │   │   └── trend-tiles/          # Average of the next 6, 12 and 24 hours vs. now
 │   ├── app.component.*           # Root component (router outlet)
 │   ├── app.config.ts             # Application configuration
+│   ├── app.config.server.ts      # Server-side rendering configuration
+│   ├── app.routes.server.ts      # Server render mode, status and cache headers per route
 │   ├── app.paths.ts              # Route paths
 │   └── app.routes.ts             # Application routing
 ├── environments/                 # Environment configurations
@@ -211,4 +226,4 @@ Rich snippets and search result enhancements via Schema.org structured data:
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests
 - Use inject from angular/core for dependency injection instead of legacy constructor way
 - Backend api documentation is located here https://milloin-server.vercel.app/api-json
-- **Public API**: `vercel.json` proxies `/api` to the backend's Swagger UI (https://milloin.xyz/api), `/api/openapi.json` to its OpenAPI document and `/api/<endpoint>` to its endpoints, so other developers can use `https://milloin.xyz/api/...`. These rewrites must stay above the `index.html` catch-all. The home footer links to it.
+- **Public API**: `vercel.json` proxies `/api` to the backend's Swagger UI (https://milloin.xyz/api), `/api/openapi.json` to its OpenAPI document and `/api/<endpoint>` to its endpoints, so other developers can use `https://milloin.xyz/api/...`. These rewrites must stay above the `/(.*)` catch-all that sends pages to the SSR function (`/api/ssr` itself is a function, which Vercel serves before any rewrite). The home footer links to it.

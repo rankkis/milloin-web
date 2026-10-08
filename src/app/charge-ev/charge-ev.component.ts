@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, afterNextRender, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AnswerHeaderComponent } from '../shared/answer-header/answer-header.component';
 import { HourlyChartComponent } from '../shared/hourly-chart/hourly-chart.component';
@@ -11,6 +11,7 @@ import {
   formatWindow,
 } from '../shared/format/format';
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
+import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
@@ -35,7 +36,7 @@ export class ChargeEvComponent {
   readonly schedule = rxResource({ stream: () => this.chargeEvService.getOptimalSchedule() });
   readonly overview = rxResource({ stream: () => this.overviewService.getOverview() });
 
-  readonly now = signal(new Date());
+  readonly now = signal(initialNow());
 
   readonly errorMessage = resourceErrorMessage;
 
@@ -130,6 +131,11 @@ export class ChargeEvComponent {
       `${formatNumber(defaults.powerConsumptionKwh, 0)} kWh:n energialle.`
     );
   });
+
+  constructor() {
+    // A server-rendered page shows the server's time until the browser takes over
+    afterNextRender(() => this.now.set(new Date()));
+  }
 
   refresh(): void {
     this.now.set(new Date());

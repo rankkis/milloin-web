@@ -1,4 +1,4 @@
-import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, afterNextRender, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AnswerHeaderComponent } from '../shared/answer-header/answer-header.component';
@@ -6,6 +6,7 @@ import { IconComponent } from '../shared/icon/icon.component';
 import { formatClock, formatNumber, formatPrice } from '../shared/format/format';
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { StartDelayDto } from '../shared/models/price.model';
+import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
@@ -61,7 +62,7 @@ export class WashLaundryComponent {
   readonly overview = rxResource({ stream: () => this.overviewService.getOverview() });
 
   /** When the answer was calculated; start and end clock times count from here */
-  readonly now = signal(new Date());
+  readonly now = signal(initialNow());
 
   readonly errorMessage = resourceErrorMessage;
   readonly ruleText = RULE_TEXT;
@@ -235,6 +236,11 @@ export class WashLaundryComponent {
   closeTipOutside(event: MouseEvent): void {
     const trigger = this.tipTrigger()?.nativeElement;
     if (trigger && !trigger.contains(event.target as Node)) this.tipOpen.set(false);
+  }
+
+  constructor() {
+    // A server-rendered page shows the server's time until the browser takes over
+    afterNextRender(() => this.now.set(new Date()));
   }
 
   refresh(): void {
