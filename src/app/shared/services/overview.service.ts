@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, timer } from 'rxjs';
 import { catchError, retry, timeout } from 'rxjs/operators';
+import { API_RETRY_COUNT } from './api-retry';
 import { environment } from '../../../environments/environment';
 import {
   HourlyPriceDto,
@@ -36,6 +37,7 @@ export interface OverviewDto {
 })
 export class OverviewService {
   private readonly http = inject(HttpClient);
+  private readonly retryCount = inject(API_RETRY_COUNT);
   private readonly apiUrl = `${environment.apiUrl}/overview`;
 
   // Only CORS-safelisted headers, so the browser skips the preflight request
@@ -52,7 +54,7 @@ export class OverviewService {
     return this.http.get<OverviewDto>(url, this.httpOptions).pipe(
       timeout(30000), // 30 second timeout for iOS
       retry({
-        count: 3,
+        count: this.retryCount,
         delay: (_error, retryIndex) => {
           const delayMs = Math.min(1000 * Math.pow(2, retryIndex), 10000);
           return timer(delayMs);
