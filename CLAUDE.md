@@ -71,7 +71,7 @@ Every page is rendered on the server (Angular SSR, `outputMode: server`) so sear
 - Run the production server locally: `npm run build && npm run serve:ssr:milloin-web-app` (http://localhost:4000).
 
 ### Deployment to milloin.xyz
-Vercel builds and deploys `master` to production on every merge, and every pull request gets a preview deployment. `vercel.json` sends every non-file path to the `api/ssr.mjs` function, which runs the Angular server (region `arn1`, Stockholm); static files are served from `dist/milloin-web-app/browser` by the CDN.
+Vercel builds and deploys `master` to production on every merge, and every pull request gets a preview deployment. `vercel.json` sends every non-file path to the `api/ssr.mjs` function, which runs the Angular server (region `arn1`, Stockholm); static files are served from `dist/milloin-web-app/browser` by the CDN. The Vercel build deletes `browser/index.csr.html`, because Vercel would serve it as the static home page instead of the server render (the server bundle has its own copy).
 
 Legacy GitHub Pages deployment (fallback until it is turned off):
 ```bash
