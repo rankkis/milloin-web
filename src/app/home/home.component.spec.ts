@@ -94,6 +94,9 @@ describe('HomeComponent', () => {
       (element) => element.textContent?.trim() ?? '',
     );
 
+  const boxClasses = (): string[] =>
+    Array.from((fixture.nativeElement as HTMLElement).querySelector('.now__box')?.classList ?? []);
+
   beforeEach(() => {
     jasmine.clock().install();
     jasmine.clock().mockDate(NOW);
@@ -108,6 +111,21 @@ describe('HomeComponent', () => {
     expect(text('h1')).toBe('Milloin…');
     expect(text('.now__value')).toBe('4,82');
     expect(text('.pill')).toBe('Normaali');
+    expect(boxClasses()).toContain('now__box--normal');
+  });
+
+  it('colors the price box by the price category', () => {
+    render(of({ ...overview, current: { price: 14.23, priceCategory: 'EXPENSIVE' } }));
+
+    expect(text('.pill')).toBe('Kallis');
+    expect(boxClasses()).toContain('now__box--expensive');
+    expect(boxClasses()).toContain('now__box');
+  });
+
+  it('keeps the price box neutral while prices load', () => {
+    render(new Observable<OverviewDto>());
+
+    expect(boxClasses()).toContain('now__box--normal');
   });
 
   it('shows a spinner in place of the price while it loads', () => {

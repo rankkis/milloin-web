@@ -18,6 +18,12 @@ $palette: (
   'accent': #2ee06f,
   'warn': #f5a35c,
   'on-accent': #0b0e0c,
+  // Current price box, by price category
+  'price-very-cheap': #2ee06f,
+  'price-cheap': #a6e35a,
+  'price-normal': #93a69a,
+  'price-expensive': #f5a35c,
+  'price-very-expensive': #ff5f52,
 );
 
 /// Emits every palette color as a --color-* custom property

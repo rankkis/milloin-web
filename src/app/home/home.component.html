@@ -6,27 +6,29 @@
 
   <div class="price-and-chart">
     <section class="now" aria-label="Sähkön hinta nyt">
-      <div class="now__label-row">
-        <h2 class="label">Hintataso nyt</h2>
-        @if (current(); as current) {
-          <span class="pill">{{ current.category }}</span>
+      <div class="now__box" [class]="'now__box--' + tone()">
+        <div class="now__label-row">
+          <h2 class="label">Hintataso nyt</h2>
+          @if (current(); as current) {
+            <span class="pill"><span class="pill__dot" aria-hidden="true"></span>{{ current.category }}</span>
+          }
+        </div>
+
+        @if (overview.error(); as error) {
+          <div class="error" role="alert">
+            <p>{{ errorMessage(error) }}</p>
+            <button type="button" class="retry" data-test-id="home-retry" (click)="reload()">
+              <app-icon name="refresh" [size]="18" />
+              Yritä uudelleen
+            </button>
+          </div>
+        } @else {
+          <p class="now__price" [attr.aria-busy]="overview.isLoading()">
+            <span class="now__value">@if (current(); as current) { {{ current.price }} } @else if (overview.isLoading()) { <app-spinner /> } @else { – }</span>
+            <span class="now__unit">c/kWh</span>
+          </p>
         }
       </div>
-
-      @if (overview.error(); as error) {
-        <div class="error" role="alert">
-          <p>{{ errorMessage(error) }}</p>
-          <button type="button" class="retry" data-test-id="home-retry" (click)="reload()">
-            <app-icon name="refresh" [size]="18" />
-            Yritä uudelleen
-          </button>
-        </div>
-      } @else {
-        <p class="now__price" [attr.aria-busy]="overview.isLoading()">
-          <span class="now__value">@if (current(); as current) { {{ current.price }} } @else if (overview.isLoading()) { <app-spinner /> } @else { – }</span>
-          <span class="now__unit">c/kWh</span>
-        </p>
-      }
 
       <!-- Reserved for an ad or a price analysis on wide screens -->
       <aside class="reserved" aria-hidden="true"></aside>

@@ -73,6 +73,43 @@ h2 {
   gap: var(--space-2);
 }
 
+// Box around the label and the price, colored by the price category
+$tones: (
+  very-cheap: 16%,
+  cheap: 14%,
+  normal: 8%,
+  expensive: 16%,
+  very-expensive: 20%,
+);
+
+@each $tone, $fill in $tones {
+  .now__box--#{$tone} {
+    --tone: #{color(price-#{$tone})};
+    --tone-fill: #{$fill};
+  }
+}
+
+.now__box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) 18px;
+  background: color-mix(in srgb, var(--tone) var(--tone-fill), transparent);
+  border: 1px solid color-mix(in srgb, var(--tone) calc(var(--tone-fill) * 2), transparent);
+  border-radius: 14px;
+
+  .pill {
+    color: var(--tone);
+    background: color-mix(in srgb, var(--tone) 18%, transparent);
+    border-color: color-mix(in srgb, var(--tone) 55%, transparent);
+  }
+}
+
+// A normal price keeps the plain text color
+.now__box--normal .pill {
+  color: color(text);
+}
+
 .now__label-row {
   display: flex;
   justify-content: space-between;
@@ -82,11 +119,21 @@ h2 {
 }
 
 .pill {
-  padding: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 9px;
   border: 1px solid color(border-strong);
   border-radius: var(--radius-pill);
   font-size: 13px;
   font-weight: 500;
+}
+
+.pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tone);
 }
 
 .now__price {
@@ -272,6 +319,11 @@ h2 {
     flex: 1 0 auto;
     min-width: 340px;
     gap: var(--space-3);
+  }
+
+  .now__box {
+    gap: var(--space-3);
+    padding: var(--space-6) 28px 28px;
   }
 
   .now__label-row {
