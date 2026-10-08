@@ -4,7 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { HomeComponent } from './home.component';
 import { OverviewDto, OverviewService } from '../shared/services/overview.service';
 import {
-  WashLaundryOptimalScheduleDto,
+  LaundrySchedule,
   WashLaundryService,
 } from '../wash-laundry/wash-laundry.service';
 import { ChargeEvService } from '../charge-ev/charge-ev.service';
@@ -49,14 +49,10 @@ const delay = (delayHours: number, costCents: number, isBest = false): StartDela
   isBest,
 });
 
-const laundry: WashLaundryOptimalScheduleDto = {
+const laundry: LaundrySchedule = {
   startDelays: [delay(0, 9.5), delay(1, 4.02), delay(2, 4.5), delay(3, 4, true)],
-  defaults: {
-    exchangeTariffCentsKwh: 0,
-    marginTariffCentsKwh: 0,
-    powerConsumptionKwh: 1,
-    periodHours: 2,
-  },
+  durationHours: 2,
+  energyKwh: 1,
 };
 
 const ev: OptimalWindowsDto = {
@@ -73,7 +69,7 @@ describe('HomeComponent', () => {
 
   const render = (
     overview$: Observable<OverviewDto> = of(overview),
-    laundrySchedule: WashLaundryOptimalScheduleDto = laundry,
+    laundrySchedule: LaundrySchedule = laundry,
   ) => {
     TestBed.configureTestingModule({
       imports: [HomeComponent],

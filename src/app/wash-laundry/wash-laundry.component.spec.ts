@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { WashLaundryComponent } from './wash-laundry.component';
-import { WashLaundryOptimalScheduleDto, WashLaundryService } from './wash-laundry.service';
+import { LaundrySchedule, WashLaundryService } from './wash-laundry.service';
 import { OverviewDto, OverviewService } from '../shared/services/overview.service';
 import { StartDelayDto } from '../shared/models/price.model';
 
@@ -19,14 +19,10 @@ const delay = (delayHours: number, costCents: number, isBest = false): StartDela
   isBest,
 });
 
-const schedule = (startDelays: StartDelayDto[]): WashLaundryOptimalScheduleDto => ({
+const schedule = (startDelays: StartDelayDto[]): LaundrySchedule => ({
   startDelays,
-  defaults: {
-    exchangeTariffCentsKwh: 0,
-    marginTariffCentsKwh: 0,
-    powerConsumptionKwh: 1.5,
-    periodHours: 2,
-  },
+  durationHours: 2,
+  energyKwh: 1.5,
 });
 
 const overview = {
@@ -36,7 +32,7 @@ const overview = {
 describe('WashLaundryComponent', () => {
   let fixture: ComponentFixture<WashLaundryComponent>;
 
-  const render = (schedule$: Observable<WashLaundryOptimalScheduleDto>) => {
+  const render = (schedule$: Observable<LaundrySchedule>) => {
     TestBed.configureTestingModule({
       imports: [WashLaundryComponent],
       providers: [

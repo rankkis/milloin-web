@@ -80,7 +80,7 @@ export class HomeComponent {
   });
 
   readonly laundryAnswer = computed<Answer | undefined>(() => {
-    const delays = (this.laundry.hasValue() ? this.laundry.value() : undefined)?.startDelays ?? [];
+    const delays = this.laundry.hasValue() ? this.laundry.value().startDelays : [];
     const recommendation = recommendDelay(delays);
     if (!recommendation) return undefined;
     const { recommended, cheapest } = recommendation;
