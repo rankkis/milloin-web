@@ -4,6 +4,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/milloin-web-app/browser",
   "redirects": [
+    { "source": "/api/", "destination": "/api", "permanent": true },
     {
       "source": "/:path(.*)",
       "has": [{ "type": "host", "value": "www.milloin.xyz" }],
