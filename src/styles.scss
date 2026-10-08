@@ -2,15 +2,13 @@
 
 @use 'colors';
 
-// IBM Plex Sans for text, IBM Plex Mono for prices and times
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
-
 // Design tokens
 :root {
   // Colors, from src/styles/_colors.scss
   @include colors.tokens;
 
-  // Typography
+  // Typography: IBM Plex Sans for text, IBM Plex Mono for prices and times,
+  // self-hosted latin subsets from @fontsource (see styles in angular.json)
   --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --text-label-size: 12px;

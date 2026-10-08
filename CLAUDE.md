@@ -101,6 +101,7 @@ src/
 │   ├── home/                     # Home: current price, price chart, trend tiles, questions
 │   ├── wash-laundry/             # When to wash laundry
 │   ├── charge-ev/                # When to charge the EV
+│   ├── not-found/                # Page for unknown addresses (noindex)
 │   ├── shared/
 │   │   ├── answer-header/        # Back link, current price and refresh on question pages
 │   │   │                         # (shared question page styles: src/styles/_answer-page.scss)
@@ -108,6 +109,7 @@ src/
 │   │   ├── hourly-chart/         # Hourly price bars from now: gridlines, +6/+12/+24 h markers, tooltip
 │   │   ├── icon/                 # Inline SVG icons
 │   │   ├── models/               # API DTOs
+│   │   ├── seo/                  # Per-page title, description, canonical and Open Graph tags
 │   │   ├── services/             # API services
 │   │   ├── spinner/              # Loading spinner shown until prices arrive
 │   │   └── trend-tiles/          # Average of the next 6, 12 and 24 hours vs. now
@@ -129,6 +131,7 @@ src/
 ### UI
 - No UI component library. Plain HTML and SCSS with design tokens as CSS custom properties in `src/styles.scss` (fonts, radius, spacing, tap size) and colors in `src/styles/_colors.scss`.
 - **Look**: dark background, one green accent (`accent`), IBM Plex Sans for text and IBM Plex Mono for prices and times.
+- **Fonts**: self-hosted latin subsets from `@fontsource/ibm-plex-sans` and `@fontsource/ibm-plex-mono`, listed in `styles` in `angular.json`; no Google Fonts.
 - **Icons**: inline SVG through `IconComponent` (`shared/icon`); no icon fonts, no emoji.
 - **Layout**: mobile first; the home screen widens to price and chart side by side (768 px) and a question table (960 px). Question pages are a single column up to 560 px.
 
@@ -149,7 +152,7 @@ src/
 - Tracks page views and user behavior automatically
 
 ### SEO Meta Tags
-All SEO meta tags are defined in `src/index.html`:
+Each route in `app.routes.ts` has its own `title` and `data.description`; `SeoTitleStrategy` (`shared/seo`) sets the title, description, canonical URL and `og:`/`twitter:` title, description and URL on every navigation. The tags in `src/index.html` are the home page's and the defaults:
 - **Title**: "Milloin… – Pörssisähkön hinta nyt ja halvimmat tunnit"
 - **Description**: Optimized for search engines with relevant keywords
 - **Keywords**: electricity price, spot price, cheapest hour, EV charging, laundry, energy savings (in Finnish)
@@ -157,7 +160,7 @@ All SEO meta tags are defined in `src/index.html`:
 - **Twitter Card Tags**: For Twitter/X sharing
 
 **Important**: When adding new features or pages:
-1. Update meta description to reflect new content
+1. Give the route a `title` and `data.description`, and update the home meta description in `src/index.html` if the site's content changes
 2. Add new routes to `src/sitemap.xml`
 3. Keep heading hierarchy coherent (h1 → h2 → h3 → h4)
 4. Update sitemap lastmod date when making significant changes
@@ -200,7 +203,7 @@ Rich snippets and search result enhancements via Schema.org structured data:
 - Schema.org Validator: https://validator.schema.org/
 
 ## Important Notes
-- This is an Angular 22 project; components default to OnPush change detection
+- This is an Angular 22 project; components default to OnPush change detection and the app is zoneless (`provideZonelessChangeDetection`, no zone.js in the build; tests still load zone.js for `fakeAsync`)
 - Uses SCSS for styling
 - Colors are defined only in `src/styles/_colors.scss`. In SCSS, `@use 'colors' as *` and use `color(accent)` or `alpha(accent, 10%)`, or the `--color-*` custom properties; never hex or rgba values.
 - Routing is enabled

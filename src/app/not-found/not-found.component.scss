@@ -1,0 +1,14 @@
+@use 'colors' as *;
+@use 'answer-page';
+
+@include answer-page.styles;
+
+.home {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  font-size: 17px;
+  font-weight: 500;
+  color: color(accent);
+}
