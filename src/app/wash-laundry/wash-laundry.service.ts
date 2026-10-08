@@ -1,21 +1,39 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, timer } from 'rxjs';
-import { catchError, retry, timeout } from 'rxjs/operators';
+import { catchError, map, retry, timeout } from 'rxjs/operators';
 import { API_RETRY_COUNT } from '../shared/services/api-retry';
 import { environment } from '../../environments/environment';
-import { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto, StartDelayDto } from '../shared/models/price.model';
+import { OptimalWindowsDto, StartDelayDto } from '../shared/models/price.model';
 
-export type { PriceCategory, OptimalTimeDto, OptimalScheduleDefaultsDto, StartDelayDto };
+export type { StartDelayDto };
 
-export interface WashLaundryOptimalScheduleDto {
-  now?: OptimalTimeDto;
-  today?: OptimalTimeDto;
-  tonight?: OptimalTimeDto;
-  tomorrow?: OptimalTimeDto;
-  /** Cost of starting now or after a 1-5 hour timer delay */
-  startDelays?: StartDelayDto[];
-  defaults: OptimalScheduleDefaultsDto;
+export interface LaundrySchedule {
+  /** Cost of starting now or after a 1-5 hour timer delay, in order of delay */
+  startDelays: StartDelayDto[];
+  /** Length of the washing program, hours */
+  durationHours: number;
+  /** Electricity used by one wash, kWh */
+  energyKwh: number;
+}
+
+/** The preset's start offsets as timer delays; the cheapest (earliest on a tie) is isBest */
+export function toLaundrySchedule(response: OptimalWindowsDto): LaundrySchedule {
+  const startDelays: StartDelayDto[] = (response.startOffsets ?? []).map((window) => ({
+    delayHours: window.offsetHours,
+    startTime: window.startTime,
+    endTime: window.endTime,
+    priceAvg: window.priceAvg,
+    priceCategory: window.priceCategory,
+    costCents: window.costCents ?? 0,
+    isBest: false,
+  }));
+  const best = startDelays.reduce<StartDelayDto | undefined>(
+    (cheapest, delay) => (!cheapest || delay.costCents < cheapest.costCents ? delay : cheapest),
+    undefined,
+  );
+  if (best) best.isBest = true;
+  return { startDelays, durationHours: response.durationHours, energyKwh: response.energyKwh ?? 0 };
 }
 
 @Injectable({
@@ -24,7 +42,7 @@ export interface WashLaundryOptimalScheduleDto {
 export class WashLaundryService {
   private readonly http = inject(HttpClient);
   private readonly retryCount = inject(API_RETRY_COUNT);
-  private readonly apiUrl = `${environment.apiUrl}/wash-laundry/optimal-schedule`;
+  private readonly apiUrl = `${environment.apiUrl}/optimal-window/presets/wash-laundry`;
 
   // Only CORS-safelisted headers, so the browser skips the preflight request
 
@@ -34,11 +52,12 @@ export class WashLaundryService {
     })
   };
 
-  getOptimalSchedule(): Observable<WashLaundryOptimalScheduleDto> {
+  getOptimalSchedule(): Observable<LaundrySchedule> {
     const url = this.apiUrl;
 
 
-    return this.http.get<WashLaundryOptimalScheduleDto>(url, this.httpOptions).pipe(
+    return this.http.get<OptimalWindowsDto>(url, this.httpOptions).pipe(
+      map(toLaundrySchedule),
       timeout(30000), // 30 second timeout for iOS
       retry({
         count: this.retryCount,

@@ -14,13 +14,6 @@ export interface OptimalTimeDto {
   pricePoints: PricePointDto[];
 }
 
-export interface OptimalScheduleDefaultsDto {
-  exchangeTariffCentsKwh: number;
-  marginTariffCentsKwh: number;
-  powerConsumptionKwh: number;
-  periodHours: number;
-}
-
 /** A window from the API's optimal-window endpoints */
 export interface WindowDto extends OptimalTimeDto {
   /** Present when the request had energyKwh */
@@ -38,6 +31,13 @@ export interface OptimalWindowsDto {
   /** The window starting now, left out when prices do not reach far enough */
   startNow?: WindowDto;
   windows: WindowDto[];
+  /** The window of each requested start offset, in order of offsetHours */
+  startOffsets?: StartOffsetWindowDto[];
+}
+
+/** The window starting a given number of hours from now */
+export interface StartOffsetWindowDto extends WindowDto {
+  offsetHours: number;
 }
 
 /** Average price of one hour on today's chart */

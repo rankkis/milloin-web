@@ -77,7 +77,7 @@ export class WashLaundryComponent {
   );
 
   private readonly delays = computed<StartDelayDto[]>(() =>
-    [...(this.schedule.hasValue() ? (this.schedule.value().startDelays ?? []) : [])].sort(
+    [...(this.schedule.hasValue() ? this.schedule.value().startDelays : [])].sort(
       (a, b) => a.delayHours - b.delayHours,
     ),
   );
@@ -90,7 +90,7 @@ export class WashLaundryComponent {
     const { recommended, cheapest, saving, extraSavingIfWaitLonger: diff, hours } = recommendation;
 
     const start = new Date(this.now().getTime() + recommended.delayHours * HOUR_MS);
-    const periodHours = this.schedule.value()?.defaults.periodHours ?? 2;
+    const periodHours = this.schedule.value()?.durationHours ?? 2;
     const end = new Date(start.getTime() + periodHours * HOUR_MS);
     const times = `käynnistyy ${formatClock(start)} · valmis ${formatClock(end)}`;
     const cheaperLater = cheapest !== recommended;
@@ -210,10 +210,11 @@ export class WashLaundryComponent {
   });
 
   readonly basis = computed(() => {
-    const defaults = this.schedule.hasValue() ? this.schedule.value().defaults : undefined;
-    if (!defaults) return undefined;
-    const kwh = formatNumber(defaults.powerConsumptionKwh, defaults.powerConsumptionKwh % 1 ? 1 : 0);
-    return `Laskettu ${defaults.periodHours} tunnin ohjelmalle ja ${kwh} kWh:n kulutukselle.`;
+    const schedule = this.schedule.hasValue() ? this.schedule.value() : undefined;
+    if (!schedule) return undefined;
+    const kwh = formatNumber(schedule.energyKwh, schedule.energyKwh % 1 ? 1 : 0);
+    const hours = formatNumber(schedule.durationHours, schedule.durationHours % 1 ? 1 : 0);
+    return `Laskettu ${hours} tunnin ohjelmalle ja ${kwh} kWh:n kulutukselle.`;
   });
 
   /** Shows the tooltip for a mouse; touch and pen open it with a tap */
