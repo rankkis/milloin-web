@@ -54,7 +54,7 @@ export class HomeComponent {
 
   readonly overview = rxResource({ stream: () => this.overviewService.getOverview() });
   readonly laundry = rxResource({ stream: () => this.washLaundryService.getOptimalSchedule() });
-  readonly ev = rxResource({ stream: () => this.chargeEvService.getOptimalSchedule() });
+  readonly ev = rxResource({ stream: () => this.chargeEvService.getOptimalWindows() });
 
   private loadedAt = Date.now();
 
@@ -102,13 +102,10 @@ export class HomeComponent {
 
   readonly evAnswer = computed<Answer | undefined>(() => {
     const schedule = this.ev.hasValue() ? this.ev.value() : undefined;
-    if (!schedule) return undefined;
 
-    const window =
-      schedule.extended && schedule.extended.priceAvg < schedule.next12Hours.priceAvg
-        ? schedule.extended
-        : schedule.next12Hours;
-    const costEuros = (window.priceAvg * schedule.defaults.powerConsumptionKwh) / 100;
+    const window = schedule?.windows[0];
+    if (!window) return undefined;
+    const costEuros = (window.priceAvg * (schedule.energyKwh ?? 0)) / 100;
     const day = formatDay(window.startTime, this.now());
     return {
       value: formatWindow(window.startTime, window.endTime),

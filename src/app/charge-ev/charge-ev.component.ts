@@ -33,7 +33,7 @@ export class ChargeEvComponent {
   private readonly chargeEvService = inject(ChargeEvService);
   private readonly overviewService = inject(OverviewService);
 
-  readonly schedule = rxResource({ stream: () => this.chargeEvService.getOptimalSchedule() });
+  readonly schedule = rxResource({ stream: () => this.chargeEvService.getOptimalWindows() });
   readonly overview = rxResource({ stream: () => this.overviewService.getOverview() });
 
   readonly now = signal(initialNow());
@@ -44,16 +44,14 @@ export class ChargeEvComponent {
     this.overview.hasValue() ? formatPrice(this.overview.value().current.price) : undefined,
   );
 
-  /** Cheapest charging window: the next 12 hours, or later if that is cheaper */
-  readonly bestWindow = computed(() => {
-    if (!this.schedule.hasValue()) return undefined;
-    const { next12Hours, extended } = this.schedule.value();
-    return extended && extended.priceAvg < next12Hours.priceAvg ? extended : next12Hours;
-  });
+  /** Cheapest charging window in all published prices */
+  readonly bestWindow = computed(() =>
+    this.schedule.hasValue() ? this.schedule.value().windows[0] : undefined,
+  );
 
   /** Energy cost in cents of a window */
   private costCents(priceAvg: number): number {
-    const kwh = this.schedule.hasValue() ? this.schedule.value().defaults.powerConsumptionKwh : 0;
+    const kwh = this.schedule.hasValue() ? (this.schedule.value().energyKwh ?? 0) : 0;
     return priceAvg * kwh;
   }
 
@@ -88,13 +86,13 @@ export class ChargeEvComponent {
 
     const schedule = this.schedule.value();
     const bestCost = this.costCents(best.priceAvg);
-    const nowCost = this.costCents(schedule.now.priceAvg);
+    const nowCost = schedule.startNow ? this.costCents(schedule.startNow.priceAvg) : bestCost;
     const saved = nowCost - bestCost;
     const savedPct = nowCost > 0 ? Math.round((saved / nowCost) * 100) : 0;
 
     return {
       cost: euros(bestCost),
-      kwh: `${formatNumber(schedule.defaults.powerConsumptionKwh, 0)} kWh`,
+      kwh: `${formatNumber(schedule.energyKwh ?? 0, 0)} kWh`,
       savingPct: savedPct > 0 ? `−${savedPct} %` : '0 %',
       saving: saved > 0 ? euros(saved) : 'nyt on halvin',
       spot: formatPrice(best.priceAvg),
@@ -106,29 +104,32 @@ export class ChargeEvComponent {
     const best = this.bestWindow();
     if (!best || !this.schedule.hasValue()) return [];
 
-    const schedule = this.schedule.value();
-    return [
+    const { startNow } = this.schedule.value();
+    const rows = [
       {
         label: capitalize(formatDay(best.startTime, this.now())),
         window: formatWindow(best.startTime, best.endTime),
         cost: euros(this.costCents(best.priceAvg)),
         isBest: true,
       },
-      {
-        label: 'Jos lataat heti',
-        window: formatWindow(schedule.now.startTime, schedule.now.endTime),
-        cost: euros(this.costCents(schedule.now.priceAvg)),
-        isBest: false,
-      },
     ];
+    if (startNow) {
+      rows.push({
+        label: 'Jos lataat heti',
+        window: formatWindow(startNow.startTime, startNow.endTime),
+        cost: euros(this.costCents(startNow.priceAvg)),
+        isBest: false,
+      });
+    }
+    return rows;
   });
 
   readonly basis = computed(() => {
-    const defaults = this.schedule.hasValue() ? this.schedule.value().defaults : undefined;
-    if (!defaults) return undefined;
+    const schedule = this.schedule.hasValue() ? this.schedule.value() : undefined;
+    if (!schedule) return undefined;
     return (
-      `Laskettu ${defaults.periodHours} tunnin lataukselle ja ` +
-      `${formatNumber(defaults.powerConsumptionKwh, 0)} kWh:n energialle.`
+      `Laskettu ${formatNumber(schedule.durationHours, 0)} tunnin lataukselle ja ` +
+      `${formatNumber(schedule.energyKwh ?? 0, 0)} kWh:n energialle.`
     );
   });
 

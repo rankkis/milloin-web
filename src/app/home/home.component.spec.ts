@@ -7,8 +7,8 @@ import {
   WashLaundryOptimalScheduleDto,
   WashLaundryService,
 } from '../wash-laundry/wash-laundry.service';
-import { ChargeEvService, ChargeOptimalScheduleDto } from '../charge-ev/charge-ev.service';
-import { HourlyPriceDto, OptimalTimeDto, StartDelayDto } from '../shared/models/price.model';
+import { ChargeEvService } from '../charge-ev/charge-ev.service';
+import { HourlyPriceDto, OptimalTimeDto, OptimalWindowsDto, StartDelayDto } from '../shared/models/price.model';
 
 // 2026-10-07 13:42 Finnish summer time (UTC+3)
 const NOW = new Date('2026-10-07T10:42:00.000Z');
@@ -59,15 +59,13 @@ const laundry: WashLaundryOptimalScheduleDto = {
   },
 };
 
-const ev: ChargeOptimalScheduleDto = {
-  now: optimal('2026-10-07T10:30:00.000Z', '2026-10-07T14:30:00.000Z', 5),
-  next12Hours: optimal('2026-10-07T22:00:00.000Z', '2026-10-08T02:00:00.000Z', 2.2),
-  defaults: {
-    exchangeTariffCentsKwh: 0,
-    marginTariffCentsKwh: 0,
-    powerConsumptionKwh: 11,
-    periodHours: 4,
-  },
+const ev: OptimalWindowsDto = {
+  durationHours: 4,
+  energyKwh: 11,
+  earliestStart: '2026-10-07T10:30:00.000Z',
+  latestEnd: '2026-10-08T21:00:00.000Z',
+  startNow: optimal('2026-10-07T10:30:00.000Z', '2026-10-07T14:30:00.000Z', 5),
+  windows: [optimal('2026-10-07T22:00:00.000Z', '2026-10-08T02:00:00.000Z', 2.2)],
 };
 
 describe('HomeComponent', () => {
@@ -83,7 +81,7 @@ describe('HomeComponent', () => {
         provideRouter([]),
         { provide: OverviewService, useValue: { getOverview: () => overview$ } },
         { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundrySchedule) } },
-        { provide: ChargeEvService, useValue: { getOptimalSchedule: () => of(ev) } },
+        { provide: ChargeEvService, useValue: { getOptimalWindows: () => of(ev) } },
       ],
     });
     fixture = TestBed.createComponent(HomeComponent);

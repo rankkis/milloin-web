@@ -21,6 +21,25 @@ export interface OptimalScheduleDefaultsDto {
   periodHours: number;
 }
 
+/** A window from the API's optimal-window endpoints */
+export interface WindowDto extends OptimalTimeDto {
+  /** Present when the request had energyKwh */
+  costCents?: number;
+  /** Saving vs. startNow; present when energyKwh and startNow are known */
+  savingsCents?: number;
+}
+
+/** Cheapest windows for a preset or custom request, cheapest first */
+export interface OptimalWindowsDto {
+  durationHours: number;
+  energyKwh?: number;
+  earliestStart: string;
+  latestEnd: string;
+  /** The window starting now, left out when prices do not reach far enough */
+  startNow?: WindowDto;
+  windows: WindowDto[];
+}
+
 /** Average price of one hour on today's chart */
 export interface HourlyPriceDto {
   startTime: string;
