@@ -18,6 +18,7 @@ import {
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { OverviewService } from '../shared/services/overview.service';
 import { resourceErrorMessage } from '../shared/resource-error';
+import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { recommendDelay } from '../wash-laundry/laundry-recommendation';
 import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
 
@@ -38,7 +39,7 @@ interface Answer {
 
 @Component({
   selector: 'app-home',
-  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, TrendTilesComponent],
+  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, SpinnerComponent, TrendTilesComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
