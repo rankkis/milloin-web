@@ -1,6 +1,6 @@
 @use 'colors' as *;
 
-$wide: 720px;
+$wide: 768px;
 $table: 960px;
 
 :host {
@@ -59,7 +59,7 @@ h2 {
   color: color(text-muted);
 }
 
-// Current price and cheapest window
+// Current price
 
 .price-and-chart {
   display: flex;
@@ -108,50 +108,6 @@ h2 {
   color: color(text-muted);
 }
 
-.window {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-  margin-top: var(--space-2);
-  padding: var(--space-3) 14px;
-  background: color(surface);
-  border: 1px solid color(border);
-  border-radius: var(--radius);
-}
-
-.window__text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.window__label {
-  font-size: 13px;
-  color: color(text-muted);
-}
-
-.window__time {
-  font-family: var(--font-mono);
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  color: color(accent);
-}
-
-.window__price {
-  font-family: var(--font-mono);
-  font-size: 16px;
-
-  .unit {
-    font-size: 13px;
-    color: color(text-muted);
-  }
-}
-
 .error {
   display: flex;
   flex-direction: column;
@@ -183,15 +139,14 @@ h2 {
 
 // Chart
 
+.reserved {
+  display: none;
+}
+
 .chart {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.chart__labels {
-  display: none;
-  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 // Questions
@@ -299,7 +254,7 @@ h2 {
   .price-and-chart {
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: stretch;
     gap: 28px 64px;
   }
 
@@ -326,38 +281,23 @@ h2 {
     font-size: 22px;
   }
 
-  .window {
-    gap: var(--space-2) var(--space-5);
-    padding: 14px var(--space-4);
-  }
-
-  .window__label {
-    font-size: 14px;
-  }
-
-  .window__time {
-    font-size: 32px;
-  }
-
-  .window__price {
-    font-size: 18px;
-
-    .unit {
-      font-size: 14px;
-    }
+  .reserved {
+    display: block;
+    flex-grow: 1;
+    min-height: 140px;
+    margin-top: var(--space-4);
+    border: 1px dashed color(border-strong);
+    border-radius: var(--radius);
   }
 
   .chart {
     flex: 999 1 480px;
     min-width: 0;
+    gap: 10px;
   }
 
-  .chart__labels {
-    display: flex;
-
-    .label {
-      font-size: 12px;
-    }
+  .chart__plot {
+    --plot-height: 190px;
   }
 
   .questions {

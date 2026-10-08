@@ -1,8 +1,9 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AnswerHeaderComponent } from '../shared/answer-header/answer-header.component';
+import { IconComponent } from '../shared/icon/icon.component';
 import { formatClock, formatNumber, formatPrice } from '../shared/format/format';
-import { PRICE_CATEGORY_TEXT, priceCategoryOf } from '../shared/format/price-category';
+import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { StartDelayDto } from '../shared/models/price.model';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
@@ -32,7 +33,7 @@ interface DelayOption {
 
 @Component({
   selector: 'app-wash-laundry',
-  imports: [AnswerHeaderComponent],
+  imports: [AnswerHeaderComponent, IconComponent],
   templateUrl: './wash-laundry.component.html',
   styleUrl: './wash-laundry.component.scss',
 })
@@ -108,7 +109,7 @@ export class WashLaundryComponent {
       savingPct: savedPct > 0 ? `−${savedPct} %` : '0 %',
       saving: savedCents > 0 ? `${formatNumber(savedCents, 1)} senttiä` : 'nyt on halvin',
       spot: formatPrice(best.priceAvg),
-      category: PRICE_CATEGORY_TEXT[priceCategoryOf(best.priceAvg)].toLowerCase(),
+      category: PRICE_CATEGORY_TEXT[best.priceCategory]?.toLowerCase(),
     };
   });
 
@@ -116,7 +117,7 @@ export class WashLaundryComponent {
     const defaults = this.schedule.hasValue() ? this.schedule.value().defaults : undefined;
     if (!defaults) return undefined;
     const kwh = formatNumber(defaults.powerConsumptionKwh, defaults.powerConsumptionKwh % 1 ? 1 : 0);
-    return `Laskettu ${defaults.periodHours} tunnin ohjelmalle ja ${kwh} kWh:n kulutukselle. Hinnat sisältävät arvonlisäveron mutta eivät siirtomaksuja.`;
+    return `Laskettu ${defaults.periodHours} tunnin ohjelmalle ja ${kwh} kWh:n kulutukselle.`;
   });
 
   refresh(): void {

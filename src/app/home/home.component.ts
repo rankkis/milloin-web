@@ -6,13 +6,13 @@ import { APP_NAVIGATION_PATHS } from '../app.paths';
 import { ChargeEvService } from '../charge-ev/charge-ev.service';
 import { HourlyChartComponent } from '../shared/hourly-chart/hourly-chart.component';
 import { IconComponent } from '../shared/icon/icon.component';
+import { TrendTilesComponent } from '../shared/trend-tiles/trend-tiles.component';
 import {
   formatClock,
   formatDate,
   formatDay,
   formatNumber,
   formatPrice,
-  formatTimeUntil,
   formatWindow,
 } from '../shared/format/format';
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
@@ -37,7 +37,7 @@ interface Answer {
 
 @Component({
   selector: 'app-home',
-  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent],
+  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, TrendTilesComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -70,16 +70,10 @@ export class HomeComponent {
     };
   });
 
-  readonly cheapestWindow = computed(() => {
-    const window = this.overviewData()?.cheapestWindow;
-    if (!window) return undefined;
-
-    const until = formatTimeUntil(window.startTime, this.now());
-    return {
-      label: until ? `Halvimmillaan · ${until} päästä` : 'Halvimmillaan · nyt',
-      time: formatWindow(window.startTime, window.endTime),
-      price: formatPrice(window.priceAvg),
-    };
+  /** Hourly prices from the current hour on; drops hours that ended since loading */
+  readonly upcoming = computed(() => {
+    const now = this.now().getTime();
+    return (this.overviewData()?.upcomingHours ?? []).filter((hour) => Date.parse(hour.endTime) > now);
   });
 
   readonly laundryAnswer = computed<Answer | undefined>(() => {

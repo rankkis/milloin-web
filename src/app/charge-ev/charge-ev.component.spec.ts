@@ -4,11 +4,10 @@ import { Observable, of, throwError } from 'rxjs';
 import { ChargeEvComponent } from './charge-ev.component';
 import { ChargeEvService, ChargeOptimalScheduleDto } from './charge-ev.service';
 import { OverviewDto, OverviewService } from '../shared/services/overview.service';
-import { OptimalTimeDto, PricePointDto } from '../shared/models/price.model';
+import { HourlyPriceDto, OptimalTimeDto } from '../shared/models/price.model';
 
 // 2026-10-07 13:42 Finnish summer time (UTC+3)
 const NOW = new Date('2026-10-07T10:42:00.000Z');
-const QUARTER_MS = 15 * 60 * 1000;
 
 const optimal = (startTime: string, endTime: string, priceAvg: number): OptimalTimeDto => ({
   startTime,
@@ -31,19 +30,22 @@ const schedule = (extended?: OptimalTimeDto): ChargeOptimalScheduleDto => ({
   },
 });
 
-// 24 hours of quarters from 13:45 Finnish time
-const futurePoints: PricePointDto[] = Array.from({ length: 97 }, (_, q) => {
-  const start = Date.parse('2026-10-07T10:45:00.000Z') + q * QUARTER_MS;
+const HOUR_MS = 60 * 60 * 1000;
+
+// 30 hours from 13:00 Finnish time, the current hour
+const upcomingHours: HourlyPriceDto[] = Array.from({ length: 30 }, (_, hour) => {
+  const start = Date.parse('2026-10-07T10:00:00.000Z') + hour * HOUR_MS;
   return {
     startTime: new Date(start).toISOString(),
-    endTime: new Date(start + QUARTER_MS).toISOString(),
-    price: 5,
+    endTime: new Date(start + HOUR_MS).toISOString(),
+    priceAvg: 5,
+    priceCategory: 'NORMAL',
   };
 });
 
 const overview = {
   current: { price: 4.82, priceCategory: 'NORMAL' },
-  future: { priceAvg: 5, priceCategory: 'NORMAL', pricePoints: futurePoints },
+  upcomingHours,
 } as OverviewDto;
 
 describe('ChargeEvComponent', () => {
@@ -97,8 +99,8 @@ describe('ChargeEvComponent', () => {
     render(of(schedule()));
 
     expect(texts('.stat__value')).toEqual(['0,25 €', '−34 %', '2,23']);
-    expect(texts('.stat__note')).toEqual(['11 kWh', '0,12 €', 'c/kWh · erittäin halpa']);
-    expect(text('.basis')).toContain('Laskettu 4 tunnin lataukselle ja 11 kWh:n energialle.');
+    expect(texts('.stat__note')).toEqual(['11 kWh', '0,12 €', 'c/kWh · halpa']);
+    expect(text('.basis')).toBe('Laskettu 4 tunnin lataukselle ja 11 kWh:n energialle.');
   });
 
   it('compares the window with charging right away', () => {
@@ -112,12 +114,24 @@ describe('ChargeEvComponent', () => {
   it('charts the next 24 hours with the window highlighted', () => {
     render(of(schedule()));
 
-    const bars = Array.from(element().querySelectorAll('.bars > div')).map((bar) => bar.className);
+    const bars = Array.from(element().querySelectorAll('.bar')).map((bar) => bar.className);
     expect(bars.length).toBe(24);
     expect(bars[0]).toBe('bar bar--current');
     // 01:00 Finnish time is the 12th hour after 13:00
     expect(bars.slice(12, 16)).toEqual(Array(4).fill('bar bar--window'));
-    expect(texts('.axis span')).toEqual(['nyt', '19', '01', '07', '13']);
+    expect(text('app-hourly-chart h2')).toBe('Seuraavat 24 tuntia');
+    expect(
+      Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.tick')).map((tick) =>
+        Array.from(tick.children)
+          .map((line) => line.textContent?.trim())
+          .join(' '),
+      ),
+    ).toEqual([
+      'nyt 13:42',
+      '+6 h 19:00',
+      '+12 h 01:00',
+      'to 12:00',
+    ]);
   });
 
   it('shows the error from the service', () => {

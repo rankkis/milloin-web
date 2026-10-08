@@ -19,18 +19,13 @@
     }
   </div>
 
-  @if (chart(); as chart) {
-    <section class="chart" aria-labelledby="chart-title">
-      <div class="chart__labels">
-        <h2 id="chart-title" class="label">Seuraavat 24 tuntia</h2>
-        <span class="label" aria-hidden="true">c/kWh</span>
-      </div>
+  @if (chartHours().length > 0) {
+    <section class="chart">
       <app-hourly-chart
-        title="Seuraavat 24 tuntia"
-        [hours]="chart.hours"
+        heading="Seuraavat 24 tuntia"
+        [hours]="chartHours()"
         [now]="now()"
         [highlight]="bestWindow()"
-        [axisLabels]="chart.axisLabels"
       />
     </section>
   }
@@ -50,7 +45,7 @@
       <div class="stat">
         <dt>Spot-hinta</dt>
         <dd class="stat__value">{{ stats.spot }}</dd>
-        <dd class="stat__note">c/kWh · {{ stats.category }}</dd>
+        <dd class="stat__note">c/kWh{{ stats.category ? ' · ' + stats.category : '' }}</dd>
       </div>
     </dl>
   }

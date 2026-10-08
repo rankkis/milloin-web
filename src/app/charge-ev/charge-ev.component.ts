@@ -10,13 +10,11 @@ import {
   formatTimeUntil,
   formatWindow,
 } from '../shared/format/format';
-import { hourlyAverages } from '../shared/format/hourly';
-import { PRICE_CATEGORY_TEXT, priceCategoryOf } from '../shared/format/price-category';
+import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
 import { ChargeEvService } from './charge-ev.service';
 
-const HOUR_MS = 60 * 60 * 1000;
 /** Hours on the chart */
 const CHART_HOURS = 24;
 
@@ -73,22 +71,13 @@ export class ChargeEvComponent {
     };
   });
 
-  readonly chart = computed(() => {
-    const overview = this.overview.hasValue() ? this.overview.value() : undefined;
-    if (!overview) return undefined;
-
-    const hours = hourlyAverages(overview.future.pricePoints).slice(0, CHART_HOURS);
-    if (hours.length === 0) return undefined;
-
-    // "nyt" under the first bar, then the clock hour at each quarter of the chart
-    const first = Date.parse(hours[0].startTime);
-    const axisLabels = [
-      'nyt',
-      ...[1, 2, 3, 4].map((quarter) =>
-        formatClock(new Date(first + Math.round((hours.length * quarter) / 4) * HOUR_MS)).slice(0, 2),
-      ),
-    ];
-    return { hours, axisLabels };
+  /** The next 24 hours from the current hour */
+  readonly chartHours = computed(() => {
+    if (!this.overview.hasValue()) return [];
+    const now = this.now().getTime();
+    return (this.overview.value().upcomingHours ?? [])
+      .filter((hour) => Date.parse(hour.endTime) > now)
+      .slice(0, CHART_HOURS);
   });
 
   readonly stats = computed(() => {
@@ -107,7 +96,7 @@ export class ChargeEvComponent {
       savingPct: savedPct > 0 ? `−${savedPct} %` : '0 %',
       saving: saved > 0 ? euros(saved) : 'nyt on halvin',
       spot: formatPrice(best.priceAvg),
-      category: PRICE_CATEGORY_TEXT[priceCategoryOf(best.priceAvg)].toLowerCase(),
+      category: PRICE_CATEGORY_TEXT[best.priceCategory]?.toLowerCase(),
     };
   });
 
@@ -137,8 +126,7 @@ export class ChargeEvComponent {
     if (!defaults) return undefined;
     return (
       `Laskettu ${defaults.periodHours} tunnin lataukselle ja ` +
-      `${formatNumber(defaults.powerConsumptionKwh, 0)} kWh:n energialle. ` +
-      'Hinnat sisältävät arvonlisäveron mutta eivät siirtomaksuja.'
+      `${formatNumber(defaults.powerConsumptionKwh, 0)} kWh:n energialle.`
     );
   });
 

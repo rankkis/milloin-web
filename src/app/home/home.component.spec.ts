@@ -12,13 +12,15 @@ import { HourlyPriceDto, OptimalTimeDto, StartDelayDto } from '../shared/models/
 
 // 2026-10-07 13:42 Finnish summer time (UTC+3)
 const NOW = new Date('2026-10-07T10:42:00.000Z');
-const DAY_START = Date.parse('2026-10-06T21:00:00.000Z');
+// 13:00 Finnish time, the current hour
+const HOUR_START = Date.parse('2026-10-07T10:00:00.000Z');
 const HOUR_MS = 60 * 60 * 1000;
 
-const hours: HourlyPriceDto[] = Array.from({ length: 24 }, (_, hour) => ({
-  startTime: new Date(DAY_START + hour * HOUR_MS).toISOString(),
-  endTime: new Date(DAY_START + (hour + 1) * HOUR_MS).toISOString(),
-  priceAvg: hour === 15 || hour === 16 ? 2.3 : 6,
+/** 13:00 today to 23:00 tomorrow; 6 c/kWh, 3 c/kWh from the 6th hour, 24 c/kWh at the end */
+const hours: HourlyPriceDto[] = Array.from({ length: 35 }, (_, hour) => ({
+  startTime: new Date(HOUR_START + hour * HOUR_MS).toISOString(),
+  endTime: new Date(HOUR_START + (hour + 1) * HOUR_MS).toISOString(),
+  priceAvg: hour === 34 ? 24 : hour >= 6 ? 3 : 6,
   priceCategory: 'NORMAL',
 }));
 
@@ -34,8 +36,7 @@ const overview: OverviewDto = {
   current: { price: 4.82, priceCategory: 'NORMAL' },
   next12Hours: { priceAvg: 5, priceCategory: 'NORMAL', pricePoints: [] },
   future: { priceAvg: 5, priceCategory: 'NORMAL', pricePoints: [] },
-  today: hours,
-  cheapestWindow: optimal('2026-10-07T12:00:00.000Z', '2026-10-07T14:00:00.000Z', 2.3),
+  upcomingHours: hours,
 };
 
 const delay = (delayHours: number, costCents: number, isBest = false): StartDelayDto => ({
@@ -43,6 +44,7 @@ const delay = (delayHours: number, costCents: number, isBest = false): StartDela
   startTime: '',
   endTime: '',
   priceAvg: costCents,
+  priceCategory: 'CHEAP',
   costCents,
   isBest,
 });
@@ -90,6 +92,11 @@ describe('HomeComponent', () => {
   const text = (selector: string): string =>
     (fixture.nativeElement as HTMLElement).querySelector(selector)?.textContent?.trim() ?? '';
 
+  const texts = (selector: string): string[] =>
+    Array.from((fixture.nativeElement as HTMLElement).querySelectorAll(selector)).map(
+      (element) => element.textContent?.trim() ?? '',
+    );
+
   beforeEach(() => {
     jasmine.clock().install();
     jasmine.clock().mockDate(NOW);
@@ -106,26 +113,53 @@ describe('HomeComponent', () => {
     expect(text('.pill')).toBe('Normaali');
   });
 
-  it('shows the cheapest window and when it starts', () => {
+  it('charts the hours from now to the last published price', () => {
     render();
 
-    expect(text('.window__label')).toBe('Halvimmillaan · 1 h 18 min päästä');
-    expect(text('.window__time')).toBe('15:00–17:00');
-    expect(text('.window__price')).toContain('2,30');
+    const element = fixture.nativeElement as HTMLElement;
+    const bars = Array.from(element.querySelectorAll('.bar')).map((bar) => bar.className);
+    expect(bars.length).toBe(35);
+    expect(bars[0]).toContain('bar--current');
+    expect(bars[1]).toContain('bar--future');
+    expect(text('app-hourly-chart h2')).toBe('Nyt → to 23:00');
+    expect(texts('.scale__value')).toEqual(['0', '10', '20']);
+    expect(
+      Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.tick')).map((tick) =>
+        Array.from(tick.children)
+          .map((line) => line.textContent?.trim())
+          .join(' '),
+      ),
+    ).toEqual([
+      'nyt 13:42',
+      '+6 h 19:00',
+      '+12 h 01:00',
+      '+24 h 13:00',
+      'to 23:00',
+    ]);
   });
 
-  it('draws today with past, current and cheapest hours', () => {
+  it('shows the price of an hour under the pointer', () => {
     render();
 
-    const bars = Array.from(
-      (fixture.nativeElement as HTMLElement).querySelectorAll('.bars > div'),
-    ).map((bar) => bar.className);
-    expect(bars.length).toBe(24);
-    expect(bars[12]).toBe('bar bar--past');
-    expect(bars[13]).toBe('bar bar--current');
-    expect(bars[15]).toBe('bar bar--window');
-    expect(bars[16]).toBe('bar bar--window');
-    expect(bars[17]).toBe('bar bar--future');
+    const plot = (fixture.nativeElement as HTMLElement).querySelector('.plot') as HTMLElement;
+    const rect = plot.getBoundingClientRect();
+    plot.dispatchEvent(
+      new PointerEvent('pointermove', { clientX: rect.left + (rect.width * 12.5) / 35, pointerType: 'mouse' }),
+    );
+    fixture.detectChanges();
+    expect(text('.tip')).toBe('to 01:00–02:00 · 3,00 c/kWh');
+
+    plot.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }));
+    fixture.detectChanges();
+    expect(text('.tip')).toBe('');
+  });
+
+  it('compares the average of the next 6, 12 and 24 hours with now', () => {
+    render();
+
+    expect(texts('.tile__label')).toEqual(['+6 h keskihinta', '+12 h keskihinta', '+24 h keskihinta']);
+    expect(texts('.tile__value').map((value) => value.split(' ')[0])).toEqual(['6,00', '4,50', '3,75']);
+    expect(texts('.tile__change')).toEqual(['+24 % vs. nyt', '−7 % vs. nyt', '−22 % vs. nyt']);
   });
 
   it('answers the laundry question with the best start delay', () => {

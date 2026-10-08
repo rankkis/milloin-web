@@ -35,6 +35,7 @@ export interface StartDelayDto {
   startTime: string;
   endTime: string;
   priceAvg: number;
+  priceCategory: PriceCategory;
   costCents: number;
   isBest: boolean;
 }

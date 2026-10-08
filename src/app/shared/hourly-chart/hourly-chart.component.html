@@ -1,10 +1,76 @@
-<div class="bars" role="img" [attr.aria-label]="summary()">
-  @for (bar of bars(); track $index) {
-    <div [class]="'bar bar--' + bar.state" [style.height]="bar.height"></div>
-  }
+<div class="head">
+  <h2 class="label">{{ title() }}</h2>
+  <span class="label" aria-hidden="true">c/kWh</span>
 </div>
+
+<div class="body">
+  <div
+    #plot
+    class="plot"
+    role="img"
+    [attr.aria-label]="summary()"
+    (pointermove)="point($event, plot)"
+    (pointerdown)="point($event, plot)"
+    (pointerleave)="leave($event)"
+  >
+    <div class="layer" aria-hidden="true">
+      @for (line of gridlines(); track line.value) {
+        <div class="gridline" [style.bottom.%]="line.bottom"></div>
+      }
+    </div>
+
+    <div class="bars">
+      @for (bar of bars(); track $index) {
+        <div class="slot">
+          <div
+            [class]="'bar bar--' + bar.state"
+            [class.bar--hovered]="hovered() === $index"
+            [style.height.%]="bar.height"
+          ></div>
+          @if (hovered() === $index) {
+            <div
+              [class]="'tip tip--' + bar.tipAlign"
+              [style.bottom]="'calc(' + bar.height + '% + var(--tip-gap))'"
+              aria-hidden="true"
+            >
+              {{ bar.tip }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="layer" aria-hidden="true">
+      @for (marker of markers(); track marker.label) {
+        <div class="marker" [style.left.%]="marker.left"></div>
+      }
+    </div>
+  </div>
+
+  <div class="scale" aria-hidden="true">
+    @for (line of gridlines(); track line.value) {
+      <span class="scale__value" [style.bottom.%]="line.bottom">{{ line.value }}</span>
+    }
+  </div>
+</div>
+
 <div class="axis" aria-hidden="true">
-  @for (label of axisLabels(); track $index) {
-    <span>{{ label }}</span>
+  <span class="tick tick--start">
+    <span class="tick__label">nyt</span>
+    <span>{{ startTime() }}</span>
+  </span>
+  @for (marker of markers(); track marker.label) {
+    @if (marker.showLabel) {
+      <span class="tick tick--marker" [style.left.%]="marker.left">
+        <span class="tick__label">{{ marker.label }}</span>
+        <span>{{ marker.time }}</span>
+      </span>
+    }
+  }
+  @if (end(); as end) {
+    <span class="tick tick--end">
+      <span>{{ end.weekday }}</span>
+      <span>{{ end.time }}</span>
+    </span>
   }
 </div>

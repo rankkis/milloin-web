@@ -56,7 +56,7 @@
       <div class="stat">
         <dt>Spot-hinta</dt>
         <dd class="stat__value">{{ stats.spot }}</dd>
-        <dd class="stat__note">c/kWh · {{ stats.category }}</dd>
+        <dd class="stat__note">c/kWh{{ stats.category ? ' · ' + stats.category : '' }}</dd>
       </div>
     </dl>
   }
@@ -65,7 +65,7 @@
     <details class="tips" id="vinkit">
       <summary class="tips__toggle" data-test-id="laundry-tips">
         Vinkit energian säästöön
-        <svg class="tips__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        <app-icon class="tips__arrow" name="forward" [size]="18" />
       </summary>
       <div class="tips__content">
         <h2 class="tips__title">Miksi pidempi ohjelma ei kuluta enemmän</h2>
