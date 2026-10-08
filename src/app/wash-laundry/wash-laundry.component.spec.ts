@@ -62,53 +62,172 @@ describe('WashLaundryComponent', () => {
 
   afterEach(() => jasmine.clock().uninstall());
 
-  it('answers with the best start delay and when the wash runs', () => {
-    render(of(schedule([delay(0, 5.8), delay(1, 4.02, true), delay(2, 4.2), delay(3, 8.5)])));
+  const texts = (selector: string): string[] =>
+    Array.from(element().querySelectorAll(selector)).map((e) => e.textContent?.trim() ?? '');
+
+  /** Delays Nyt, +1, +2 … with these costs; isBest marks the cheapest as the backend does */
+  const delays = (...costs: number[]): StartDelayDto[] => {
+    const min = Math.min(...costs);
+    return costs.map((cost, hours) => delay(hours, cost, cost === min));
+  };
+
+  it('recommends a delay that saves enough and tells about a cheaper later start', () => {
+    render(of(schedule(delays(14.8, 12.9, 6.6, 6.1, 5.4, 5.0))));
 
     expect(text('h1')).toBe('Milloin kannattaa pestä pyykkiä?');
-    expect(text('.answer__value')).toBe('+1 h');
-    expect(text('.answer__sentence')).toBe('Aseta koneen ajastus yhteen tuntiin.');
-    expect(text('.answer__times')).toBe('käynnistyy 14:42 · valmis 16:42');
+    expect(text('.answer__value')).toBe('+2 h');
+    expect(text('.answer__instruction')).toBe('Aseta koneen ajastus kahteen tuntiin.');
+    expect(text('.answer__reason')).toBe(
+      'Säästät 8,2 senttiä verrattuna heti käynnistämiseen. ' +
+        'Pesu olisi 5 tunnin päästä vielä 1,6 senttiä halvempi, mutta lisäodotus ei kannata.',
+    );
+    expect(text('.answer__times')).toBe('käynnistyy 15:42 · valmis 17:42');
     expect(text('app-answer-header .price')).toContain('nyt 4,82');
   });
 
-  it('shows the cost of every delay and highlights the best', () => {
-    render(of(schedule([delay(0, 5.8), delay(1, 4.02, true), delay(2, 8)])));
+  it('recommends a delay that is also the cheapest', () => {
+    render(of(schedule(delays(10, 5, 5, 5, 5, 5))));
 
-    const delays = Array.from(element().querySelectorAll('.delay'));
-    expect(delays.map((d) => d.querySelector('.delay__label')?.textContent?.trim())).toEqual([
+    expect(text('.answer__value')).toBe('+1 h');
+    expect(text('.answer__instruction')).toBe('Aseta koneen ajastus yhteen tuntiin.');
+    expect(text('.answer__reason')).toBe('Säästät 5,0 senttiä verrattuna heti käynnistämiseen.');
+    expect(texts('.legend__item')).toEqual(['suositus']);
+  });
+
+  it('starts now when a cheaper later start saves too little', () => {
+    render(of(schedule(delays(7.6, 8.1, 6.9, 5.2, 4.5, 6.3))));
+
+    expect(text('.answer__value')).toBe('Nyt');
+    expect(text('.answer__instruction')).toBe('Käynnistä kone nyt.');
+    expect(text('.answer__reason')).toBe(
+      'Pesu olisi 4 tunnin päästä 3,1 senttiä halvempi, mutta niin pieni säästö ei ole odottamisen arvoinen.',
+    );
+    expect(text('.answer__times')).toBe('käynnistyy 13:42 · valmis 15:42');
+  });
+
+  it('says one hour as "tunnin päästä"', () => {
+    render(of(schedule(delays(5.8, 4.0, 4.2, 8.5, 14.6, 16.6))));
+
+    expect(text('.answer__reason')).toBe(
+      'Pesu olisi tunnin päästä 1,8 senttiä halvempi, mutta niin pieni säästö ei ole odottamisen arvoinen.',
+    );
+  });
+
+  it('says the price stays nearly the same when a later start saves under a cent', () => {
+    render(of(schedule(delays(5, 4.5, 6, 7))));
+
+    expect(text('.answer__reason')).toBe(
+      'Hinta pysyy lähes samana seuraavat 3 tuntia, joten odottaminen ei kannata.',
+    );
+  });
+
+  it('starts now when now is cheapest', () => {
+    render(of(schedule(delays(3, 4, 5, 6, 7, 8))));
+
+    expect(text('.answer__value')).toBe('Nyt');
+    expect(text('.answer__instruction')).toBe('Käynnistä kone nyt.');
+    expect(text('.answer__reason')).toBe('Seuraavan 5 tunnin aikana pesu ei tule halvemmaksi.');
+    expect(texts('.stat dt')[1]).toBe('Halvin vaihtoehto');
+    expect(texts('.stat:nth-child(2) dd')).toEqual(['Nyt', 'halvin seuraaviin 5 tuntiin']);
+  });
+
+  it('marks the recommended and the cheapest delay in the strip', () => {
+    render(of(schedule(delays(14.8, 12.9, 6.6, 6.1, 5.4, 5.0))));
+
+    const cells = Array.from(element().querySelectorAll<HTMLElement>('.delay'));
+    expect(cells.map((d) => d.querySelector('.delay__label')?.textContent?.trim())).toEqual([
       'Nyt',
       '+1',
       '+2',
+      '+3',
+      '+4',
+      '+5',
     ]);
-    expect(delays.map((d) => d.querySelector('.delay__cost')?.textContent?.trim())).toEqual([
-      '5,8',
-      '4,0',
-      '8,0',
+    expect(cells.map((d) => d.querySelector('.delay__cost')?.textContent?.trim())).toEqual([
+      '14,8',
+      '12,9',
+      '6,6',
+      '6,1',
+      '5,4',
+      '5,0',
     ]);
-    expect(delays[1].classList).toContain('delay--best');
-    expect(delays[1].getAttribute('aria-label')).toBe('1 tunnin päästä: 4,0 senttiä, halvin');
-    expect((delays[2].querySelector('.delay__bar') as HTMLElement).style.height).toBe('64px');
+    expect(cells[2].tagName).toBe('BUTTON');
+    expect(cells[2].classList).toContain('delay--recommended');
+    expect(cells[2].getAttribute('aria-label')).toBe('2 tunnin päästä: 6,6 senttiä, suositus');
+    expect(cells[5].classList).toContain('delay--cheapest');
+    expect(cells[5].getAttribute('aria-label')).toBe('5 tunnin päästä: 5,0 senttiä, halvin');
+    expect(cells[1].getAttribute('aria-label')).toBe('tunnin päästä: 12,9 senttiä');
+    expect((cells[0].querySelector('.delay__bar') as HTMLElement).style.height).toBe('64px');
+    expect(texts('.legend__item')).toEqual(['suositus', 'halvin']);
   });
 
-  it('shows the cost, saving and spot price of the best delay', () => {
-    render(of(schedule([delay(0, 5.8), delay(1, 4.02, true)])));
+  it('says suositus ja halvin when the recommendation is the cheapest', () => {
+    render(of(schedule(delays(3, 4))));
 
-    const values = Array.from(element().querySelectorAll('.stat__value')).map((v) =>
-      v.textContent?.trim(),
-    );
-    expect(values).toEqual(['4,0', '−31 %', '4,02']);
-    expect(text('.stat:nth-child(2) .stat__note')).toBe('1,8 senttiä');
+    const button = element().querySelector('[data-test-id="laundry-recommended-delay"]');
+    expect(button?.getAttribute('aria-label')).toBe('Nyt: 3,0 senttiä, suositus ja halvin');
+    expect(element().querySelector('.delay--cheapest')).toBeNull();
+  });
+
+  it('shows the cost, saving and spot price of the recommended delay', () => {
+    render(of(schedule(delays(14.8, 12.9, 6.6, 6.1, 5.4, 5.0))));
+
+    expect(texts('.stat__value')).toEqual(['6,6', '−55 %', '6,60']);
+    expect(text('.stat:nth-child(2) dt')).toBe('Säästö vs. nyt');
+    expect(text('.stat:nth-child(2) .stat__note')).toBe('8,2 senttiä');
     expect(text('.stat:nth-child(3) .stat__note')).toBe('c/kWh · halpa');
     expect(text('.basis')).toBe('Laskettu 2 tunnin ohjelmalle ja 1,5 kWh:n kulutukselle.');
   });
 
-  it('says to start now when now is cheapest', () => {
-    render(of(schedule([delay(0, 3, true), delay(1, 4)])));
+  it('shows the cheapest option when waiting is not worth it', () => {
+    render(of(schedule(delays(7.6, 8.1, 6.9, 5.2, 4.5, 6.3))));
 
-    expect(text('.answer__value')).toBe('Nyt');
-    expect(text('.answer__sentence')).toBe('Käynnistä kone heti, nyt on halvinta.');
-    expect(text('.stat:nth-child(2) .stat__value')).toBe('0 %');
+    expect(texts('.stat__value')).toEqual(['7,6', '+4 h', '7,60']);
+    expect(text('.stat:nth-child(2) dt')).toBe('Halvin vaihtoehto');
+    expect(text('.stat:nth-child(2) .stat__note')).toBe('3,1 snt halvempi');
+  });
+
+  describe('rule tooltip', () => {
+    const tip = () => element().querySelector<HTMLElement>('[role="tooltip"]')!;
+    const button = () =>
+      element().querySelector<HTMLButtonElement>('[data-test-id="laundry-recommended-delay"]')!;
+    const tap = (target: HTMLElement) => {
+      target.dispatchEvent(new PointerEvent('click', { bubbles: true, detail: 1, pointerType: 'touch' }));
+      fixture.detectChanges();
+    };
+
+    beforeEach(() => render(of(schedule(delays(14.8, 12.9, 6.6, 6.1, 5.4, 5.0)))));
+
+    it('explains the rule and is described by the recommended cell', () => {
+      expect(tip().hidden).toBeTrue();
+      expect(tip().textContent?.trim()).toBe(
+        'Odottaminen kannattaa vasta, kun säästö on vähintään 5 senttiä. ' +
+          'Jokainen lisätunti vaatii 2 senttiä enemmän säästöä.',
+      );
+      expect(button().getAttribute('aria-describedby')).toBe(tip().id);
+      expect(tip().classList).toContain('tip--center');
+    });
+
+    it('toggles on tap and closes on a tap elsewhere', () => {
+      tap(button());
+      expect(tip().hidden).toBeFalse();
+      tap(button());
+      expect(tip().hidden).toBeTrue();
+
+      tap(button());
+      tap(element().querySelector('h1')!);
+      expect(tip().hidden).toBeTrue();
+    });
+
+    it('opens on mouse hover and closes on Esc', () => {
+      button().dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }));
+      fixture.detectChanges();
+      expect(tip().hidden).toBeFalse();
+
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      fixture.detectChanges();
+      expect(tip().hidden).toBeTrue();
+    });
   });
 
   it('explains when there are not enough prices', () => {

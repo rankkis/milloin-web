@@ -122,7 +122,7 @@ src/
 ## Features
 
 - **Home**: current price and its category (from the backend), hourly price bars from the current hour to the last published price (gridlines every 10 c/kWh, dashed +6/+12/+24 h markers, tooltip on hover or tap), trend tiles with the average of the next 6, 12 and 24 hours vs. now, and one row per question with its answer. On wide screens an invisible slot under the price is reserved for an ad or price analysis. Data loads on open and again when the tab returns after 15 minutes.
-- **Question pages**: laundry answers with a timer delay (Nyt, +1 … +5 h) and the cost of each (2 h program, 1,5 kWh, costed by the backend); EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now.
+- **Question pages**: laundry recommends a timer delay (Nyt, +1 … +5 h) from the cost of each (2 h program, 1,5 kWh, costed by the backend); waiting must save at least 5 snt for +1 h and 2 snt more for each further hour (`wash-laundry/laundry-recommendation.ts`), so the recommendation is not always the cheapest option (the backend's `isBest`); EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now.
 - Clock times are shown in Finnish time (`shared/format/format.ts`).
 
 ### UI
