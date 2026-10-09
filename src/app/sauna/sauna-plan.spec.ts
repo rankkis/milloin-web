@@ -65,6 +65,12 @@ describe('sauna plan', () => {
     expect(saunaStarts(full, NOW, 0, 'day').map((s) => s.hour)).toEqual([14, 15, 16]);
   });
 
+  it('leaves out night starts 00–05 at any time of day', () => {
+    const starts = saunaStarts(full, NOW, 1, 'any').map((s) => s.hour);
+    expect(starts[0]).toBe(6);
+    expect(starts[starts.length - 1]).toBe(23);
+  });
+
   it('recommends a usual sauna time unless another start saves enough', () => {
     // 21:00 start (warm 22:00) is 8 cents cheaper than 19:00: too little to give up the usual time
     const small = saunaResponse(costsUntil(45, (h) => (h === 21 ? 42 : h === 19 ? 50 : 60)));
