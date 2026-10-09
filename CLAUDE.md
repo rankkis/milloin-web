@@ -1,7 +1,7 @@
 # Milloin Web - Angular Project
 
 ## Project Overview
-Angular web application for the Milloin project. Milloin translates to When in english. The home page shows the current spot price, hourly prices from now to the last published hour, the average price of the next 6, 12 and 24 hours, and answers pre-defined questions such as when to start the washing machine or charge the EV. The answers come from the milloin-server backend, which calculates them from day-ahead spot prices (ENTSO-E).
+Angular web application for the Milloin project. Milloin translates to When in english. The site answers everyday "when" questions ("Milloin saunotaan?"), grouped into categories. The home page lists every question with its answer, grouped by category. The Sähkö category page shows the current spot price, hourly prices from now to the last published hour, the average price of the next 6, 12 and 24 hours, and the electricity questions (when to wash laundry, charge the EV, heat the sauna). Those answers come from the milloin-server backend, which calculates them from day-ahead spot prices (ENTSO-E).
 
 Goal for the site is saving money by running high-consumption tasks during optimal time windows.
 
@@ -111,7 +111,9 @@ ng generate pipe <name>          # Generate pipe
 ```
 src/
 ├── app/                           # Application source code
-│   ├── home/                     # Home: current price, price chart, trend tiles, questions
+│   ├── home/                     # Home: every question grouped by category, category filter
+│   ├── electricity/              # Sähkö category page (/sahko-on-halpaa): current price, price chart, trend tiles, questions
+│   │                             # (electricity-answers.ts: price and answers shared with home)
 │   ├── wash-laundry/             # When to wash laundry
 │   ├── charge-ev/                # When to charge the EV
 │   ├── sauna/                    # When to heat the sauna (milloin saunotaan)
@@ -131,7 +133,8 @@ src/
 │   ├── app.config.ts             # Application configuration
 │   ├── app.config.server.ts      # Server-side rendering configuration
 │   ├── app.routes.server.ts      # Server render mode, status and cache headers per route
-│   ├── app.paths.ts              # Route paths
+│   ├── app.paths.ts              # Route paths and redirects from earlier paths
+│   ├── topics.ts                 # Categories and their questions (title, path, icon), listed on home; add new paths to sitemap.xml too
 │   └── app.routes.ts             # Application routing
 ├── environments/                 # Environment configurations
 ├── styles/_colors.scss           # The only place colors are defined
@@ -140,7 +143,9 @@ src/
 
 ## Features
 
-- **Home**: current price and its category (from the backend) in a box colored by the category (`price-*` colors), hourly price bars from the current hour to the last published price (gridlines every 10 c/kWh, dashed +6/+12/+24 h markers, tooltip on hover or tap), trend tiles with the average of the next 6, 12 and 24 hours vs. now, and one row per question with its answer (laundry, EV, sauna). On wide screens an invisible slot under the price is reserved for an ad or price analysis. Data loads on open and again when the tab returns after 15 minutes.
+- **Questions and URLs**: every question is a short "Milloin …?" sentence, preferably passive ("Milloin saunotaan?", "Milloin pestään pyykit?"), shown whole everywhere. Its URL finishes the sentence after the domain: drop "Milloin" and "?", lower case, ä/ö → a/o, spaces → hyphens, directly under the domain with no category (`/saunotaan`, `/pestaan-pyykit`, `/ladataan-auto`). A category page reads as a question too (Sähkö: `/sahko-on-halpaa`). Moved pages keep a permanent redirect in both `vercel.json` and `LEGACY_PATH_REDIRECTS` (`app.paths.ts`). New questions and categories go in `topics.ts`. Plan for future categories (Raha, Taivas, Vapaa): the "milloin.xyz: topics, URLs and home" doc.
+- **Home**: header, a category filter (shown once there are two or more categories), then one table of questions grouped by category. Each group heading links to its category page (the Sähkö heading also shows the current price); each row links to its question page and shows the answer (phone: answer with a short line; 960 px+: Kysymys | Vastaus | Tarkemmin). Data loads on open and again when the tab returns after 15 minutes.
+- **Sähkö page** (`/sahko-on-halpaa`): "Takaisin" link to home, the title "Sähkö", the current price and its category (from the backend) in a box colored by the category (`price-*` colors), hourly price bars from the current hour to the last published price (gridlines every 10 c/kWh, dashed +6/+12/+24 h markers, tooltip on hover or tap), trend tiles with the average of the next 6, 12 and 24 hours vs. now, and one row per electricity question with its answer. On wide screens an invisible slot under the price is reserved for an ad or price analysis.
 - **Question pages**: laundry recommends a timer delay (Nyt, +1 … +5 h) from the cost of each (2 h program, 1,5 kWh, costed by the backend); waiting must save at least 5 snt for +1 h and 2 snt more for each further hour (`wash-laundry/laundry-recommendation.ts`), so the recommendation is not always the cheapest option (the backend's `isBest`); EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now. Sauna (`/saunotaan`) answers with when the sauna is warm (heater start + 1 h) for the cheapest full-hour heater start of a 3-hour, 8 kWh session (backend preset `sauna`), and tells when to start heating; the visitor picks Tänään/Huomenna and Päivä (heater on 6–16) / Ilta (17–21, default) / Ei väliä, choices without prices are disabled; until the visitor picks a day, tomorrow is shown once today's evening is over, with a button for the cheapest start still left tonight; the page fits a phone screen without scrolling; starts whose prices are not published yet are dashed bars with a note, and a button suggests the other day when it is at least 1 snt cheaper (`sauna/sauna-plan.ts`).
 - Clock times are shown in Finnish time (`shared/format/format.ts`).
 
@@ -149,7 +154,7 @@ src/
 - **Look**: dark background, one green accent (`accent`), IBM Plex Sans for text and IBM Plex Mono for prices and times.
 - **Fonts**: self-hosted latin subsets from `@fontsource/ibm-plex-sans` and `@fontsource/ibm-plex-mono`, listed in `styles` in `angular.json`; no Google Fonts.
 - **Icons**: inline SVG through `IconComponent` (`shared/icon`); no icon fonts, no emoji.
-- **Layout**: mobile first; the home screen widens to price and chart side by side (768 px) and a question table (960 px). Question pages are a single column up to 560 px.
+- **Layout**: mobile first; home and the Sähkö page show their questions as a table from 960 px, and the Sähkö page puts price and chart side by side from 768 px. Question pages are a single column up to 560 px.
 
 ## Development Workflow
 1. Create feature branch from main

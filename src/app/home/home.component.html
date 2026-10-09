@@ -4,77 +4,76 @@
     <p class="clock">{{ date() }}</p>
   </header>
 
-  <div class="price-and-chart">
-    <section class="now" aria-label="Sähkön hinta nyt">
-      <div class="now__box" [class]="'now__box--' + tone()">
-        <div class="now__label-row">
-          <h2 class="label">Hintataso nyt</h2>
-          @if (current(); as current) {
-            <span class="pill"><span class="pill__dot" aria-hidden="true"></span>{{ current.category }}</span>
-          }
-        </div>
-
-        @if (overview.error(); as error) {
-          <div class="error" role="alert">
-            <p>{{ errorMessage(error) }}</p>
-            <button type="button" class="retry" data-test-id="home-retry" (click)="reload()">
-              <app-icon name="refresh" [size]="18" />
-              Yritä uudelleen
-            </button>
-          </div>
-        } @else {
-          <p class="now__price" [attr.aria-busy]="overview.isLoading()">
-            <span class="now__value">@if (current(); as current) { {{ current.price }} } @else if (overview.isLoading()) { <app-spinner /> } @else { – }</span>
-            <span class="now__unit">c/kWh</span>
-          </p>
-        }
-      </div>
-
-      <!-- Reserved for an ad or a price analysis on wide screens -->
-      <aside class="reserved" aria-hidden="true"></aside>
-    </section>
-
-    @if (overviewData(); as data) {
-      @if (upcoming().length > 0) {
-        <section class="chart">
-          <app-hourly-chart class="chart__plot" [hours]="upcoming()" [now]="now()" />
-          <app-trend-tiles [hours]="upcoming()" [current]="data.current.price" />
-        </section>
+  @if (showFilter) {
+    <div class="filter" role="group" aria-label="Aihe">
+      <button
+        type="button"
+        class="chip"
+        data-test-id="home-filter-all"
+        [attr.aria-pressed]="selected() === all"
+        (click)="select(all)"
+      >
+        Kaikki
+      </button>
+      @for (category of categories; track category.id) {
+        <button
+          type="button"
+          class="chip"
+          [attr.data-test-id]="'home-filter-' + category.id"
+          [attr.aria-pressed]="selected() === category.id"
+          (click)="select(category.id)"
+        >
+          {{ category.name }}
+        </button>
       }
-    }
-  </div>
+    </div>
+  }
 
-  <nav class="questions" aria-labelledby="questions-title">
-    <div class="questions__head">
-      <h2 id="questions-title" class="label questions__col-question">Milloin…</h2>
-      <span class="label questions__col-answer" aria-hidden="true">Vastaus</span>
-      <span class="label questions__col-detail" aria-hidden="true">Tarkemmin</span>
-      <span class="label questions__col-price" aria-hidden="true">Hinta</span>
+  @if (overview.error(); as error) {
+    <div class="error" role="alert">
+      <p>{{ errorMessage(error) }}</p>
+      <button type="button" class="retry" data-test-id="home-retry" (click)="reload()">
+        <app-icon name="refresh" [size]="18" />
+        Yritä uudelleen
+      </button>
+    </div>
+  }
+
+  <nav class="questions" aria-label="Kysymykset">
+    <div class="questions__head" aria-hidden="true">
+      <span class="label">Kysymys</span>
+      <span class="label questions__col-answer">Vastaus</span>
+      <span class="label questions__col-detail">Tarkemmin</span>
     </div>
 
-    <a class="question" [routerLink]="'/' + paths.WASH_LAUNDRY" data-test-id="home-wash-laundry">
-      <span class="question__text">
-        <app-icon class="question__icon" name="washer" />
-        …kannattaa pestä pyykkiä?
-      </span>
-      <ng-container *ngTemplateOutlet="answer; context: { $implicit: laundryAnswer(), loading: laundry.isLoading() }" />
-    </a>
+    @for (category of shownCategories(); track category.id) {
+      <section class="group" [attr.aria-labelledby]="'group-' + category.id">
+        <h2 class="group__head" [id]="'group-' + category.id">
+          <a class="group__link" [routerLink]="'/' + category.path" [attr.data-test-id]="'home-category-' + category.id">
+            {{ category.name }}
+            <app-icon name="chevron" [size]="16" />
+          </a>
+          @if (category.id === 'sahko' && electricityNow(); as now) {
+            <span class="group__meta">{{ now }}</span>
+          }
+        </h2>
 
-    <a class="question" [routerLink]="'/' + paths.CHARGE_EV" data-test-id="home-charge-ev">
-      <span class="question__text">
-        <app-icon class="question__icon" name="car" />
-        …kannattaa ladata auto?
-      </span>
-      <ng-container *ngTemplateOutlet="answer; context: { $implicit: evAnswer(), loading: ev.isLoading() }" />
-    </a>
-
-    <a class="question" [routerLink]="'/' + paths.SAUNA" data-test-id="home-sauna">
-      <span class="question__text">
-        <app-icon class="question__icon" name="sauna" />
-        …saunotaan?
-      </span>
-      <ng-container *ngTemplateOutlet="answer; context: { $implicit: saunaAnswer(), loading: sauna.isLoading() }" />
-    </a>
+        @for (question of category.questions; track question.id) {
+          <a class="question" [routerLink]="'/' + question.path" [attr.data-test-id]="'home-' + question.id">
+            <span class="question__text">
+              <app-icon class="question__icon" [name]="question.icon" />
+              {{ question.title }}
+            </span>
+            @let reply = answer(question.id);
+            <span class="question__answer" [class.accent]="reply?.highlight">@if (reply) { {{ reply.value }} } @else if (loading(question.id)) { <app-spinner label="" /> } @else { – }</span>
+            @if (reply) {
+              <span class="question__short">{{ reply.short }} · {{ reply.price }}</span>
+              <span class="question__detail">{{ reply.detail }} · {{ reply.price }}</span>
+            }
+          </a>
+        }
+      </section>
+    }
   </nav>
 
   <footer class="footer">
@@ -82,12 +81,3 @@
     <a class="footer__link" href="/api" data-test-id="home-api">Avoin rajapinta kehittäjille</a>
   </footer>
 </div>
-
-<ng-template #answer let-answer let-loading="loading">
-  <span class="question__answer" [class.accent]="answer?.highlight">@if (answer) { {{ answer.value }} } @else if (loading) { <app-spinner label="" /> } @else { – }</span>
-  @if (answer) {
-    <span class="question__short">{{ answer.short }} · {{ answer.price }}</span>
-    <span class="question__detail">{{ answer.detail }}</span>
-    <span class="question__price">{{ answer.price }}</span>
-  }
-</ng-template>

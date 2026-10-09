@@ -9,6 +9,8 @@
   },
   "redirects": [
     { "source": "/api/", "destination": "/api", "permanent": true },
+    { "source": "/kannattaa-pesta-pyykkia", "destination": "/pestaan-pyykit", "permanent": true },
+    { "source": "/kannattaa-ladata-auto", "destination": "/ladataan-auto", "permanent": true },
     {
       "source": "/:path(.*)",
       "has": [{ "type": "host", "value": "www.milloin.xyz" }],

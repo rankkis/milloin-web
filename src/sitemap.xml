@@ -7,14 +7,20 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://milloin.xyz/kannattaa-pesta-pyykkia</loc>
-    <lastmod>2026-10-08</lastmod>
+    <loc>https://milloin.xyz/sahko-on-halpaa</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://milloin.xyz/pestaan-pyykit</loc>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://milloin.xyz/kannattaa-ladata-auto</loc>
-    <lastmod>2026-10-08</lastmod>
+    <loc>https://milloin.xyz/ladataan-auto</loc>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>

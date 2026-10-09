@@ -1,182 +1,71 @@
-import { Component, DestroyRef, afterNextRender, computed, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { NgTemplateOutlet } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { APP_NAVIGATION_PATHS } from '../app.paths';
-import { ChargeEvService } from '../charge-ev/charge-ev.service';
-import { HourlyChartComponent } from '../shared/hourly-chart/hourly-chart.component';
+import { ElectricityAnswers, Answer } from '../electricity/electricity-answers';
 import { IconComponent } from '../shared/icon/icon.component';
-import { TrendTilesComponent } from '../shared/trend-tiles/trend-tiles.component';
-import {
-  formatClock,
-  formatDate,
-  formatDay,
-  formatNumber,
-  formatPrice,
-  formatWindow,
-} from '../shared/format/format';
-import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
-import { PriceCategory } from '../shared/models/price.model';
-import { OverviewService } from '../shared/services/overview.service';
-import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
-import { SaunaService } from '../sauna/sauna.service';
-import { cents, hourClock, planSauna, readyClock } from '../sauna/sauna-plan';
-import { recommendDelay } from '../wash-laundry/laundry-recommendation';
-import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
+import { CATEGORIES, QuestionId } from '../topics';
 
-/** Color of the current price box, by price category */
-const PRICE_TONE: Record<PriceCategory, string> = {
-  VERY_CHEAP: 'very-cheap',
-  CHEAP: 'cheap',
-  NORMAL: 'normal',
-  EXPENSIVE: 'expensive',
-  VERY_EXPENSIVE: 'very-expensive',
-};
+/** Category filter value that shows every category */
+const ALL = 'all';
 
-const MINUTE_MS = 60 * 1000;
-const HOUR_MS = 60 * MINUTE_MS;
-/** Reload when the page comes back into view with older data than this */
-const STALE_AFTER_MS = 15 * MINUTE_MS;
-
-interface Answer {
-  value: string;
-  /** Shown under the answer on phones */
-  short: string;
-  /** Shown in its own column on wider screens */
-  detail: string;
-  price: string;
-  highlight: boolean;
-}
-
+/** Home: every question grouped by category, each with its answer */
 @Component({
   selector: 'app-home',
-  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, SpinnerComponent, TrendTilesComponent],
+  imports: [RouterLink, IconComponent, SpinnerComponent],
+  providers: [ElectricityAnswers],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-  private readonly overviewService = inject(OverviewService);
-  private readonly washLaundryService = inject(WashLaundryService);
-  private readonly chargeEvService = inject(ChargeEvService);
-  private readonly saunaService = inject(SaunaService);
+  private readonly answers = inject(ElectricityAnswers);
 
-  readonly paths = APP_NAVIGATION_PATHS;
-  readonly now = signal(initialNow());
+  readonly categories = CATEGORIES;
+  readonly all = ALL;
+  /** The filter is only worth showing once there is more than one category */
+  readonly showFilter = CATEGORIES.length > 1;
+  readonly selected = signal<string>(ALL);
 
-  readonly overview = rxResource({ stream: () => this.overviewService.getOverview() });
-  readonly laundry = rxResource({ stream: () => this.washLaundryService.getOptimalSchedule() });
-  readonly ev = rxResource({ stream: () => this.chargeEvService.getOptimalWindows() });
-  readonly sauna = rxResource({ stream: () => this.saunaService.getStarts() });
-
-  private loadedAt = Date.now();
-
-  /** Overview data; undefined while loading or after an error */
-  readonly overviewData = computed(() =>
-    this.overview.hasValue() ? this.overview.value() : undefined,
-  );
-
-  readonly date = computed(() => `${formatDate(this.now())} · ${formatClock(this.now())}`);
-
-  readonly current = computed(() => {
-    const current = this.overviewData()?.current;
-    return current && {
-      price: formatPrice(current.price),
-      category: PRICE_CATEGORY_TEXT[current.priceCategory] ?? PRICE_CATEGORY_TEXT.NORMAL,
-    };
+  readonly shownCategories = computed(() => {
+    const selected = this.selected();
+    return selected === ALL ? CATEGORIES : CATEGORIES.filter((category) => category.id === selected);
   });
 
-  /** Color of the current price box; neutral while loading or after an error */
-  readonly tone = computed(() => {
-    const category = this.overviewData()?.current.priceCategory;
-    return (category && PRICE_TONE[category]) ?? PRICE_TONE.NORMAL;
+  readonly date = this.answers.date;
+  readonly overview = this.answers.overview;
+
+  /** Current price for the Sähkö heading, e.g. "nyt 4,82 c/kWh · normaali" */
+  readonly electricityNow = computed(() => {
+    const current = this.answers.current();
+    return current && `nyt ${current.price} c/kWh · ${current.category.toLowerCase()}`;
   });
 
-  /** Hourly prices from the current hour on; drops hours that ended since loading */
-  readonly upcoming = computed(() => {
-    const now = this.now().getTime();
-    return (this.overviewData()?.upcomingHours ?? []).filter((hour) => Date.parse(hour.endTime) > now);
-  });
+  private readonly answerOf: Record<QuestionId, () => Answer | undefined> = {
+    sauna: this.answers.saunaAnswer,
+    laundry: this.answers.laundryAnswer,
+    ev: this.answers.evAnswer,
+  };
 
-  readonly laundryAnswer = computed<Answer | undefined>(() => {
-    const delays = this.laundry.hasValue() ? this.laundry.value().startDelays : [];
-    const recommendation = recommendDelay(delays);
-    if (!recommendation) return undefined;
-    const { recommended, cheapest } = recommendation;
+  private readonly loadingOf: Record<QuestionId, () => boolean> = {
+    sauna: this.answers.sauna.isLoading,
+    laundry: this.answers.laundry.isLoading,
+    ev: this.answers.ev.isLoading,
+  };
 
-    const price = `${formatNumber(recommended.costCents, 1)} snt`;
-    if (recommended.delayHours === 0) {
-      const detail = cheapest !== recommended ? 'odottaminen ei kannata' : 'nyt on halvinta';
-      return { value: 'Nyt', short: 'heti', detail, price, highlight: true };
-    }
-    const start = new Date(this.now().getTime() + recommended.delayHours * HOUR_MS);
-    return {
-      value: `+${recommended.delayHours} h`,
-      short: 'ajastus',
-      detail: `ajastus, käynnistyy ${formatClock(start)}`,
-      price,
-      highlight: true,
-    };
-  });
+  answer(id: QuestionId): Answer | undefined {
+    return this.answerOf[id]();
+  }
 
-  readonly evAnswer = computed<Answer | undefined>(() => {
-    const schedule = this.ev.hasValue() ? this.ev.value() : undefined;
+  loading(id: QuestionId): boolean {
+    return this.loadingOf[id]();
+  }
 
-    const window = schedule?.windows[0];
-    if (!window) return undefined;
-    const costEuros = (window.priceAvg * (schedule.energyKwh ?? 0)) / 100;
-    const day = formatDay(window.startTime, this.now());
-    return {
-      value: formatWindow(window.startTime, window.endTime),
-      short: day,
-      detail: day,
-      price: `${formatNumber(costEuros, 2)} €`,
-      highlight: false,
-    };
-  });
-
-  /** The sauna page's default answer: when the sauna is warm after the cheapest evening start, today or tomorrow once the evening is over */
-  readonly saunaAnswer = computed<Answer | undefined>(() => {
-    const plan = this.sauna.hasValue() ? planSauna(this.sauna.value(), this.now(), undefined, 'evening') : undefined;
-    if (!plan) return undefined;
-    const day = plan.day === 0 ? 'tänään' : 'huomenna';
-    const price = `${cents(plan.best.window.costCents)} snt`;
-    return {
-      value: readyClock(plan.best.hour),
-      short: day,
-      detail: `${day}, lämmitys ${hourClock(plan.best.hour)}`,
-      price,
-      highlight: false,
-    };
-  });
-
-  constructor() {
-    const destroyRef = inject(DestroyRef);
-
-    // Browser only: the clock and reloading when the tab comes back
-    afterNextRender(() => {
-      this.now.set(new Date());
-      const tick = setInterval(() => this.now.set(new Date()), 30 * 1000);
-      destroyRef.onDestroy(() => clearInterval(tick));
-
-      const onVisible = () => {
-        if (document.visibilityState === 'visible' && Date.now() - this.loadedAt > STALE_AFTER_MS) {
-          this.reload();
-        }
-      };
-      document.addEventListener('visibilitychange', onVisible);
-      destroyRef.onDestroy(() => document.removeEventListener('visibilitychange', onVisible));
-    });
+  select(id: string): void {
+    this.selected.set(id);
   }
 
   reload(): void {
-    this.loadedAt = Date.now();
-    this.now.set(new Date());
-    this.overview.reload();
-    this.laundry.reload();
-    this.ev.reload();
-    this.sauna.reload();
+    this.answers.reload();
   }
 
   readonly errorMessage = resourceErrorMessage;

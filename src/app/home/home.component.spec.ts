@@ -90,16 +90,13 @@ const sauna: OptimalWindowsDto = {
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
 
-  const render = (
-    overview$: Observable<OverviewDto> = of(overview),
-    laundrySchedule: LaundrySchedule = laundry,
-  ) => {
+  const render = (overview$: Observable<OverviewDto> = of(overview)) => {
     TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
         provideRouter([]),
         { provide: OverviewService, useValue: { getOverview: () => overview$ } },
-        { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundrySchedule) } },
+        { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundry) } },
         { provide: ChargeEvService, useValue: { getOptimalWindows: () => of(ev) } },
         { provide: SaunaService, useValue: { getStarts: () => of(sauna) } },
       ],
@@ -110,16 +107,15 @@ describe('HomeComponent', () => {
     fixture.detectChanges();
   };
 
-  const text = (selector: string): string =>
-    (fixture.nativeElement as HTMLElement).querySelector(selector)?.textContent?.trim() ?? '';
+  const element = (selector: string): HTMLElement | null =>
+    (fixture.nativeElement as HTMLElement).querySelector(selector);
+
+  const text = (selector: string): string => element(selector)?.textContent?.trim().replace(/\s+/g, ' ') ?? '';
 
   const texts = (selector: string): string[] =>
     Array.from((fixture.nativeElement as HTMLElement).querySelectorAll(selector)).map(
-      (element) => element.textContent?.trim() ?? '',
+      (el) => el.textContent?.trim().replace(/\s+/g, ' ') ?? '',
     );
-
-  const boxClasses = (): string[] =>
-    Array.from((fixture.nativeElement as HTMLElement).querySelector('.now__box')?.classList ?? []);
 
   beforeEach(() => {
     jasmine.clock().install();
@@ -128,128 +124,50 @@ describe('HomeComponent', () => {
 
   afterEach(() => jasmine.clock().uninstall());
 
-  it('shows the date and the current price', () => {
+  it('shows the title and the date', () => {
     render();
 
-    expect(text('.clock')).toBe('ke 7.10. · 13:42');
     expect(text('h1')).toBe('Milloin…');
-    expect(text('.now__value')).toBe('4,82');
-    expect(text('.pill')).toBe('Normaali');
-    expect(boxClasses()).toContain('now__box--normal');
+    expect(text('.clock')).toBe('ke 7.10. · 13:42');
   });
 
-  it('colors the price box by the price category', () => {
-    render(of({ ...overview, current: { price: 14.23, priceCategory: 'EXPENSIVE' } }));
-
-    expect(text('.pill')).toBe('Kallis');
-    expect(boxClasses()).toContain('now__box--expensive');
-    expect(boxClasses()).toContain('now__box');
-  });
-
-  it('keeps the price box neutral while prices load', () => {
-    render(new Observable<OverviewDto>());
-
-    expect(boxClasses()).toContain('now__box--normal');
-  });
-
-  it('shows a spinner in place of the price while it loads', () => {
-    render(new Observable<OverviewDto>());
-
-    const spinner = (fixture.nativeElement as HTMLElement).querySelector('.now__value app-spinner');
-    expect(spinner?.getAttribute('role')).toBe('status');
-    expect(spinner?.textContent?.trim()).toBe('Ladataan hintoja');
-  });
-
-  it('charts the hours from now to the last published price', () => {
+  it('lists the questions as whole sentences under their category', () => {
     render();
 
-    const element = fixture.nativeElement as HTMLElement;
-    const bars = Array.from(element.querySelectorAll('.bar')).map((bar) => bar.className);
-    expect(bars.length).toBe(35);
-    expect(bars[0]).toContain('bar--current');
-    expect(bars[1]).toContain('bar--future');
-    expect(text('app-hourly-chart h2')).toBe('Nyt → to 23:00');
-    expect(texts('.scale__value')).toEqual(['0', '10', '20']);
-    expect(
-      Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.tick')).map((tick) =>
-        Array.from(tick.children)
-          .map((line) => line.textContent?.trim())
-          .join(' '),
-      ),
-    ).toEqual([
-      'nyt 13:42',
-      '+6 h 19:00',
-      '+12 h 01:00',
-      '+24 h 13:00',
-      'to 23:00',
-    ]);
+    expect(texts('.group__link')).toEqual(['Sähkö']);
+    expect(texts('.question__text')).toEqual(['Milloin saunotaan?', 'Milloin pestään pyykit?', 'Milloin ladataan auto?']);
   });
 
-  it('shows the price of an hour under the pointer', () => {
+  it('links each category heading to its page and each question to its answer page', () => {
     render();
 
-    const plot = (fixture.nativeElement as HTMLElement).querySelector('.plot') as HTMLElement;
-    const rect = plot.getBoundingClientRect();
-    plot.dispatchEvent(
-      new PointerEvent('pointermove', { clientX: rect.left + (rect.width * 12.5) / 35, pointerType: 'mouse' }),
-    );
-    fixture.detectChanges();
-    expect(text('.tip')).toBe('to 01:00–02:00 · 3,00 c/kWh');
-
-    plot.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' }));
-    fixture.detectChanges();
-    expect(text('.tip')).toBe('');
+    expect(element('[data-test-id="home-category-sahko"]')?.getAttribute('href')).toBe('/sahko-on-halpaa');
+    expect(element('[data-test-id="home-sauna"]')?.getAttribute('href')).toBe('/saunotaan');
+    expect(element('[data-test-id="home-laundry"]')?.getAttribute('href')).toBe('/pestaan-pyykit');
+    expect(element('[data-test-id="home-ev"]')?.getAttribute('href')).toBe('/ladataan-auto');
   });
 
-  it('compares the average of the next 6, 12 and 24 hours with now', () => {
+  it('shows the current price in the Sähkö heading', () => {
     render();
 
-    expect(texts('.tile__label')).toEqual(['+6 h keskihinta', '+12 h keskihinta', '+24 h keskihinta']);
-    expect(texts('.tile__value').map((value) => value.split(' ')[0])).toEqual(['6,00', '4,50', '3,75']);
-    expect(texts('.tile__change')).toEqual(['+24 % vs. nyt', '−7 % vs. nyt', '−22 % vs. nyt']);
+    expect(text('.group__meta')).toBe('nyt 4,82 c/kWh · normaali');
   });
 
-  it('answers the laundry question with the recommended start delay, not the cheapest', () => {
+  it('answers each question in its row', () => {
     render();
 
-    const row = '[data-test-id="home-wash-laundry"]';
-    expect(text(`${row} .question__answer`)).toBe('+1 h');
-    expect(text(`${row} .question__short`)).toBe('ajastus · 4,0 snt');
-    expect(text(`${row} .question__detail`)).toBe('ajastus, käynnistyy 14:42');
+    expect(text('[data-test-id="home-sauna"] .question__answer')).toBe('20:00');
+    expect(text('[data-test-id="home-sauna"] .question__short')).toBe('tänään · 39,7 snt');
+    expect(text('[data-test-id="home-laundry"] .question__answer')).toBe('+1 h');
+    expect(text('[data-test-id="home-laundry"] .question__detail')).toBe('ajastus, käynnistyy 14:42 · 4,0 snt');
+    expect(text('[data-test-id="home-ev"] .question__answer')).toBe('01:00–05:00');
+    expect(text('[data-test-id="home-ev"] .question__detail')).toBe('ensi yönä · 0,24 €');
   });
 
-  it('says waiting is not worth it when a later start saves too little', () => {
-    render(of(overview), { ...laundry, startDelays: [delay(0, 5.2), delay(1, 4.02, true), delay(2, 4.5)] });
-
-    const row = '[data-test-id="home-wash-laundry"]';
-    expect(text(`${row} .question__answer`)).toBe('Nyt');
-    expect(text(`${row} .question__short`)).toBe('heti · 5,2 snt');
-    expect(text(`${row} .question__detail`)).toBe('odottaminen ei kannata');
-  });
-
-  it('says now is cheapest when no later start is cheaper', () => {
-    render(of(overview), { ...laundry, startDelays: [delay(0, 3, true), delay(1, 4.02), delay(2, 4.5)] });
-
-    const row = '[data-test-id="home-wash-laundry"]';
-    expect(text(`${row} .question__answer`)).toBe('Nyt');
-    expect(text(`${row} .question__detail`)).toBe('nyt on halvinta');
-  });
-
-  it('answers the EV question with the charging window and its cost', () => {
+  it('hides the category filter while there is only one category', () => {
     render();
 
-    const row = '[data-test-id="home-charge-ev"]';
-    expect(text(`${row} .question__answer`)).toBe('01:00–05:00');
-    expect(text(`${row} .question__short`)).toBe('ensi yönä · 0,24 €');
-  });
-
-  it('answers the sauna question with when the sauna is warm after the cheapest evening start', () => {
-    render();
-
-    const row = '[data-test-id="home-sauna"]';
-    expect(text(`${row} .question__answer`)).toBe('20:00');
-    expect(text(`${row} .question__short`)).toBe('tänään · 39,7 snt');
-    expect(text(`${row} .question__detail`)).toBe('tänään, lämmitys 19:00');
+    expect(element('.filter')).toBeNull();
   });
 
   it('shows the error and retries', () => {
@@ -257,5 +175,6 @@ describe('HomeComponent', () => {
 
     expect(text('.error p')).toBe('Palvelinvirhe - yritä myöhemmin uudelleen');
     expect(text('[data-test-id="home-retry"]')).toBe('Yritä uudelleen');
+    expect(texts('.question__text').length).toBe(3);
   });
 });
