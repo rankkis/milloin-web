@@ -168,18 +168,30 @@ export class SaunaComponent {
     return plan && (plan.starts.find((start) => start.hour === this.pickedHour()) ?? plan.best);
   });
 
+  /** The tapped start: its total cost, and how it compares with the cheapest or the most expensive start */
   readonly pickedText = computed(() => {
     const plan = this.plan();
     const picked = this.picked();
     if (!plan || !picked) return undefined;
+    const main = `Kiuas päälle klo ${hourClock(picked.hour)} · `;
+    if (!picked.window) return { main: main + 'hinta ei vielä tiedossa', compare: undefined };
+
     const { best, worst } = plan;
-    const saving = worst.window.costCents - best.window.costCents;
-    const savedPct = Math.round((saving / worst.window.costCents) * 100);
-    const bestText = ` · halvin${saving >= 0.05 && worst.window.costCents > 0 ? `, −${savedPct} %` : ''}`;
-    const price = picked.window
-      ? `${cents(picked.window.costCents)} snt${picked === best ? bestText : ''}`
-      : 'hinta ei vielä tiedossa';
-    return `klo ${hourClock(picked.hour)} · ${price}`;
+    const cost = picked.window.costCents;
+    let compare: string;
+    if (picked === best) {
+      const saving = worst.window.costCents - cost;
+      const savedPct = Math.round((saving / worst.window.costCents) * 100);
+      compare =
+        saving >= 0.05 && worst.window.costCents > 0
+          ? `Halvin aloitus: ${savedPct} % halvempi kuin kallein (klo ${hourClock(worst.hour)}).`
+          : 'Halvin aloitus.';
+    } else {
+      const extra = cost - best.window.costCents;
+      const extraPct = best.window.costCents > 0 ? ` (+${Math.round((extra / best.window.costCents) * 100)} %)` : '';
+      compare = `${cents(extra)} snt${extraPct} kalliimpi kuin halvin (klo ${hourClock(best.hour)}).`;
+    }
+    return { main: `${main}yhteensä ${cents(cost)} snt`, compare };
   });
 
   readonly basis = computed(() => {
