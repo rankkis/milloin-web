@@ -226,7 +226,7 @@ export class SaunaComponent {
     if (!response) return undefined;
     return (
       `Laskettu ${formatNumber(response.durationHours, 0)} tunnin saunomiselle ja ${formatKwh(this.kwh())} kWh:lle. ` +
-      'Päivä: kiuas päälle klo 6–16, ilta 17–21. ' +
+      'Kiuas päälle: päivä klo 6–16, ilta 17–21, ei väliä 6–23. ' +
       'Illalla suosittelemme saunaa, joka on lämmin klo 19–21, ' +
       `ellei muu aika ole vähintään ${OFF_HOURS_MIN_SAVING_CENTS} senttiä ja ` +
       `sähköenergialtaan ${OFF_HOURS_MIN_SAVING_PCT} % halvempi.`

@@ -8,7 +8,8 @@ export type SaunaPart = 'day' | 'evening' | 'any';
 export const PART_HOURS: Record<SaunaPart, [number, number]> = {
   day: [6, 16],
   evening: [17, 21],
-  any: [0, 23],
+  // No heater starts 00–05: nobody heats the sauna in the middle of the night
+  any: [6, 23],
 };
 
 export const DAYS: SaunaDay[] = [0, 1];
