@@ -28,12 +28,15 @@ const MIN_HEIGHT_PCT = 2;
 const MARKER_HOURS = [6, 12, 24];
 /** A gridline every this many c/kWh */
 const GRID_STEP = 10;
+/** The scale reaches at least this many c/kWh so low prices look low */
+const MIN_SCALE = 10;
 const HOUR_MS = 60 * 60 * 1000;
 
 /**
- * Hourly price bars from the current hour onwards, with gridlines every
- * 10 c/kWh, dashed markers at +6, +12 and +24 hours and a tooltip on
- * hover or tap. The first hour is the current one.
+ * Hourly price bars from the current hour onwards, scaled to the highest
+ * price but at least 10 c/kWh, with gridlines every 10 c/kWh, dashed
+ * markers at +6, +12 and +24 hours and a tooltip on hover or tap. The
+ * first hour is the current one.
  */
 @Component({
   selector: 'app-hourly-chart',
@@ -52,7 +55,10 @@ export class HourlyChartComponent {
   /** Index of the bar under the pointer */
   readonly hovered = signal<number | null>(null);
 
-  private readonly max = computed(() => Math.max(...this.hours().map((hour) => hour.priceAvg), 0));
+  /** Top of the scale: the highest price, at least MIN_SCALE */
+  private readonly max = computed(() =>
+    Math.max(...this.hours().map((hour) => hour.priceAvg), MIN_SCALE),
+  );
 
   readonly end = computed(() => {
     const hours = this.hours();
@@ -76,7 +82,7 @@ export class HourlyChartComponent {
     return hours.map((hour, index) => {
       const start = Date.parse(hour.startTime);
       const end = Date.parse(hour.endTime);
-      const pct = max > 0 ? (Math.max(hour.priceAvg, 0) / max) * 100 : 0;
+      const pct = (Math.max(hour.priceAvg, 0) / max) * 100;
 
       let state: BarState = 'future';
       if (start < windowEnd && end > windowStart) state = 'window';
@@ -93,11 +99,11 @@ export class HourlyChartComponent {
     });
   });
 
-  /** Baseline and a line at every 10 c/kWh below the maximum */
+  /** Baseline and a line at every 10 c/kWh up to the top of the scale */
   readonly gridlines = computed(() => {
     const max = this.max();
     const lines = [{ value: '0', bottom: 0 }];
-    for (let value = GRID_STEP; value < max; value += GRID_STEP) {
+    for (let value = GRID_STEP; value <= max; value += GRID_STEP) {
       lines.push({ value: String(value), bottom: (value / max) * 100 });
     }
     return lines;
