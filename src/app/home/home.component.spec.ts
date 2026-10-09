@@ -9,6 +9,8 @@ import {
 } from '../wash-laundry/wash-laundry.service';
 import { ChargeEvService } from '../charge-ev/charge-ev.service';
 import { SaunaService } from '../sauna/sauna.service';
+import { EnceService } from '../ence/ence.service';
+import { EnceDto } from '../ence/ence.model';
 import {
   HourlyPriceDto,
   OptimalTimeDto,
@@ -87,6 +89,24 @@ const sauna: OptimalWindowsDto = {
   startOffsets: [saunaStart('2026-10-07T13:00:00.000Z', 52), saunaStart('2026-10-07T16:00:00.000Z', 39.7)],
 };
 
+// ENCE plays tomorrow at 18:30 Finnish time
+const ence: EnceDto = {
+  updatedAt: '2026-10-07T10:12:00.000Z',
+  source: 'PandaScore',
+  team: { name: 'ENCE' },
+  nextMatch: {
+    startTime: '2026-10-08T15:30:00.000Z',
+    live: false,
+    opponent: { name: 'Sashi' },
+    event: 'CCT Europe Series 9',
+    format: 'Bo3',
+    streams: [],
+  },
+  upcoming: [],
+  results: [],
+  news: [],
+};
+
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
 
@@ -99,6 +119,7 @@ describe('HomeComponent', () => {
         { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundry) } },
         { provide: ChargeEvService, useValue: { getOptimalWindows: () => of(ev) } },
         { provide: SaunaService, useValue: { getStarts: () => of(sauna) } },
+        { provide: EnceService, useValue: { getEnce: () => of(ence) } },
       ],
     });
     fixture = TestBed.createComponent(HomeComponent);
@@ -134,7 +155,7 @@ describe('HomeComponent', () => {
   it('lists the questions as whole sentences under their category', () => {
     render();
 
-    expect(texts('.group__link')).toEqual(['Sähkö', 'Raha']);
+    expect(texts('.group__link')).toEqual(['Sähkö', 'Raha', 'Sekalaista']);
     expect(texts('.question__text')).toEqual([
       'Milloin saunotaan?',
       'Milloin pestään pyykit?',
@@ -142,6 +163,7 @@ describe('HomeComponent', () => {
       'Milloin Kelan tuet maksetaan?',
       'Milloin veronpalautukset tulevat?',
       'Milloin eläke maksetaan?',
+      'Milloin Ence pelaa?',
     ]);
   });
 
@@ -156,6 +178,16 @@ describe('HomeComponent', () => {
     expect(element('[data-test-id="home-kela"]')?.getAttribute('href')).toBe('/kelan-tuet-maksetaan');
     expect(element('[data-test-id="home-tax-refund"]')?.getAttribute('href')).toBe('/veronpalautukset-tulevat');
     expect(element('[data-test-id="home-pension"]')?.getAttribute('href')).toBe('/elake-maksetaan');
+    expect(element('[data-test-id="home-category-sekalaista"]')?.getAttribute('href')).toBe('/mitakin-tapahtuu');
+    expect(element('[data-test-id="home-ence"]')?.getAttribute('href')).toBe('/ence-pelaa');
+  });
+
+  it('answers when ENCE plays next', () => {
+    render();
+
+    expect(text('[data-test-id="home-ence"] .question__answer')).toBe('to 18:30');
+    expect(text('[data-test-id="home-ence"] .question__short')).toBe('huomenna · vs. Sashi');
+    expect(text('[data-test-id="home-ence"] .question__detail')).toBe('huomenna vs. Sashi · CCT Europe Series 9, Bo3');
   });
 
   it('shows the current price in the Sähkö heading', () => {
@@ -187,7 +219,7 @@ describe('HomeComponent', () => {
   it('filters the questions by category', () => {
     render();
 
-    expect(texts('.chip')).toEqual(['Kaikki', 'Sähkö', 'Raha']);
+    expect(texts('.chip')).toEqual(['Kaikki', 'Sähkö', 'Raha', 'Sekalaista']);
     element<HTMLButtonElement>('[data-test-id="home-filter-raha"]')?.click();
     fixture.detectChanges();
 
@@ -200,6 +232,6 @@ describe('HomeComponent', () => {
 
     expect(text('.error p')).toBe('Palvelinvirhe - yritä myöhemmin uudelleen');
     expect(text('[data-test-id="home-retry"]')).toBe('Yritä uudelleen');
-    expect(texts('.question__text').length).toBe(6);
+    expect(texts('.question__text').length).toBe(7);
   });
 });

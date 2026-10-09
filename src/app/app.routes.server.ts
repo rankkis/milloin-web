@@ -19,6 +19,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'kelan-tuet-maksetaan', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'veronpalautukset-tulevat', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'elake-maksetaan', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  { path: 'mitakin-tapahtuu', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  { path: 'ence-pelaa', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   // Earlier addresses that redirect to the new ones
   { path: 'kannattaa-pesta-pyykkia', renderMode: RenderMode.Server, status: 301 },
   { path: 'kannattaa-ladata-auto', renderMode: RenderMode.Server, status: 301 },

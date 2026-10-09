@@ -79,6 +79,10 @@ h2 {
 
 // Questions
 
+.accent {
+  color: color(accent);
+}
+
 .questions {
   display: flex;
   flex-direction: column;

@@ -7,6 +7,8 @@ export const APP_NAVIGATION_PATHS = {
   KELA: 'kelan-tuet-maksetaan',
   TAX_REFUND: 'veronpalautukset-tulevat',
   PENSION: 'elake-maksetaan',
+  MISC: 'mitakin-tapahtuu',
+  ENCE: 'ence-pelaa',
 };
 
 /** Earlier addresses of moved pages, redirected permanently to the new ones (also in vercel.json) */

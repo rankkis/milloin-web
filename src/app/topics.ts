@@ -1,7 +1,7 @@
 import { APP_NAVIGATION_PATHS } from './app.paths';
 import { IconName } from './shared/icon/icon.component';
 
-export type QuestionId = 'sauna' | 'laundry' | 'ev' | 'kela' | 'tax-refund' | 'pension';
+export type QuestionId = 'sauna' | 'laundry' | 'ev' | 'kela' | 'tax-refund' | 'pension' | 'ence';
 
 /** A question the site answers. The title is the whole question; the path finishes the sentence after "milloin.xyz/". */
 export interface Question {
@@ -40,5 +40,11 @@ export const CATEGORIES: Category[] = [
       { id: 'tax-refund', title: 'Milloin veronpalautukset tulevat?', path: APP_NAVIGATION_PATHS.TAX_REFUND, icon: 'receipt' },
       { id: 'pension', title: 'Milloin eläke maksetaan?', path: APP_NAVIGATION_PATHS.PENSION, icon: 'coin' },
     ],
+  },
+  {
+    id: 'sekalaista',
+    name: 'Sekalaista',
+    path: APP_NAVIGATION_PATHS.MISC,
+    questions: [{ id: 'ence', title: 'Milloin Ence pelaa?', path: APP_NAVIGATION_PATHS.ENCE, icon: 'gamepad' }],
   },
 ];

@@ -5,7 +5,7 @@ import { PaymentDayRouteData } from './money/payment-day/payment-day.component';
 import { SeoRouteData } from './shared/seo/seo-title-strategy';
 
 const HOME_DESCRIPTION =
-  'Milloin saunotaan, pestään pyykit tai ladataan auto, ja milloin Kelan tuet, veronpalautukset ja eläke tulevat tilille? Vastaukset arjen milloin-kysymyksiin ja sähkön hinta nyt.';
+  'Milloin saunotaan, pestään pyykit tai ladataan auto, milloin Kelan tuet, veronpalautukset ja eläke tulevat tilille ja milloin Ence pelaa? Vastaukset arjen milloin-kysymyksiin ja sähkön hinta nyt.';
 
 const paymentDay = () => import('./money/payment-day/payment-day.component').then(m => m.PaymentDayComponent);
 
@@ -92,6 +92,23 @@ export const routes: Routes = [
       description:
         'Milloin työeläke, kansaneläke ja takuueläke tulevat tilille? Seuraavat eläkkeen maksupäivät pankkipäivät huomioiden.',
     } satisfies SeoRouteData & PaymentDayRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.MISC,
+    loadComponent: () => import('./misc/misc.component').then(m => m.MiscComponent),
+    title: 'Milloin mitäkin tapahtuu? – Sekalaiset milloin-kysymykset | Milloin…',
+    data: {
+      description: 'Sekalaiset milloin-kysymykset, kuten milloin Ence pelaa seuraavan CS2-ottelunsa.',
+    } satisfies SeoRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.ENCE,
+    loadComponent: () => import('./ence/ence.component').then(m => m.EnceComponent),
+    title: 'Milloin Ence pelaa? – ENCE:n seuraava CS2-ottelu ja striimit | Milloin…',
+    data: {
+      description:
+        'Milloin ENCE pelaa seuraavan Counter-Strike 2 -ottelunsa? Ottelun aika ja vastustaja, suomen- ja englanninkieliset striimit, tulevat ottelut ja uutiset.',
+    } satisfies SeoRouteData,
   },
   // Earlier addresses; Vercel redirects these permanently before they reach the app
   ...Object.entries(LEGACY_PATH_REDIRECTS).map(([path, redirectTo]) => ({ path, redirectTo, pathMatch: 'full' as const })),

@@ -1,0 +1,148 @@
+<div class="page">
+  <app-answer-header [loading]="ence.isLoading()" (refresh)="reload()" />
+
+  <div class="layout">
+    <div class="answer">
+      <h1 class="question">Milloin Ence pelaa?</h1>
+      @if (data()) {
+        <div class="answer__line">
+          <p class="answer__value" [class.answer__value--none]="!match()">{{ value() }}</p>
+          @if (started()) {
+            <span class="live"><span class="live__dot" aria-hidden="true"></span>LIVE</span>
+          }
+        </div>
+        @if (match(); as match) {
+          <p class="answer__sentence">ENCE vs. {{ match.opponent.name }}</p>
+        }
+        <p class="answer__when">{{ when() }}</p>
+      } @else if (ence.error(); as error) {
+        <p class="message" role="alert">{{ errorMessage(error) }}</p>
+      } @else {
+        <p class="answer__value answer__value--loading"><app-spinner /></p>
+      }
+    </div>
+
+    @if (data(); as data) {
+      @if (match(); as match) {
+        <section class="match" aria-label="Ottelu">
+          <div class="match__teams">
+            <div class="team">
+              @if (logo(data.team); as src) {
+                <img class="team__logo" [src]="src" alt="" width="64" height="64" />
+              } @else {
+                <span class="team__logo team__logo--none"><app-icon name="shield" [size]="28" /></span>
+              }
+              <span class="team__name">{{ data.team.name }}</span>
+            </div>
+            <span class="match__vs">vs.</span>
+            <div class="team">
+              @if (logo(match.opponent); as src) {
+                <img class="team__logo" [src]="src" alt="" width="64" height="64" />
+              } @else {
+                <span class="team__logo team__logo--none"><app-icon name="shield" [size]="28" /></span>
+              }
+              <span class="team__name">{{ match.opponent.name }}</span>
+            </div>
+          </div>
+          <p class="match__facts">
+            @if (match.event) {
+              <span>{{ match.event }}</span>
+            }
+            @if (match.format) {
+              <span class="mono">{{ match.format }}</span>
+            }
+            <span class="mono">{{ matchTime() }}</span>
+          </p>
+          <a class="match__link" [href]="hltvUrl" target="_blank" rel="noopener" data-test-id="ence-hltv">
+            ENCE HLTV.orgissa
+            <app-icon name="external" [size]="16" />
+          </a>
+        </section>
+      }
+
+      @if (match()) {
+        <section class="streams" aria-labelledby="streams-title">
+          <div class="streams__head">
+            <h2 id="streams-title" class="label">Striimit</h2>
+            @if (hasViewers()) {
+              <span class="label" aria-hidden="true">katsojia</span>
+            }
+          </div>
+          @for (stream of streams(); track trackStream(stream); let i = $index) {
+            <a class="stream" [href]="stream.url" target="_blank" rel="noopener" [attr.data-test-id]="'ence-stream-' + (i + 1)">
+              <span class="stream__play" aria-hidden="true"><app-icon name="play" [size]="14" /></span>
+              <span class="stream__text">
+                <span class="stream__name">
+                  <span class="stream__channel">{{ stream.name }}</span>
+                  @if (stream.official) {
+                    <span class="stream__tag">virallinen</span>
+                  }
+                </span>
+                <span class="stream__meta">{{ stream.meta }}</span>
+              </span>
+              @if (stream.viewersText) {
+                <span class="stream__viewers">{{ stream.viewersText }}</span>
+              }
+              <app-icon class="stream__icon" name="external" [size]="16" />
+            </a>
+          } @empty {
+            <p class="streams__none">Suomen- tai englanninkielisiä striimejä ei ole vielä julkaistu.</p>
+          }
+        </section>
+      }
+
+      <div class="lists">
+        @if (match()) {
+          @if (upcoming().length) {
+            <section class="list" aria-labelledby="upcoming-title">
+              <h2 id="upcoming-title" class="label list__title">Seuraavat ottelut</h2>
+              @for (next of upcoming(); track next.startTime) {
+                <div class="row">
+                  <span class="row__when">{{ next.when }}</span>
+                  <span class="row__text">vs. {{ next.opponent.name }}</span>
+                  <span class="row__end">{{ next.format }}</span>
+                </div>
+              }
+            </section>
+          }
+        } @else if (results().length) {
+          <section class="list" aria-labelledby="results-title">
+            <h2 id="results-title" class="label list__title">Viimeksi pelatut</h2>
+            @for (result of results(); track result.startTime) {
+              <div class="row">
+                <span class="row__when">{{ result.when }}</span>
+                <span class="row__text">vs. {{ result.opponent.name }}</span>
+                <span class="row__end" [class.accent]="result.won">{{ result.score }}</span>
+              </div>
+            }
+          </section>
+        }
+
+        @if (news().length) {
+          <section class="list" aria-labelledby="news-title">
+            <h2 id="news-title" class="label list__title">Uutiset</h2>
+            @for (item of news(); track item.url; let i = $index) {
+              <a class="row row--link" [href]="item.url" target="_blank" rel="noopener" [attr.data-test-id]="'ence-news-' + (i + 1)">
+                <span class="row__when">{{ item.when }}</span>
+                <span class="row__text">
+                  {{ item.title }}
+                  @if (item.source) {
+                    <span class="row__source">{{ item.source }}</span>
+                  }
+                </span>
+                <app-icon class="row__icon" name="external" [size]="16" />
+              </a>
+            }
+          </section>
+        }
+      </div>
+    }
+  </div>
+
+  @if (updated(); as updated) {
+    <p class="basis">
+      Ottelut: {{ updated }}. Uutiset: Google News. Tiedot päivittyvät tunnin välein, joten käynnissä olevan ottelun
+      tulosta ei näytetä. Striimeistä näytetään suomen- ja englanninkieliset.
+    </p>
+  }
+</div>
