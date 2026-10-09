@@ -18,6 +18,7 @@ import {
   hasPrices,
   hourClock,
   laterToday,
+  readyClock,
   missingPricesNotice,
   planSauna,
   tomorrowNote,
@@ -105,11 +106,11 @@ export class SaunaComponent {
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
     const saving = worst.window.costCents - best.window.costCents;
     const durationHours = this.response()?.durationHours ?? 3;
-    let reason = `Sauna on lämmin noin kello ${hourClock((best.hour + 1) % 24)}. Saunominen maksaa ${cents(best.window.costCents)} senttiä`;
-    reason += saving >= 0.05 ? `, eli ${cents(saving)} senttiä vähemmän kuin kello ${hourClock(worst.hour)} aloitettuna.` : '.';
+    let reason = `Saunominen maksaa ${cents(best.window.costCents)} senttiä`;
+    reason += saving >= 0.05 ? `, eli ${cents(saving)} senttiä vähemmän kuin jos lämmitys aloitetaan kello ${hourClock(worst.hour)}.` : '.';
     return {
-      value: hourClock(best.hour),
-      instruction: `Laita kiuas päälle ${day} kello ${hourClock(best.hour)}.`,
+      value: readyClock(best.hour),
+      instruction: `Aloita lämmitys ${day} kello ${hourClock(best.hour)}, niin sauna on lämmin kello ${readyClock(best.hour)}.`,
       reason,
       times: `${day} · kiuas päällä ${hourClock(best.hour)}–${hourClock((best.hour + durationHours) % 24 || 24)}`,
     };
@@ -123,7 +124,7 @@ export class SaunaComponent {
     return (
       other && {
         day: other.day,
-        text: `${DAY_TEXT[other.day]} kello ${hourClock(other.hour)} ${cents(plan.best.window.costCents - other.window.costCents)} snt halvempi`,
+        text: `${DAY_TEXT[other.day]} saunaan kello ${readyClock(other.hour)}, ${cents(plan.best.window.costCents - other.window.costCents)} snt halvempi`,
       }
     );
   });
@@ -133,7 +134,7 @@ export class SaunaComponent {
     const response = this.response();
     const plan = this.plan();
     const start = response && plan && laterToday(response, this.now(), plan);
-    return start && `Saunotko vielä tänään? Kello ${hourClock(start.hour)}: ${cents(start.window.costCents)} snt`;
+    return start && `Saunotko vielä tänään? Saunaan kello ${readyClock(start.hour)}, ${cents(start.window.costCents)} snt`;
   });
 
   readonly notice = computed(() => {

@@ -76,8 +76,11 @@ describe('SaunaComponent', () => {
     render(of(response(45, 48)));
 
     expect(text('h1')).toBe('Milloin saunotaan?');
-    expect(text('.answer__value')).toBe('21:00');
-    expect(text('.answer__instruction')).toBe('Laita kiuas päälle tänään kello 21:00.');
+    expect(text('.answer__value')).toBe('22:00');
+    expect(text('.answer__instruction')).toBe('Aloita lämmitys tänään kello 21:00, niin sauna on lämmin kello 22:00.');
+    expect(text('.answer__reason')).toBe(
+      'Saunominen maksaa 39,7 senttiä, eli 12,3 senttiä vähemmän kuin jos lämmitys aloitetaan kello 17:00.',
+    );
     expect(text('.answer__times')).toBe('tänään · kiuas päällä 21:00–24:00');
     expect(button('sauna-day-today').getAttribute('aria-pressed')).toBe('true');
     expect(button('sauna-part-evening').getAttribute('aria-pressed')).toBe('true');
@@ -88,10 +91,10 @@ describe('SaunaComponent', () => {
   it('switches to tomorrow from the cheaper-day button', () => {
     render(of(response(45, 48)));
 
-    expect(text('[data-test-id="sauna-other-day"]')).toBe('Huomenna kello 18:00 15,7 snt halvempi');
+    expect(text('[data-test-id="sauna-other-day"]')).toBe('Huomenna saunaan kello 19:00, 15,7 snt halvempi');
     click('sauna-other-day');
 
-    expect(text('.answer__value')).toBe('18:00');
+    expect(text('.answer__value')).toBe('19:00');
     expect(button('sauna-day-tomorrow').getAttribute('aria-pressed')).toBe('true');
   });
 
@@ -130,14 +133,14 @@ describe('SaunaComponent', () => {
     jasmine.clock().mockDate(LATE);
     render(of(response(45, 48)));
 
-    expect(text('.answer__value')).toBe('18:00');
+    expect(text('.answer__value')).toBe('19:00');
     expect(button('sauna-day-tomorrow').getAttribute('aria-pressed')).toBe('true');
     expect(text('.notice')).toBe('Tämän illan saunavuorot ovat jo ohi, joten näytämme huomisen.');
     expect(element().querySelector('[data-test-id="sauna-other-day"]')).toBeNull();
-    expect(text('[data-test-id="sauna-tonight"]')).toBe('Saunotko vielä tänään? Kello 23:00: 52,0 snt');
+    expect(text('[data-test-id="sauna-tonight"]')).toBe('Saunotko vielä tänään? Saunaan kello 00:00, 52,0 snt');
 
     click('sauna-tonight');
-    expect(text('.answer__value')).toBe('23:00');
+    expect(text('.answer__value')).toBe('00:00');
     expect(button('sauna-day-today').getAttribute('aria-pressed')).toBe('true');
     expect(button('sauna-part-any').getAttribute('aria-pressed')).toBe('true');
     expect(element().querySelector('[data-test-id="sauna-tonight"]')).toBeNull();

@@ -243,12 +243,13 @@ describe('HomeComponent', () => {
     expect(text(`${row} .question__short`)).toBe('ensi yönä · 0,24 €');
   });
 
-  it('answers the sauna question with the cheapest evening start today', () => {
+  it('answers the sauna question with when the sauna is warm after the cheapest evening start', () => {
     render();
 
     const row = '[data-test-id="home-sauna"]';
-    expect(text(`${row} .question__answer`)).toBe('19:00');
+    expect(text(`${row} .question__answer`)).toBe('20:00');
     expect(text(`${row} .question__short`)).toBe('tänään · 39,7 snt');
+    expect(text(`${row} .question__detail`)).toBe('tänään, lämmitys 19:00');
   });
 
   it('shows the error and retries', () => {

@@ -22,7 +22,7 @@ import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { SaunaService } from '../sauna/sauna.service';
-import { cents, hourClock, planSauna } from '../sauna/sauna-plan';
+import { cents, hourClock, planSauna, readyClock } from '../sauna/sauna-plan';
 import { recommendDelay } from '../wash-laundry/laundry-recommendation';
 import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
 
@@ -136,13 +136,19 @@ export class HomeComponent {
     };
   });
 
-  /** The sauna page's default answer: the cheapest evening start today, or tomorrow once the evening is over */
+  /** The sauna page's default answer: when the sauna is warm after the cheapest evening start, today or tomorrow once the evening is over */
   readonly saunaAnswer = computed<Answer | undefined>(() => {
     const plan = this.sauna.hasValue() ? planSauna(this.sauna.value(), this.now(), undefined, 'evening') : undefined;
     if (!plan) return undefined;
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
     const price = `${cents(plan.best.window.costCents)} snt`;
-    return { value: hourClock(plan.best.hour), short: day, detail: day, price, highlight: false };
+    return {
+      value: readyClock(plan.best.hour),
+      short: day,
+      detail: `${day}, lämmitys ${hourClock(plan.best.hour)}`,
+      price,
+      highlight: false,
+    };
   });
 
   constructor() {
