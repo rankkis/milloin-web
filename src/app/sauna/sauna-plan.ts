@@ -125,6 +125,12 @@ export function laterToday(response: OptimalWindowsDto, now: Date, plan: SaunaPl
   return priced.length ? cheapest(priced) : undefined;
 }
 
+/** The heater warms the sauna in about an hour */
+export const HEAT_UP_HOURS = 1;
+
+/** When the sauna is warm if the heater goes on at this hour, e.g. 22:00 for 21:00 */
+export const readyClock = (startHour: number): string => hourClock((startHour + HEAT_UP_HOURS) % 24);
+
 /** Hour as a clock time, e.g. 09:00; 24 is midnight at the end of the day */
 export const hourClock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`;
 
