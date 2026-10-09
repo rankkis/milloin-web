@@ -20,6 +20,17 @@ const PART_FALLBACK: SaunaPart[] = ['evening', 'day', 'any'];
 /** Another day is suggested when it is at least this many cents cheaper */
 const OTHER_DAY_MIN_SAVING_CENTS = 1;
 
+/**
+ * Evening heater starts whose sauna is warm 19–21, the usual sauna time:
+ * Saturday and Friday evenings are the usual sauna nights, and saunas add to
+ * the 17–19 evening peak of electricity use.
+ */
+export const PREFERRED_START_HOURS: [number, number] = [18, 20];
+/** A start outside the preferred hours must save at least this many cents… */
+export const OFF_HOURS_MIN_SAVING_CENTS = 10;
+/** …and at least this share of the cheapest preferred start's cost, percent */
+export const OFF_HOURS_MIN_SAVING_PCT = 10;
+
 /** A start hour of a day; window is missing when its prices are not published yet */
 export interface SaunaStart {
   hour: number;
@@ -30,13 +41,15 @@ export interface SaunaPlan {
   day: SaunaDay;
   part: SaunaPart;
   starts: SaunaStart[];
-  best: SaunaStart & { window: NonNullable<SaunaStart['window']> };
+  /** The start the page answers with: the cheapest, but in the evening a usual sauna time unless another saves enough */
+  recommended: SaunaStart & { window: NonNullable<SaunaStart['window']> };
+  cheapest: SaunaStart & { window: NonNullable<SaunaStart['window']> };
   worst: SaunaStart & { window: NonNullable<SaunaStart['window']> };
   /** Today's time of day is over, so tomorrow is shown without the visitor choosing it */
   autoTomorrow: boolean;
 }
 
-type Priced = SaunaPlan['best'];
+type Priced = SaunaPlan['cheapest'];
 
 const isPriced = (start: SaunaStart): start is Priced => start.window !== undefined;
 
@@ -66,6 +79,34 @@ export function saunaStarts(
 const cheapest = (starts: Priced[]): Priced =>
   starts.reduce((best, start) => (start.window.costCents < best.window.costCents ? start : best));
 
+/** Rounds to 0,1 cents, the precision the page shows */
+const round1 = (value: number) => Math.round(value * 10) / 10;
+
+/** Whether the sauna is warm 19–21 with this start */
+export const isPreferredStart = (hour: number): boolean =>
+  hour >= PREFERRED_START_HOURS[0] && hour <= PREFERRED_START_HOURS[1];
+
+/** Whether a start outside the preferred hours saves enough over the cheapest preferred start */
+export function offHoursWorthIt(preferredCents: number, offHoursCents: number): boolean {
+  const saving = round1(preferredCents - offHoursCents);
+  return (
+    saving >= OFF_HOURS_MIN_SAVING_CENTS && saving >= round1((preferredCents * OFF_HOURS_MIN_SAVING_PCT) / 100)
+  );
+}
+
+/**
+ * The start to recommend. In the evening it is the cheapest start whose sauna
+ * is warm 19–21, unless another start saves enough; at other times of day the
+ * cheapest start.
+ */
+export function recommendStart(priced: Priced[], part: SaunaPart): Priced {
+  const cheapestStart = cheapest(priced);
+  const preferred = part === 'evening' ? priced.filter((start) => isPreferredStart(start.hour)) : [];
+  if (!preferred.length) return cheapestStart;
+  const best = cheapest(preferred);
+  return offHoursWorthIt(best.window.costCents, cheapestStart.window.costCents) ? cheapestStart : best;
+}
+
 /** Whether a day and time of day has at least one start with a known price */
 export function hasPrices(response: OptimalWindowsDto, now: Date, day: SaunaDay, part: SaunaPart): boolean {
   return saunaStarts(response, now, day, part).some(isPriced);
@@ -76,7 +117,7 @@ export function dayHasPrices(response: OptimalWindowsDto, now: Date, day: SaunaD
 }
 
 /**
- * The cheapest start of the chosen day and time of day. Without a chosen
+ * The recommended start of the chosen day and time of day. Without a chosen
  * day it is today, or tomorrow when today's time of day is over. A choice
  * without prices falls back to today, then to the evening, the day and any
  * time. Undefined when no start has a price.
@@ -100,20 +141,20 @@ export function planSauna(
   const starts = saunaStarts(response, now, day, part);
   const priced = starts.filter(isPriced);
   const worst = priced.reduce((max, start) => (start.window.costCents > max.window.costCents ? start : max));
-  return { day, part, starts, best: cheapest(priced), worst, autoTomorrow };
+  return { day, part, starts, recommended: recommendStart(priced, part), cheapest: cheapest(priced), worst, autoTomorrow };
 }
 
 /**
- * The other day's cheapest start at the same time of day, when it is clearly
- * cheaper. Not offered when today's time of day is already over.
+ * The other day's recommended start at the same time of day, when it is clearly
+ * cheaper than this day's. Not offered when today's time of day is already over.
  */
 export function cheaperOtherDay(response: OptimalWindowsDto, now: Date, plan: SaunaPlan): Priced & { day: SaunaDay } | undefined {
   if (plan.autoTomorrow) return undefined;
   const day: SaunaDay = plan.day === 0 ? 1 : 0;
   const priced = saunaStarts(response, now, day, plan.part).filter(isPriced);
   if (!priced.length) return undefined;
-  const best = cheapest(priced);
-  return best.window.costCents <= plan.best.window.costCents - OTHER_DAY_MIN_SAVING_CENTS
+  const best = recommendStart(priced, plan.part);
+  return best.window.costCents <= plan.recommended.window.costCents - OTHER_DAY_MIN_SAVING_CENTS
     ? { ...best, day }
     : undefined;
 }

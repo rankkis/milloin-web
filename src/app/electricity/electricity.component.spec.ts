@@ -243,7 +243,7 @@ describe('ElectricityComponent', () => {
     expect(text(`${row} .question__short`)).toBe('ensi yönä · 0,24 €');
   });
 
-  it('answers the sauna question with when the sauna is warm after the cheapest evening start', () => {
+  it('answers the sauna question with when the sauna is warm after the recommended evening start', () => {
     render();
 
     const row = '[data-test-id="electricity-sauna"]';

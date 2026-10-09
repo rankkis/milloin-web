@@ -120,16 +120,16 @@ export class ElectricityAnswers {
     };
   });
 
-  /** The sauna page's default answer: when the sauna is warm after the cheapest evening start, today or tomorrow once the evening is over */
+  /** The sauna page's default answer: when the sauna is warm after the recommended evening start, today or tomorrow once the evening is over */
   readonly saunaAnswer = computed<Answer | undefined>(() => {
     const plan = this.sauna.hasValue() ? planSauna(this.sauna.value(), this.now(), undefined, 'evening') : undefined;
     if (!plan) return undefined;
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
-    const price = `${cents(plan.best.window.costCents)} snt`;
+    const price = `${cents(plan.recommended.window.costCents)} snt`;
     return {
-      value: readyClock(plan.best.hour),
+      value: readyClock(plan.recommended.hour),
       short: day,
-      detail: `${day}, lämmitys ${hourClock(plan.best.hour)}`,
+      detail: `${day}, lämmitys ${hourClock(plan.recommended.hour)}`,
       price,
       highlight: false,
     };

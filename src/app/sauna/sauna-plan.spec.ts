@@ -5,6 +5,7 @@ import {
   hasPrices,
   laterToday,
   missingPricesNotice,
+  offHoursWorthIt,
   planSauna,
   saunaStarts,
   tomorrowNote,
@@ -64,9 +65,48 @@ describe('sauna plan', () => {
     expect(saunaStarts(full, NOW, 0, 'day').map((s) => s.hour)).toEqual([14, 15, 16]);
   });
 
+  it('recommends a usual sauna time unless another start saves enough', () => {
+    // 21:00 start (warm 22:00) is 8 cents cheaper than 19:00: too little to give up the usual time
+    const small = saunaResponse(costsUntil(45, (h) => (h === 21 ? 42 : h === 19 ? 50 : 60)));
+    const plan = planSauna(small, NOW, 0, 'evening')!;
+    expect([plan.recommended.hour, plan.cheapest.hour]).toEqual([19, 21]);
+
+    // 12 cents cheaper is enough
+    const large = saunaResponse(costsUntil(45, (h) => (h === 21 ? 38 : h === 19 ? 50 : 60)));
+    expect(planSauna(large, NOW, 0, 'evening')!.recommended.hour).toBe(21);
+  });
+
+  it('needs the saving to be both 10 cents and 10 %', () => {
+    expect(offHoursWorthIt(50, 40)).toBeTrue();
+    expect(offHoursWorthIt(50, 40.1)).toBeFalse();
+    expect(offHoursWorthIt(300, 280)).toBeFalse();
+    expect(offHoursWorthIt(300, 270)).toBeTrue();
+    expect(offHoursWorthIt(-5, -20)).toBeTrue();
+  });
+
+  it('recommends the cheapest start by day and at any time', () => {
+    const small = saunaResponse(costsUntil(45, (h) => (h === 21 || h === 16 ? 42 : 50)));
+    expect(planSauna(small, NOW, 0, 'any')!.recommended.hour).toBe(16);
+    expect(planSauna(small, NOW, 0, 'day')!.recommended.hour).toBe(16);
+  });
+
+  it('recommends a start outside the usual time when no usual start is left', () => {
+    // 20:30: only the 21:00 start is left this evening
+    const plan = planSauna(full, new Date('2026-10-07T17:30:00.000Z'), 0, 'evening')!;
+    expect(plan.recommended.hour).toBe(21);
+  });
+
+  it('compares the other day by its recommended start', () => {
+    // Tomorrow's 21:00 start is cheapest but only 5 cents under its 19:00 start, which is 1 cent under today's
+    const costs = costsUntil(45, (h) => (h === 19 ? 50 : h === 43 ? 49 : h === 45 ? 44 : 60));
+    const response = saunaResponse(costs);
+    const other = cheaperOtherDay(response, NOW, planSauna(response, NOW, 0, 'evening')!)!;
+    expect([other.day, other.hour]).toEqual([1, 19]);
+  });
+
   it('picks the cheapest start and the most expensive one', () => {
     const plan = planSauna(full, NOW, undefined, 'evening')!;
-    expect([plan.day, plan.part, plan.best.hour, plan.worst.window.costCents, plan.autoTomorrow]).toEqual([
+    expect([plan.day, plan.part, plan.recommended.hour, plan.worst.window.costCents, plan.autoTomorrow]).toEqual([
       0,
       'evening',
       21,
@@ -84,7 +124,7 @@ describe('sauna plan', () => {
   it('shows tomorrow once the evening is over and offers the rest of tonight', () => {
     expect(hasPrices(full, LATE, 0, 'evening')).toBeFalse();
     const plan = planSauna(full, LATE, undefined, 'evening')!;
-    expect([plan.day, plan.part, plan.best.hour, plan.autoTomorrow]).toEqual([1, 'evening', 18, true]);
+    expect([plan.day, plan.part, plan.recommended.hour, plan.autoTomorrow]).toEqual([1, 'evening', 18, true]);
     expect(missingPricesNotice(full, LATE, plan)).toBe('Tämän illan saunavuorot ovat jo ohi, joten näytämme huomisen.');
     expect(cheaperOtherDay(full, LATE, plan)).toBeUndefined();
     expect(laterToday(full, LATE, plan)!.hour).toBe(23);

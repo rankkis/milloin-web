@@ -215,6 +215,10 @@
   background: color(accent);
 }
 
+.start__bar--cheapest {
+  border: 1px dashed color(accent);
+}
+
 .start__bar--picked {
   outline: 1px solid color(text);
 }
