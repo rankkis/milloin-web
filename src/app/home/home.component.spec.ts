@@ -190,10 +190,11 @@ describe('HomeComponent', () => {
     expect(text('[data-test-id="home-ence"] .question__detail')).toBe('huomenna vs. Sashi · CCT Europe Series 9, Bo3');
   });
 
-  it('shows the current price in the Sähkö heading', () => {
+  it('shows the current spot price in the Sähkö heading, linked to the Sähkö page', () => {
     render();
 
-    expect(text('.group__meta')).toBe('nyt 4,82 c/kWh · normaali');
+    expect(text('.group__meta')).toBe('Pörssisähkö nyt 4,82 c/kWh · normaali');
+    expect(element('[data-test-id="home-electricity-price"]')?.getAttribute('href')).toBe('/sahko-on-halpaa');
   });
 
   it('answers each question in its row', () => {

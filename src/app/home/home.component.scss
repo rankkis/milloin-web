@@ -177,8 +177,19 @@ h2 {
   font-family: var(--font-mono);
   letter-spacing: 0;
   text-transform: none;
-  white-space: nowrap;
+  text-align: right;
   color: color(text-muted);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: color(accent);
+  }
+}
+
+/* Wraps before the category on narrow screens, not inside it */
+.group__category {
+  white-space: nowrap;
 }
 
 .question {
