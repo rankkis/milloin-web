@@ -13,5 +13,6 @@ export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'kannattaa-pesta-pyykkia', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'kannattaa-ladata-auto', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  { path: 'saunotaan', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: '**', renderMode: RenderMode.Server, status: 404, headers: CACHE_HEADERS },
 ];

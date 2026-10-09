@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type IconName = 'washer' | 'car' | 'back' | 'forward' | 'refresh' | 'trend-up' | 'trend-down';
+export type IconName = 'washer' | 'car' | 'sauna' | 'back' | 'forward' | 'refresh' | 'trend-up' | 'trend-down';
 
 /** Inline line icon. Decorative: label the surrounding control instead. */
 @Component({
@@ -29,6 +29,11 @@ export type IconName = 'washer' | 'car' | 'back' | 'forward' | 'refresh' | 'tren
           <circle cx="7.5" cy="17" r="2" />
           <circle cx="16.5" cy="17" r="2" />
           <path d="M9.5 17h5" />
+        }
+        @case ('sauna') {
+          <path d="M8 3c-1 1.2-1 2.3 0 3.5s1 2.3 0 3.5M12 3c-1 1.2-1 2.3 0 3.5s1 2.3 0 3.5M16 3c-1 1.2-1 2.3 0 3.5s1 2.3 0 3.5" />
+          <rect x="4" y="13" width="16" height="8" rx="1.5" />
+          <path d="M4 17h16" />
         }
         @case ('back') {
           <path d="M19 12H5M11 6l-6 6 6 6" />

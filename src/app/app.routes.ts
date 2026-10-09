@@ -10,7 +10,7 @@ export const routes: Routes = [
     title: 'Milloin… – Pörssisähkön hinta nyt ja halvimmat tunnit',
     data: {
       description:
-        'Pörssisähkön hinta nyt, tuntihinnat huomiseen asti ja keskihinta seuraavien 6, 12 ja 24 tunnin ajalta. Katso milloin pyykinpesu ja sähköauton lataus tulevat halvimmiksi.',
+        'Pörssisähkön hinta nyt, tuntihinnat huomiseen asti ja keskihinta seuraavien 6, 12 ja 24 tunnin ajalta. Katso milloin pyykinpesu, sähköauton lataus ja saunominen tulevat halvimmiksi.',
     } satisfies SeoRouteData,
   },
   {
@@ -29,6 +29,15 @@ export const routes: Routes = [
     data: {
       description:
         'Sähköauton halvin neljän tunnin latausaika seuraavan vuorokauden pörssisähkön hinnoista ja paljonko säästät verrattuna lataukseen heti.',
+    } satisfies SeoRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.SAUNA,
+    loadComponent: () => import('./sauna/sauna.component').then(m => m.SaunaComponent),
+    title: 'Milloin saunotaan? – Sähkökiukaan halvin lämmitysaika | Milloin…',
+    data: {
+      description:
+        'Milloin sähkösauna kannattaa lämmittää tänään tai huomenna? Katso saunomisen hinta pörssisähkön tuntihinnoilla eri aloitusajoille ja halvin aika aamu- tai iltapäivälle.',
     } satisfies SeoRouteData,
   },
   {

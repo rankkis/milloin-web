@@ -114,6 +114,7 @@ src/
 │   ├── home/                     # Home: current price, price chart, trend tiles, questions
 │   ├── wash-laundry/             # When to wash laundry
 │   ├── charge-ev/                # When to charge the EV
+│   ├── sauna/                    # When to heat the sauna (milloin saunotaan)
 │   ├── not-found/                # Page for unknown addresses (noindex)
 │   ├── shared/
 │   │   ├── answer-header/        # Back link, current price and refresh on question pages
@@ -139,8 +140,8 @@ src/
 
 ## Features
 
-- **Home**: current price and its category (from the backend) in a box colored by the category (`price-*` colors), hourly price bars from the current hour to the last published price (gridlines every 10 c/kWh, dashed +6/+12/+24 h markers, tooltip on hover or tap), trend tiles with the average of the next 6, 12 and 24 hours vs. now, and one row per question with its answer. On wide screens an invisible slot under the price is reserved for an ad or price analysis. Data loads on open and again when the tab returns after 15 minutes.
-- **Question pages**: laundry recommends a timer delay (Nyt, +1 … +5 h) from the cost of each (2 h program, 1,5 kWh, costed by the backend); waiting must save at least 5 snt for +1 h and 2 snt more for each further hour (`wash-laundry/laundry-recommendation.ts`), so the recommendation is not always the cheapest option (the backend's `isBest`); EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now.
+- **Home**: current price and its category (from the backend) in a box colored by the category (`price-*` colors), hourly price bars from the current hour to the last published price (gridlines every 10 c/kWh, dashed +6/+12/+24 h markers, tooltip on hover or tap), trend tiles with the average of the next 6, 12 and 24 hours vs. now, and one row per question with its answer (laundry, EV, sauna). On wide screens an invisible slot under the price is reserved for an ad or price analysis. Data loads on open and again when the tab returns after 15 minutes.
+- **Question pages**: laundry recommends a timer delay (Nyt, +1 … +5 h) from the cost of each (2 h program, 1,5 kWh, costed by the backend); waiting must save at least 5 snt for +1 h and 2 snt more for each further hour (`wash-laundry/laundry-recommendation.ts`), so the recommendation is not always the cheapest option (the backend's `isBest`); EV charging answers with the cheapest 4-hour clock-time window, a chart of the next 24 hours and a comparison with charging now. Sauna (`/saunotaan`) answers with the cheapest full-hour start for a 3-hour, 8 kWh session (backend preset `sauna`); the visitor picks Tänään/Huomenna and Aamupäivä (heater on 6–11) / Iltapäivä (12–21, default) / Ei väliä, choices without prices are disabled, starts whose prices are not published yet are dashed bars with a note, and a button suggests the other day when it is at least 1 snt cheaper (`sauna/sauna-plan.ts`).
 - Clock times are shown in Finnish time (`shared/format/format.ts`).
 
 ### UI

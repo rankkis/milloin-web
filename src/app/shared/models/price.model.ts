@@ -31,7 +31,7 @@ export interface OptimalWindowsDto {
   /** The window starting now, left out when prices do not reach far enough */
   startNow?: WindowDto;
   windows: WindowDto[];
-  /** The window of each requested start offset, in order of offsetHours */
+  /** The window of each requested start offset or full hour, in order of offsetHours */
   startOffsets?: StartOffsetWindowDto[];
 }
 

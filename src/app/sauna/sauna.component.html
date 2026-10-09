@@ -1,0 +1,139 @@
+<div class="page">
+  <app-answer-header
+    [currentPrice]="currentPrice()"
+    [loading]="starts.isLoading()"
+    (refresh)="refresh()"
+  />
+
+  <div class="answer">
+    <h1 class="question">Milloin saunotaan?</h1>
+
+    @if (starts.error(); as error) {
+      <p class="message" role="alert">{{ errorMessage(error) }}</p>
+    } @else if (answer(); as answer) {
+      <p class="answer__value">{{ answer.value }}</p>
+      <p class="answer__instruction">{{ answer.instruction }}</p>
+      <p class="answer__reason">{{ answer.reason }}</p>
+      <p class="answer__times">{{ answer.times }}</p>
+      @if (otherDay(); as other) {
+        <button type="button" class="other-day" data-test-id="sauna-other-day" (click)="chooseDay(other.day)">
+          {{ other.text }}
+          <app-icon name="forward" [size]="18" />
+        </button>
+      }
+    } @else if (starts.isLoading()) {
+      <p class="answer__value answer__value--loading"><app-spinner /></p>
+    } @else {
+      <p class="message">
+        Tänään ei ole enää saunavuoroja, joiden hinta tiedetään. Huomisen hinnat julkaistaan noin kello 14.
+      </p>
+    }
+  </div>
+
+  @if (plan()) {
+    <div class="choices">
+      <div class="choices__row choices__row--days" role="group" aria-label="Päivä">
+        @for (option of days(); track option.day) {
+          <button
+            type="button"
+            class="choice"
+            [class.choice--selected]="option.selected"
+            [attr.aria-pressed]="option.selected"
+            [disabled]="option.disabled"
+            [attr.data-test-id]="option.testId"
+            (click)="chooseDay(option.day)"
+          >
+            {{ option.label }}
+            @if (option.note) {
+              <span class="choice__note">{{ option.note }}</span>
+            }
+          </button>
+        }
+      </div>
+      <div class="choices__row choices__row--parts" role="group" aria-label="Vuorokaudenaika">
+        @for (option of parts(); track option.part) {
+          <button
+            type="button"
+            class="choice"
+            [class.choice--selected]="option.selected"
+            [attr.aria-pressed]="option.selected"
+            [disabled]="option.disabled"
+            [attr.data-test-id]="option.testId"
+            (click)="choosePart(option.part)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (notice(); as notice) {
+      <p class="notice" role="status">
+        <svg class="notice__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v6l3 2" />
+        </svg>
+        {{ notice }}
+      </p>
+    }
+
+    <section class="starts" aria-labelledby="starts-title">
+      <div class="starts__labels">
+        <h2 id="starts-title" class="label">Kiuas päälle klo</h2>
+        <span class="label" aria-hidden="true">snt / saunominen</span>
+      </div>
+      <ol class="starts__bars">
+        @for (bar of bars(); track bar.hour) {
+          <li class="starts__slot">
+            <button
+              type="button"
+              class="start"
+              data-test-id="sauna-start-bar"
+              [attr.aria-label]="bar.ariaLabel"
+              (click)="pickedHour.set(bar.hour)"
+            >
+              <span
+                class="start__bar"
+                [class.start__bar--best]="bar.best"
+                [class.start__bar--picked]="bar.picked"
+                [class.start__bar--missing]="bar.missing"
+                [style.height.%]="bar.heightPct"
+              ></span>
+            </button>
+          </li>
+        }
+      </ol>
+      <div class="starts__hours" aria-hidden="true">
+        @for (bar of bars(); track bar.hour) {
+          <span class="starts__hour">{{ bar.label }}</span>
+        }
+      </div>
+      <p class="starts__picked" aria-live="polite">{{ pickedText() }}</p>
+    </section>
+  }
+
+  @if (stats(); as stats) {
+    <dl class="stats">
+      <div class="stat">
+        <dt>Saunan hinta</dt>
+        <dd class="stat__value">{{ stats.cost }}</dd>
+        <dd class="stat__note">senttiä</dd>
+      </div>
+      <div class="stat">
+        <dt>Säästö vs. kallein</dt>
+        <dd class="stat__value accent">{{ stats.savingPct }}</dd>
+        <dd class="stat__note">{{ stats.saving }} senttiä</dd>
+      </div>
+      <div class="stat">
+        <dt>Spot-hinta</dt>
+        <dd class="stat__value">{{ stats.spot }}</dd>
+        <dd class="stat__note">c/kWh{{ stats.category ? ' · ' + stats.category : '' }}</dd>
+      </div>
+    </dl>
+  }
+
+  @if (basis(); as basis) {
+    <p class="basis">{{ basis }}</p>
+  }
+</div>
