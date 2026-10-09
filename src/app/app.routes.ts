@@ -1,7 +1,13 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { APP_NAVIGATION_PATHS, LEGACY_PATH_REDIRECTS } from './app.paths';
+import { PaymentDayRouteData } from './money/payment-day/payment-day.component';
 import { SeoRouteData } from './shared/seo/seo-title-strategy';
+
+const HOME_DESCRIPTION =
+  'Milloin saunotaan, pestään pyykit tai ladataan auto, ja milloin Kelan tuet, veronpalautukset ja eläke tulevat tilille? Vastaukset arjen milloin-kysymyksiin ja sähkön hinta nyt.';
+
+const paymentDay = () => import('./money/payment-day/payment-day.component').then(m => m.PaymentDayComponent);
 
 export const routes: Routes = [
   {
@@ -9,8 +15,7 @@ export const routes: Routes = [
     component: HomeComponent,
     title: 'Milloin… – Vastaukset arjen milloin-kysymyksiin',
     data: {
-      description:
-        'Milloin saunotaan, pestään pyykit tai ladataan auto? Vastaukset arjen milloin-kysymyksiin, laskettuna pörssisähkön tuntihinnoista, ja sähkön hinta nyt.',
+      description: HOME_DESCRIPTION,
     } satisfies SeoRouteData,
   },
   {
@@ -48,6 +53,45 @@ export const routes: Routes = [
       description:
         'Milloin sähkösauna kannattaa lämmittää tänään tai huomenna? Katso saunomisen hinta pörssisähkön tuntihinnoilla eri aloitusajoille ja halvin aika päivälle tai illalle.',
     } satisfies SeoRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.MONEY,
+    loadComponent: () => import('./money/money.component').then(m => m.MoneyComponent),
+    title: 'Milloin raha tulee tilille? – Kelan tukien, veronpalautusten ja eläkkeiden maksupäivät | Milloin…',
+    data: {
+      description:
+        'Milloin Kelan tuet, veronpalautukset ja eläkkeet tulevat tilille? Seuraavat maksupäivät laskettuna maksajien julkaisemista säännöistä ja pankkipäivistä.',
+    } satisfies SeoRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.KELA,
+    loadComponent: paymentDay,
+    title: 'Milloin Kelan tuet maksetaan? – Kelan maksupäivät | Milloin…',
+    data: {
+      question: 'kela',
+      description:
+        'Milloin opintoraha, asumistuki, toimeentulotuki, lapsilisä, kansaneläke ja muut Kelan tuet tulevat tilille? Seuraava maksupäivä jokaiselle tuelle pankkipäivät huomioiden.',
+    } satisfies SeoRouteData & PaymentDayRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.TAX_REFUND,
+    loadComponent: paymentDay,
+    title: 'Milloin veronpalautukset tulevat? – Veronpalautusten maksupäivät 2026 | Milloin…',
+    data: {
+      question: 'tax-refund',
+      description:
+        'Veronpalautusten maksupäivät 2026: palautuksen päivä sen mukaan, milloin verotuksesi valmistui, ja seuraava palautuspäivä.',
+    } satisfies SeoRouteData & PaymentDayRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.PENSION,
+    loadComponent: paymentDay,
+    title: 'Milloin eläke maksetaan? – Työeläkkeen ja kansaneläkkeen maksupäivät | Milloin…',
+    data: {
+      question: 'pension',
+      description:
+        'Milloin työeläke, kansaneläke ja takuueläke tulevat tilille? Seuraavat eläkkeen maksupäivät pankkipäivät huomioiden.',
+    } satisfies SeoRouteData & PaymentDayRouteData,
   },
   // Earlier addresses; Vercel redirects these permanently before they reach the app
   ...Object.entries(LEGACY_PATH_REDIRECTS).map(([path, redirectTo]) => ({ path, redirectTo, pathMatch: 'full' as const })),

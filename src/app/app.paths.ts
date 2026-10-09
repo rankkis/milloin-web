@@ -3,6 +3,10 @@ export const APP_NAVIGATION_PATHS = {
   WASH_LAUNDRY: 'pestaan-pyykit',
   CHARGE_EV: 'ladataan-auto',
   SAUNA: 'saunotaan',
+  MONEY: 'raha-tulee-tilille',
+  KELA: 'kelan-tuet-maksetaan',
+  TAX_REFUND: 'veronpalautukset-tulevat',
+  PENSION: 'elake-maksetaan',
 };
 
 /** Earlier addresses of moved pages, redirected permanently to the new ones (also in vercel.json) */

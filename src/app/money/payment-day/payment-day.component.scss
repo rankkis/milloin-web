@@ -1,0 +1,80 @@
+@use 'colors' as *;
+@use 'answer-page';
+
+@include answer-page.styles;
+
+.answer__value {
+  font-size: 52px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+// Payment days, one row each
+
+.payments {
+  display: flex;
+  flex-direction: column;
+}
+
+.payments__title {
+  margin-bottom: var(--space-2);
+}
+
+.payment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name date'
+    'rule until';
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid color(border);
+
+  &:last-child {
+    border-bottom: 1px solid color(border);
+  }
+}
+
+.payment--past {
+  color: color(text-muted);
+}
+
+.payment__name {
+  grid-area: name;
+  font-size: 15px;
+}
+
+.payment__date {
+  grid-area: date;
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.payment__rule,
+.payment__until {
+  font-size: 12px;
+  color: color(text-muted);
+}
+
+.payment__rule {
+  grid-area: rule;
+}
+
+.payment__until {
+  grid-area: until;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.basis__link {
+  color: inherit;
+
+  &:hover {
+    color: color(text);
+  }
+}

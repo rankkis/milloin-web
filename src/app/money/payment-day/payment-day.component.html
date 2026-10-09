@@ -1,0 +1,31 @@
+<div class="page">
+  <app-answer-header [refreshable]="false" />
+
+  <div class="answer">
+    <h1 class="question">{{ title }}</h1>
+    <p class="answer__value">{{ answer().value }}</p>
+    <p class="answer__sentence">{{ answer().sentence }}</p>
+  </div>
+
+  <section class="payments" aria-labelledby="payments-title">
+    <h2 id="payments-title" class="label payments__title">{{ question.heading }}</h2>
+    @for (row of answer().rows; track row.name) {
+      <div class="payment" [class.payment--past]="row.past">
+        <span class="payment__name">{{ row.name }}</span>
+        <span class="payment__date" [class.accent]="row.next">{{ row.date }}</span>
+        @if (row.rule) {
+          <span class="payment__rule">{{ row.rule }}</span>
+        }
+        <span class="payment__until">{{ row.until }}</span>
+      </div>
+    }
+  </section>
+
+  <p class="basis">
+    {{ question.note }}
+    Lähde:
+    <a class="basis__link" [href]="question.source.url" data-test-id="payment-source" rel="noopener" target="_blank">{{
+      question.source.label
+    }}</a>
+  </p>
+</div>

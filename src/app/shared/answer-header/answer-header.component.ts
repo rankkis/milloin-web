@@ -22,17 +22,19 @@ import { IconComponent } from '../icon/icon.component';
       @if (currentPrice(); as price) {
         <p class="price">nyt {{ price }} <span class="unit">c/kWh</span></p>
       }
-      <button
-        type="button"
-        class="refresh"
-        aria-label="Päivitä"
-        data-test-id="answer-refresh"
-        [class.refresh--loading]="loading()"
-        [disabled]="loading()"
-        (click)="refresh.emit()"
-      >
-        <app-icon name="refresh" [size]="18" />
-      </button>
+      @if (refreshable()) {
+        <button
+          type="button"
+          class="refresh"
+          aria-label="Päivitä"
+          data-test-id="answer-refresh"
+          [class.refresh--loading]="loading()"
+          [disabled]="loading()"
+          (click)="refresh.emit()"
+        >
+          <app-icon name="refresh" [size]="18" />
+        </button>
+      }
     </div>
   `,
   styleUrl: './answer-header.component.scss',
@@ -43,6 +45,8 @@ export class AnswerHeaderComponent {
   /** Current price, already formatted */
   readonly currentPrice = input<string>();
   readonly loading = input(false);
+  /** False on pages with nothing to reload */
+  readonly refreshable = input(true);
   readonly refresh = output<void>();
 
   /**

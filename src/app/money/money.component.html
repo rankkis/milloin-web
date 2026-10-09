@@ -1,0 +1,37 @@
+<div class="page">
+  <div class="top">
+    <header class="header">
+      <a class="back" routerLink="/" data-test-id="money-back">
+        <app-icon name="back" [size]="18" />
+        Takaisin
+      </a>
+      <p class="clock">{{ date() }}</p>
+    </header>
+    <h1 class="title">Raha</h1>
+  </div>
+
+  <nav class="questions" aria-labelledby="questions-title">
+    <div class="questions__head">
+      <h2 id="questions-title" class="label questions__col-question">Kysymys</h2>
+      <span class="label questions__col-answer" aria-hidden="true">Vastaus</span>
+      <span class="label questions__col-detail" aria-hidden="true">Tarkemmin</span>
+    </div>
+
+    @for (row of rows(); track row.id) {
+      <a class="question" [routerLink]="'/' + row.path" [attr.data-test-id]="'money-' + row.id">
+        <span class="question__text">
+          <app-icon class="question__icon" [name]="row.icon" />
+          {{ row.title }}
+        </span>
+        <span class="question__answer">{{ row.answer.value }}</span>
+        <span class="question__short">{{ row.answer.short }}</span>
+        <span class="question__detail">{{ row.answer.detail }}</span>
+      </a>
+    }
+  </nav>
+
+  <footer class="footer">
+    © 2025 hurlumhei oy ·
+    <a class="footer__link" href="/api" data-test-id="money-api">Avoin rajapinta kehittäjille</a>
+  </footer>
+</div>

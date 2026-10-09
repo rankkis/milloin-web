@@ -1,6 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ElectricityAnswers, Answer } from '../electricity/electricity-answers';
+import { finnishToday } from '../money/banking-days';
+import { MONEY_QUESTIONS } from '../money/money-questions';
 import { IconComponent } from '../shared/icon/icon.component';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
@@ -31,6 +33,7 @@ export class HomeComponent {
     return selected === ALL ? CATEGORIES : CATEGORIES.filter((category) => category.id === selected);
   });
 
+  readonly now = this.answers.now;
   readonly date = this.answers.date;
   readonly overview = this.answers.overview;
 
@@ -40,13 +43,26 @@ export class HomeComponent {
     return current && `nyt ${current.price} c/kWh · ${current.category.toLowerCase()}`;
   });
 
+  private readonly today = computed(() => finnishToday(this.now()));
+
+  /** A Raha answer: a payment day, calculated here from the published rules */
+  private moneyAnswer(id: keyof typeof MONEY_QUESTIONS): () => Answer {
+    return computed(() => {
+      const { value, short, detail } = MONEY_QUESTIONS[id].answer(this.today());
+      return { value, short, detail, price: '', highlight: false };
+    });
+  }
+
   private readonly answerOf: Record<QuestionId, () => Answer | undefined> = {
     sauna: this.answers.saunaAnswer,
     laundry: this.answers.laundryAnswer,
     ev: this.answers.evAnswer,
+    kela: this.moneyAnswer('kela'),
+    'tax-refund': this.moneyAnswer('tax-refund'),
+    pension: this.moneyAnswer('pension'),
   };
 
-  private readonly loadingOf: Record<QuestionId, () => boolean> = {
+  private readonly loadingOf: Partial<Record<QuestionId, () => boolean>> = {
     sauna: this.answers.sauna.isLoading,
     laundry: this.answers.laundry.isLoading,
     ev: this.answers.ev.isLoading,
@@ -57,7 +73,12 @@ export class HomeComponent {
   }
 
   loading(id: QuestionId): boolean {
-    return this.loadingOf[id]();
+    return this.loadingOf[id]?.() ?? false;
+  }
+
+  /** Answer and price joined for the row, e.g. "tänään · 39,7 snt"; Raha answers have no price */
+  withPrice(text: string, price: string): string {
+    return price ? `${text} · ${price}` : text;
   }
 
   select(id: string): void {

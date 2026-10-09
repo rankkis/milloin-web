@@ -107,8 +107,8 @@ describe('HomeComponent', () => {
     fixture.detectChanges();
   };
 
-  const element = (selector: string): HTMLElement | null =>
-    (fixture.nativeElement as HTMLElement).querySelector(selector);
+  const element = <T extends HTMLElement = HTMLElement>(selector: string): T | null =>
+    (fixture.nativeElement as HTMLElement).querySelector<T>(selector);
 
   const text = (selector: string): string => element(selector)?.textContent?.trim().replace(/\s+/g, ' ') ?? '';
 
@@ -134,8 +134,15 @@ describe('HomeComponent', () => {
   it('lists the questions as whole sentences under their category', () => {
     render();
 
-    expect(texts('.group__link')).toEqual(['Sähkö']);
-    expect(texts('.question__text')).toEqual(['Milloin saunotaan?', 'Milloin pestään pyykit?', 'Milloin ladataan auto?']);
+    expect(texts('.group__link')).toEqual(['Sähkö', 'Raha']);
+    expect(texts('.question__text')).toEqual([
+      'Milloin saunotaan?',
+      'Milloin pestään pyykit?',
+      'Milloin ladataan auto?',
+      'Milloin Kelan tuet maksetaan?',
+      'Milloin veronpalautukset tulevat?',
+      'Milloin eläke maksetaan?',
+    ]);
   });
 
   it('links each category heading to its page and each question to its answer page', () => {
@@ -145,6 +152,10 @@ describe('HomeComponent', () => {
     expect(element('[data-test-id="home-sauna"]')?.getAttribute('href')).toBe('/saunotaan');
     expect(element('[data-test-id="home-laundry"]')?.getAttribute('href')).toBe('/pestaan-pyykit');
     expect(element('[data-test-id="home-ev"]')?.getAttribute('href')).toBe('/ladataan-auto');
+    expect(element('[data-test-id="home-category-raha"]')?.getAttribute('href')).toBe('/raha-tulee-tilille');
+    expect(element('[data-test-id="home-kela"]')?.getAttribute('href')).toBe('/kelan-tuet-maksetaan');
+    expect(element('[data-test-id="home-tax-refund"]')?.getAttribute('href')).toBe('/veronpalautukset-tulevat');
+    expect(element('[data-test-id="home-pension"]')?.getAttribute('href')).toBe('/elake-maksetaan');
   });
 
   it('shows the current price in the Sähkö heading', () => {
@@ -164,10 +175,24 @@ describe('HomeComponent', () => {
     expect(text('[data-test-id="home-ev"] .question__detail')).toBe('ensi yönä · 0,24 €');
   });
 
-  it('hides the category filter while there is only one category', () => {
+  it('answers the Raha questions with payment days, without a price', () => {
     render();
 
-    expect(element('.filter')).toBeNull();
+    expect(text('[data-test-id="home-kela"] .question__answer')).toBe('ke 7.10.');
+    expect(text('[data-test-id="home-kela"] .question__detail')).toBe('kansaneläke ja vammaistuet · tänään');
+    expect(text('[data-test-id="home-tax-refund"] .question__short')).toBe('27 päivän päästä');
+    expect(text('[data-test-id="home-pension"] .question__answer')).toBe('ma 2.11.');
+  });
+
+  it('filters the questions by category', () => {
+    render();
+
+    expect(texts('.chip')).toEqual(['Kaikki', 'Sähkö', 'Raha']);
+    element<HTMLButtonElement>('[data-test-id="home-filter-raha"]')?.click();
+    fixture.detectChanges();
+
+    expect(texts('.group__link')).toEqual(['Raha']);
+    expect(element('[data-test-id="home-filter-raha"]')?.getAttribute('aria-pressed')).toBe('true');
   });
 
   it('shows the error and retries', () => {
@@ -175,6 +200,6 @@ describe('HomeComponent', () => {
 
     expect(text('.error p')).toBe('Palvelinvirhe - yritä myöhemmin uudelleen');
     expect(text('[data-test-id="home-retry"]')).toBe('Yritä uudelleen');
-    expect(texts('.question__text').length).toBe(3);
+    expect(texts('.question__text').length).toBe(6);
   });
 });
