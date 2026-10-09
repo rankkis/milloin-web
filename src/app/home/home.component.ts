@@ -40,7 +40,7 @@ export class HomeComponent {
   /** Current price for the Sähkö heading, e.g. "nyt 4,82 c/kWh · normaali" */
   readonly electricityNow = computed(() => {
     const current = this.answers.current();
-    return current && `nyt ${current.price} c/kWh · ${current.category.toLowerCase()}`;
+    return current && { price: `Pörssisähkö nyt ${current.price} c/kWh`, category: current.category.toLowerCase() };
   });
 
   private readonly today = computed(() => finnishToday(this.now()));
