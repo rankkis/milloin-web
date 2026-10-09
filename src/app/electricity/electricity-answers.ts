@@ -6,6 +6,7 @@ import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { PriceCategory } from '../shared/models/price.model';
 import { OverviewService } from '../shared/services/overview.service';
 import { initialNow } from '../shared/render-time';
+import { totalCents } from '../shared/tariffs/tariffs';
 import { SaunaService } from '../sauna/sauna.service';
 import { cents, hourClock, planSauna, readyClock } from '../sauna/sauna-plan';
 import { recommendDelay } from '../wash-laundry/laundry-recommendation';
@@ -84,12 +85,12 @@ export class ElectricityAnswers {
   });
 
   readonly laundryAnswer = computed<Answer | undefined>(() => {
-    const delays = this.laundry.hasValue() ? this.laundry.value().startDelays : [];
-    const recommendation = recommendDelay(delays);
-    if (!recommendation) return undefined;
+    const schedule = this.laundry.hasValue() ? this.laundry.value() : undefined;
+    const recommendation = recommendDelay(schedule?.startDelays ?? []);
+    if (!schedule || !recommendation) return undefined;
     const { recommended, cheapest } = recommendation;
 
-    const price = `${formatNumber(recommended.costCents, 1)} snt`;
+    const price = `${formatNumber(totalCents(recommended.costCents, schedule.energyKwh), 1)} snt`;
     if (recommended.delayHours === 0) {
       const detail = cheapest !== recommended ? 'odottaminen ei kannata' : 'nyt on halvinta';
       return { value: 'Nyt', short: 'heti', detail, price, highlight: true };
@@ -109,7 +110,8 @@ export class ElectricityAnswers {
 
     const window = schedule?.windows[0];
     if (!window) return undefined;
-    const costEuros = (window.priceAvg * (schedule.energyKwh ?? 0)) / 100;
+    const kwh = schedule.energyKwh ?? 0;
+    const costEuros = totalCents(window.priceAvg * kwh, kwh) / 100;
     const day = formatDay(window.startTime, this.now());
     return {
       value: formatWindow(window.startTime, window.endTime),
@@ -122,10 +124,11 @@ export class ElectricityAnswers {
 
   /** The sauna page's default answer: when the sauna is warm after the recommended evening start, today or tomorrow once the evening is over */
   readonly saunaAnswer = computed<Answer | undefined>(() => {
-    const plan = this.sauna.hasValue() ? planSauna(this.sauna.value(), this.now(), undefined, 'evening') : undefined;
+    const response = this.sauna.hasValue() ? this.sauna.value() : undefined;
+    const plan = response && planSauna(response, this.now(), undefined, 'evening');
     if (!plan) return undefined;
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
-    const price = `${cents(plan.recommended.window.costCents)} snt`;
+    const price = `${cents(totalCents(plan.recommended.window.costCents, response.energyKwh ?? 0))} snt`;
     return {
       value: readyClock(plan.recommended.hour),
       short: day,

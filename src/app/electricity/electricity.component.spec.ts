@@ -214,7 +214,7 @@ describe('ElectricityComponent', () => {
 
     const row = '[data-test-id="electricity-wash-laundry"]';
     expect(text(`${row} .question__answer`)).toBe('+1 h');
-    expect(text(`${row} .question__short`)).toBe('ajastus · 4,0 snt');
+    expect(text(`${row} .question__short`)).toBe('ajastus · 10,9 snt');
     expect(text(`${row} .question__detail`)).toBe('ajastus, käynnistyy 14:42');
   });
 
@@ -223,7 +223,7 @@ describe('ElectricityComponent', () => {
 
     const row = '[data-test-id="electricity-wash-laundry"]';
     expect(text(`${row} .question__answer`)).toBe('Nyt');
-    expect(text(`${row} .question__short`)).toBe('heti · 5,2 snt');
+    expect(text(`${row} .question__short`)).toBe('heti · 12,1 snt');
     expect(text(`${row} .question__detail`)).toBe('odottaminen ei kannata');
   });
 
@@ -240,7 +240,7 @@ describe('ElectricityComponent', () => {
 
     const row = '[data-test-id="electricity-charge-ev"]';
     expect(text(`${row} .question__answer`)).toBe('01:00–05:00');
-    expect(text(`${row} .question__short`)).toBe('ensi yönä · 0,24 €');
+    expect(text(`${row} .question__short`)).toBe('ensi yönä · 1,00 €');
   });
 
   it('answers the sauna question with when the sauna is warm after the recommended evening start', () => {
@@ -248,7 +248,7 @@ describe('ElectricityComponent', () => {
 
     const row = '[data-test-id="electricity-sauna"]';
     expect(text(`${row} .question__answer`)).toBe('20:00');
-    expect(text(`${row} .question__short`)).toBe('tänään · 39,7 snt');
+    expect(text(`${row} .question__short`)).toBe('tänään · 95,1 snt');
     expect(text(`${row} .question__detail`)).toBe('tänään, lämmitys 19:00');
   });
 

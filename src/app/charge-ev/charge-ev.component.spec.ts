@@ -110,9 +110,13 @@ describe('ChargeEvComponent', () => {
   it('shows the cost, saving and spot price for 11 kWh', () => {
     render(of(schedule()));
 
-    expect(texts('.stat__value')).toEqual(['0,25 €', '−34 %', '2,23']);
+    expect(texts('.stat__value')).toEqual(['1,01 €', '−11 %', '2,23']);
     expect(texts('.stat__note')).toEqual(['11 kWh', '0,12 €', 'c/kWh · halpa']);
-    expect(text('.basis')).toBe('Laskettu 4 tunnin lataukselle ja 11 kWh:n energialle.');
+    expect(texts('.basis p')).toEqual([
+      'Laskettu 4 tunnin lataukselle ja 11 kWh:n energialle.',
+      'Hinta = 11 kWh × (spot 2,23 + siirto 3,50 + sähkövero 2,92 + marginaali 0,50 c/kWh) = 1,01 €. ' +
+        'Siirto ja marginaali ovat tyypillisiä arvoja. Hinnat sis. alv 25,5 %, kuukausimaksut eivät sisälly.',
+    ]);
   });
 
   it('compares the window with charging right away', () => {
@@ -120,14 +124,14 @@ describe('ChargeEvComponent', () => {
 
     expect(texts('.comparison__label')).toEqual(['Ensi yönä', 'Jos lataat heti']);
     expect(texts('.comparison__window')).toEqual(['01:00–05:00', '13:30–17:30']);
-    expect(texts('.comparison__cost')).toEqual(['0,25 €', '0,37 €']);
+    expect(texts('.comparison__cost')).toEqual(['1,01 €', '1,13 €']);
   });
 
   it('leaves charging right away out when prices do not reach far enough', () => {
     render(of(schedule([tonight], null)));
 
     expect(texts('.comparison__label')).toEqual(['Ensi yönä']);
-    expect(texts('.stat__value')).toEqual(['0,25 €', '0 %', '2,23']);
+    expect(texts('.stat__value')).toEqual(['1,01 €', '0 %', '2,23']);
   });
 
   it('charts the next 24 hours with the window highlighted', () => {

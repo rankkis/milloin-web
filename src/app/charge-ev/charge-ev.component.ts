@@ -15,6 +15,7 @@ import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
+import { TARIFF_NOTE, costFormula, totalCents } from '../shared/tariffs/tariffs';
 import { ChargeEvService } from './charge-ev.service';
 
 /** Hours on the chart */
@@ -49,10 +50,11 @@ export class ChargeEvComponent {
     this.schedule.hasValue() ? this.schedule.value().windows[0] : undefined,
   );
 
-  /** Energy cost in cents of a window */
+  private readonly kwh = computed(() => (this.schedule.hasValue() ? (this.schedule.value().energyKwh ?? 0) : 0));
+
+  /** Total cost in cents of a window: energy plus transfer, tax and margin */
   private costCents(priceAvg: number): number {
-    const kwh = this.schedule.hasValue() ? (this.schedule.value().energyKwh ?? 0) : 0;
-    return priceAvg * kwh;
+    return totalCents(priceAvg * this.kwh(), this.kwh());
   }
 
   readonly answer = computed(() => {
@@ -132,6 +134,14 @@ export class ChargeEvComponent {
       `${formatNumber(schedule.energyKwh ?? 0, 0)} kWh:n energialle.`
     );
   });
+
+  /** How the cheapest window's price is calculated */
+  readonly formula = computed(() => {
+    const best = this.bestWindow();
+    return best && costFormula(best.priceAvg * this.kwh(), this.kwh(), '€');
+  });
+
+  readonly tariffNote = TARIFF_NOTE;
 
   constructor() {
     // A server-rendered page shows the server's time until the browser takes over

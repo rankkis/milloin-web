@@ -25,6 +25,7 @@ import {
   planSauna,
   tomorrowNote,
 } from './sauna-plan';
+import { TARIFF_NOTE, costFormula, formatKwh, totalCents } from '../shared/tariffs/tariffs';
 import { SaunaService } from './sauna.service';
 
 /** Bars of the start-time chart scale to the most expensive start */
@@ -68,6 +69,13 @@ export class SaunaComponent {
     this.overview.hasValue() ? formatPrice(this.overview.value().current.price) : undefined,
   );
 
+  private readonly kwh = computed(() => this.response()?.energyKwh ?? 0);
+
+  /** Total cost of a start in cents: energy plus transfer, tax and margin */
+  private total(start: { window: { costCents: number } }): number {
+    return totalCents(start.window.costCents, this.kwh());
+  }
+
   readonly plan = computed(() => {
     const response = this.response();
     return response && planSauna(response, this.now(), this.wantedDay(), this.wantedPart());
@@ -108,7 +116,7 @@ export class SaunaComponent {
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
     const saving = worst.window.costCents - best.window.costCents;
     const durationHours = this.response()?.durationHours ?? 3;
-    let reason = `Saunominen maksaa ${cents(best.window.costCents)} senttiä`;
+    let reason = `Saunominen maksaa ${cents(this.total(best))} senttiä`;
     reason += saving >= 0.05 ? `, eli ${cents(saving)} senttiä vähemmän kuin jos lämmitys aloitetaan kello ${hourClock(worst.hour)}.` : '.';
     const extra = best.window.costCents - cheapest.window.costCents;
     if (extra >= 0.05) {
@@ -142,7 +150,7 @@ export class SaunaComponent {
     const response = this.response();
     const plan = this.plan();
     const start = response && plan && laterToday(response, this.now(), plan);
-    return start && `Saunotko vielä tänään? Saunaan kello ${readyClock(start.hour)}, ${cents(start.window.costCents)} snt`;
+    return start && `Saunotko vielä tänään? Saunaan kello ${readyClock(start.hour)}, ${cents(this.total(start))} snt`;
   });
 
   readonly notice = computed(() => {
@@ -154,12 +162,12 @@ export class SaunaComponent {
   readonly bars = computed(() => {
     const plan = this.plan();
     if (!plan) return [];
-    const maxCost = plan.worst.window.costCents;
+    const maxCost = this.total(plan.worst);
     const every = plan.starts.length > MAX_LABELLED_BARS ? 3 : 1;
     const picked = this.picked();
     const cheapestDiffers = plan.cheapest !== plan.recommended;
     return plan.starts.map((start, index) => {
-      const cost = start.window?.costCents;
+      const cost = start.window && this.total({ window: start.window });
       const roles = [start === plan.recommended && 'suositus', cheapestDiffers && start === plan.cheapest && 'halvin'];
       const price = cost === undefined ? 'hinta ei vielä tiedossa' : `${cents(cost)} senttiä`;
       return {
@@ -190,22 +198,24 @@ export class SaunaComponent {
     if (!picked.window) return { main: main + 'hinta ei vielä tiedossa', compare: undefined };
 
     const { recommended, cheapest: best, worst } = plan;
-    const cost = picked.window.costCents;
+    const cost = this.total({ window: picked.window });
     let compare: string;
     if (picked === recommended && recommended !== best) {
       compare =
         `Suositus: sauna lämmin klo ${readyClock(picked.hour)}. ` +
-        `Halvin aloitus (klo ${hourClock(best.hour)}) olisi ${cents(cost - best.window.costCents)} snt halvempi.`;
+        `Halvin aloitus (klo ${hourClock(best.hour)}) olisi ${cents(cost - this.total(best))} snt halvempi.`;
     } else if (picked === best) {
-      const saving = worst.window.costCents - cost;
-      const savedPct = Math.round((saving / worst.window.costCents) * 100);
+      const worstCost = this.total(worst);
+      const saving = worstCost - cost;
+      const savedPct = Math.round((saving / worstCost) * 100);
       compare =
-        saving >= 0.05 && worst.window.costCents > 0
+        saving >= 0.05 && worstCost > 0
           ? `Halvin aloitus: ${savedPct} % halvempi kuin kallein (klo ${hourClock(worst.hour)}).`
           : 'Halvin aloitus.';
     } else {
-      const extra = cost - best.window.costCents;
-      const extraPct = best.window.costCents > 0 ? ` (+${Math.round((extra / best.window.costCents) * 100)} %)` : '';
+      const bestCost = this.total(best);
+      const extra = cost - bestCost;
+      const extraPct = bestCost > 0 ? ` (+${Math.round((extra / bestCost) * 100)} %)` : '';
       compare = `${cents(extra)} snt${extraPct} kalliimpi kuin halvin (klo ${hourClock(best.hour)}).`;
     }
     return { main: `${main}yhteensä ${cents(cost)} snt`, compare };
@@ -214,14 +224,22 @@ export class SaunaComponent {
   readonly basis = computed(() => {
     const response = this.response();
     if (!response) return undefined;
-    const kwh = formatNumber(response.energyKwh ?? 0, (response.energyKwh ?? 0) % 1 ? 1 : 0);
     return (
-      `Laskettu ${formatNumber(response.durationHours, 0)} tunnin saunomiselle ja ${kwh} kWh:lle. ` +
+      `Laskettu ${formatNumber(response.durationHours, 0)} tunnin saunomiselle ja ${formatKwh(this.kwh())} kWh:lle. ` +
       'Päivä: kiuas päälle klo 6–16, ilta 17–21. ' +
       'Illalla suosittelemme saunaa, joka on lämmin klo 19–21, ' +
-      `ellei muu aika ole vähintään ${OFF_HOURS_MIN_SAVING_CENTS} senttiä ja ${OFF_HOURS_MIN_SAVING_PCT} % halvempi.`
+      `ellei muu aika ole vähintään ${OFF_HOURS_MIN_SAVING_CENTS} senttiä ja ` +
+      `sähköenergialtaan ${OFF_HOURS_MIN_SAVING_PCT} % halvempi.`
     );
   });
+
+  /** How the price of the start shown under the chart is calculated */
+  readonly formula = computed(() => {
+    const window = this.picked()?.window;
+    return window && costFormula(window.costCents, this.kwh(), 'snt');
+  });
+
+  readonly tariffNote = TARIFF_NOTE;
 
   constructor() {
     // A server-rendered page shows the server's time until the browser takes over
