@@ -243,7 +243,7 @@ describe('HomeComponent', () => {
     expect(text(`${row} .question__short`)).toBe('ensi yönä · 0,24 €');
   });
 
-  it('answers the sauna question with the cheapest afternoon start today', () => {
+  it('answers the sauna question with the cheapest evening start today', () => {
     render();
 
     const row = '[data-test-id="home-sauna"]';

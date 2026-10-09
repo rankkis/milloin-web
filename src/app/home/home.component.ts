@@ -136,9 +136,9 @@ export class HomeComponent {
     };
   });
 
-  /** The sauna page's default answer: the cheapest afternoon start today */
+  /** The sauna page's default answer: the cheapest evening start today, or tomorrow once the evening is over */
   readonly saunaAnswer = computed<Answer | undefined>(() => {
-    const plan = this.sauna.hasValue() ? planSauna(this.sauna.value(), this.now(), 0, 'pm') : undefined;
+    const plan = this.sauna.hasValue() ? planSauna(this.sauna.value(), this.now(), undefined, 'evening') : undefined;
     if (!plan) return undefined;
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
     const price = `${cents(plan.best.window.costCents)} snt`;

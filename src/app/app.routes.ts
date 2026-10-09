@@ -37,7 +37,7 @@ export const routes: Routes = [
     title: 'Milloin saunotaan? – Sähkökiukaan halvin lämmitysaika | Milloin…',
     data: {
       description:
-        'Milloin sähkösauna kannattaa lämmittää tänään tai huomenna? Katso saunomisen hinta pörssisähkön tuntihinnoilla eri aloitusajoille ja halvin aika aamu- tai iltapäivälle.',
+        'Milloin sähkösauna kannattaa lämmittää tänään tai huomenna? Katso saunomisen hinta pörssisähkön tuntihinnoilla eri aloitusajoille ja halvin aika päivälle tai illalle.',
     } satisfies SeoRouteData,
   },
   {

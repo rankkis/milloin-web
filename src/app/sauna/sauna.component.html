@@ -21,6 +21,12 @@
           <app-icon name="forward" [size]="18" />
         </button>
       }
+      @if (tonight(); as tonight) {
+        <button type="button" class="other-day other-day--quiet" data-test-id="sauna-tonight" (click)="chooseTonight()">
+          {{ tonight }}
+          <app-icon name="forward" [size]="18" />
+        </button>
+      }
     } @else if (starts.isLoading()) {
       <p class="answer__value answer__value--loading"><app-spinner /></p>
     } @else {
@@ -111,26 +117,6 @@
       </div>
       <p class="starts__picked" aria-live="polite">{{ pickedText() }}</p>
     </section>
-  }
-
-  @if (stats(); as stats) {
-    <dl class="stats">
-      <div class="stat">
-        <dt>Saunan hinta</dt>
-        <dd class="stat__value">{{ stats.cost }}</dd>
-        <dd class="stat__note">senttiä</dd>
-      </div>
-      <div class="stat">
-        <dt>Säästö vs. kallein</dt>
-        <dd class="stat__value accent">{{ stats.savingPct }}</dd>
-        <dd class="stat__note">{{ stats.saving }} senttiä</dd>
-      </div>
-      <div class="stat">
-        <dt>Spot-hinta</dt>
-        <dd class="stat__value">{{ stats.spot }}</dd>
-        <dd class="stat__note">c/kWh{{ stats.category ? ' · ' + stats.category : '' }}</dd>
-      </div>
-    </dl>
   }
 
   @if (basis(); as basis) {
