@@ -21,10 +21,10 @@ export const routes: Routes = [
   {
     path: APP_NAVIGATION_PATHS.ELECTRICITY,
     loadComponent: () => import('./electricity/electricity.component').then(m => m.ElectricityComponent),
-    title: 'Milloin sähkö on halpaa? – Pörssisähkön hinta nyt ja halvimmat tunnit | Milloin…',
+    title: 'Pörssisähkön hinta nyt – Milloin sähkö on halpaa? | Milloin…',
     data: {
       description:
-        'Pörssisähkön hinta nyt, tuntihinnat huomiseen asti ja keskihinta seuraavien 6, 12 ja 24 tunnin ajalta. Katso milloin pyykinpesu, sähköauton lataus ja saunominen tulevat halvimmiksi.',
+        'Sähkön hinta nyt: pörssisähkön tuntihinnat tänään ja huomenna sekä keskihinta seuraavien 6, 12 ja 24 tunnin ajalta. Katso milloin pyykinpesu, sähköauton lataus ja saunominen tulevat halvimmiksi.',
     } satisfies SeoRouteData,
   },
   {
