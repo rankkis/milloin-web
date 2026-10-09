@@ -238,8 +238,20 @@
 }
 
 .starts__picked {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.starts__picked-main {
   font-family: var(--font-mono);
   font-size: 13px;
+}
+
+.starts__picked-compare {
+  font-size: 13px;
+  line-height: 1.4;
+  color: color(text-muted);
 }
 
 .basis {

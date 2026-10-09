@@ -118,10 +118,12 @@ describe('SaunaComponent', () => {
   it('shows the price of a tapped start', () => {
     render(of(response(45, 48)));
 
-    expect(text('.starts__picked')).toBe('klo 21:00 · 39,7 snt · halvin, −24 %');
+    expect(text('.starts__picked-main')).toBe('Kiuas päälle klo 21:00 · yhteensä 39,7 snt');
+    expect(text('.starts__picked-compare')).toBe('Halvin aloitus: 24 % halvempi kuin kallein (klo 17:00).');
     element().querySelectorAll<HTMLButtonElement>('[data-test-id="sauna-start-bar"]')[0].click();
     fixture.detectChanges();
-    expect(text('.starts__picked')).toBe('klo 17:00 · 52,0 snt');
+    expect(text('.starts__picked-main')).toBe('Kiuas päälle klo 17:00 · yhteensä 52,0 snt');
+    expect(text('.starts__picked-compare')).toBe('12,3 snt (+31 %) kalliimpi kuin halvin (klo 21:00).');
   });
 
   it('shows tomorrow once the evening is over, with a button for tonight', () => {

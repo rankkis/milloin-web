@@ -115,7 +115,14 @@
           <span class="starts__hour">{{ bar.label }}</span>
         }
       </div>
-      <p class="starts__picked" aria-live="polite">{{ pickedText() }}</p>
+      @if (pickedText(); as picked) {
+        <div class="starts__picked" aria-live="polite">
+          <p class="starts__picked-main">{{ picked.main }}</p>
+          @if (picked.compare) {
+            <p class="starts__picked-compare">{{ picked.compare }}</p>
+          }
+        </div>
+      }
     </section>
   }
 
