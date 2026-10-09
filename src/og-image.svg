@@ -3,7 +3,7 @@
   <rect width="1200" height="630" fill="#0B0E0C"/>
 
   <text x="80" y="300" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="140" font-weight="700" letter-spacing="-4.2" fill="#E9F1EB">Milloin<tspan fill="#2EE06F">…</tspan></text>
-  <text x="80" y="380" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="44" fill="#93A69A">Vastaukset arjen milloin-kysymyksiin</text>
+  <text x="80" y="380" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="44" fill="#93A69A">…jotta tietäisit oikean hetken</text>
 
   <rect x="80" y="520" width="64" height="6" rx="3" fill="#2EE06F"/>
   <text x="168" y="532" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="32" fill="#93A69A">milloin.xyz</text>
