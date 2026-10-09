@@ -6,9 +6,9 @@ import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { PriceCategory } from '../shared/models/price.model';
 import { OverviewService } from '../shared/services/overview.service';
 import { initialNow } from '../shared/render-time';
-import { totalCents } from '../shared/tariffs/tariffs';
+import { formatEuros, totalCents } from '../shared/tariffs/tariffs';
 import { SaunaService } from '../sauna/sauna.service';
-import { cents, hourClock, planSauna, readyClock } from '../sauna/sauna-plan';
+import { hourClock, planSauna, readyClock } from '../sauna/sauna-plan';
 import { recommendDelay } from '../wash-laundry/laundry-recommendation';
 import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
 
@@ -128,7 +128,7 @@ export class ElectricityAnswers {
     const plan = response && planSauna(response, this.now(), undefined, 'evening');
     if (!plan) return undefined;
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
-    const price = `${cents(totalCents(plan.recommended.window.costCents, response.energyKwh ?? 0))} snt`;
+    const price = formatEuros(totalCents(plan.recommended.window.costCents, response.energyKwh ?? 0));
     return {
       value: readyClock(plan.recommended.hour),
       short: day,

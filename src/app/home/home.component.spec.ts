@@ -168,7 +168,7 @@ describe('HomeComponent', () => {
     render();
 
     expect(text('[data-test-id="home-sauna"] .question__answer')).toBe('20:00');
-    expect(text('[data-test-id="home-sauna"] .question__short')).toBe('tänään · 95,1 snt');
+    expect(text('[data-test-id="home-sauna"] .question__short')).toBe('tänään · 0,95 €');
     expect(text('[data-test-id="home-laundry"] .question__answer')).toBe('+1 h');
     expect(text('[data-test-id="home-laundry"] .question__detail')).toBe('ajastus, käynnistyy 14:42 · 10,9 snt');
     expect(text('[data-test-id="home-ev"] .question__answer')).toBe('01:00–05:00');

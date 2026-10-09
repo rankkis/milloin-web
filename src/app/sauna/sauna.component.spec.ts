@@ -83,7 +83,7 @@ describe('SaunaComponent', () => {
     expect(text('.answer__value')).toBe('22:00');
     expect(text('.answer__instruction')).toBe('Aloita lämmitys tänään kello 21:00, niin sauna on lämmin kello 22:00.');
     expect(text('.answer__reason')).toBe(
-      'Saunominen maksaa 95,1 senttiä, eli 12,3 senttiä vähemmän kuin jos lämmitys aloitetaan kello 17:00.',
+      'Saunominen maksaa 0,95 €, eli 12,3 senttiä vähemmän kuin jos lämmitys aloitetaan kello 17:00.',
     );
     expect(text('.answer__times')).toBe('tänään · kiuas päällä 21:00–24:00');
     expect(button('sauna-day-today').getAttribute('aria-pressed')).toBe('true');
@@ -99,7 +99,7 @@ describe('SaunaComponent', () => {
     expect(text('.answer__value')).toBe('20:00');
     expect(text('.answer__instruction')).toBe('Aloita lämmitys tänään kello 19:00, niin sauna on lämmin kello 20:00.');
     expect(text('.answer__reason')).toBe(
-      'Saunominen maksaa 105,4 senttiä, eli 2,0 senttiä vähemmän kuin jos lämmitys aloitetaan kello 17:00. ' +
+      'Saunominen maksaa 1,05 €, eli 2,0 senttiä vähemmän kuin jos lämmitys aloitetaan kello 17:00. ' +
         'Kello 22:00 sauna olisi 6,0 senttiä halvempi, mutta niin pieni säästö ei ole tavallisesta ' +
         'saunomisajasta luopumisen arvoinen.',
     );
@@ -143,13 +143,13 @@ describe('SaunaComponent', () => {
   it('shows the price of a tapped start', () => {
     render(of(response(45, 48)));
 
-    expect(text('.starts__picked-main')).toBe('Kiuas päälle klo 21:00 · yhteensä 95,1 snt');
+    expect(text('.starts__picked-main')).toBe('Kiuas päälle klo 21:00 · yhteensä 0,95 €');
     expect(text('.starts__picked-compare')).toBe('Halvin aloitus: 11 % halvempi kuin kallein (klo 17:00).');
     element().querySelectorAll<HTMLButtonElement>('[data-test-id="sauna-start-bar"]')[0].click();
     fixture.detectChanges();
-    expect(text('.starts__picked-main')).toBe('Kiuas päälle klo 17:00 · yhteensä 107,4 snt');
+    expect(text('.starts__picked-main')).toBe('Kiuas päälle klo 17:00 · yhteensä 1,07 €');
     expect(text('.starts__picked-compare')).toBe('12,3 snt (+13 %) kalliimpi kuin halvin (klo 21:00).');
-    expect(text('.basis')).toContain('Hinta = 8 kWh × (spot 6,50 + siirto 3,50 + sähkövero 2,92 + marginaali 0,50 c/kWh) = 107,4 snt.');
+    expect(text('.basis')).toContain('Hinta = 8 kWh × (spot 6,50 + siirto 3,50 + sähkövero 2,92 + marginaali 0,50 c/kWh) = 1,07 €.');
   });
 
   it('shows tomorrow once the evening is over, with a button for tonight', () => {
@@ -160,7 +160,7 @@ describe('SaunaComponent', () => {
     expect(button('sauna-day-tomorrow').getAttribute('aria-pressed')).toBe('true');
     expect(text('.notice')).toBe('Tämän illan saunavuorot ovat jo ohi, joten näytämme huomisen.');
     expect(element().querySelector('[data-test-id="sauna-other-day"]')).toBeNull();
-    expect(text('[data-test-id="sauna-tonight"]')).toBe('Saunotko vielä tänään? Saunaan kello 00:00, 107,4 snt');
+    expect(text('[data-test-id="sauna-tonight"]')).toBe('Saunotko vielä tänään? Saunaan kello 00:00, 1,07 €');
 
     click('sauna-tonight');
     expect(text('.answer__value')).toBe('00:00');
