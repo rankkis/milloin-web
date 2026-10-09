@@ -67,8 +67,8 @@
             @let reply = answer(question.id);
             <span class="question__answer" [class.accent]="reply?.highlight">@if (reply) { {{ reply.value }} } @else if (loading(question.id)) { <app-spinner label="" /> } @else { – }</span>
             @if (reply) {
-              <span class="question__short">{{ reply.short }} · {{ reply.price }}</span>
-              <span class="question__detail">{{ reply.detail }} · {{ reply.price }}</span>
+              <span class="question__short">{{ withPrice(reply.short, reply.price) }}</span>
+              <span class="question__detail">{{ withPrice(reply.detail, reply.price) }}</span>
             }
           </a>
         }
