@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type IconName = 'washer' | 'car' | 'sauna' | 'back' | 'home' | 'forward' | 'chevron' | 'refresh' | 'trend-up' | 'trend-down' | 'calendar' | 'receipt' | 'coin';
+export type IconName = 'washer' | 'car' | 'sauna' | 'back' | 'home' | 'forward' | 'chevron' | 'refresh' | 'trend-up' | 'trend-down' | 'calendar' | 'receipt' | 'coin' | 'gamepad' | 'shield' | 'play' | 'external';
 
 /** Inline line icon. Decorative: label the surrounding control instead. */
 @Component({
@@ -46,6 +46,18 @@ export type IconName = 'washer' | 'car' | 'sauna' | 'back' | 'home' | 'forward' 
         @case ('coin') {
           <circle cx="12" cy="12" r="9" />
           <path d="M14.5 9.5c0-1.2-1.1-2-2.5-2s-2.5.8-2.5 2 1.2 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2-2.5-.8-2.5-2M12 6v1.5M12 16.5V18" />
+        }
+        @case ('gamepad') {
+          <path d="M6 11h4M8 9v4M15 12h.01M18 10h.01M17.3 5H6.7a4 4 0 0 0-4 3.6l-.6 6A3 3 0 0 0 5.1 18h.3a3 3 0 0 0 2.1-.9L9 15.6h6l1.5 1.5a3 3 0 0 0 2.1.9h.3a3 3 0 0 0 3-3.4l-.6-6A4 4 0 0 0 17.3 5z" />
+        }
+        @case ('shield') {
+          <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" />
+        }
+        @case ('play') {
+          <path d="M7 4.5v15l12-7.5z" fill="currentColor" />
+        }
+        @case ('external') {
+          <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
         }
         @case ('back') {
           <path d="M19 12H5M11 6l-6 6 6 6" />
