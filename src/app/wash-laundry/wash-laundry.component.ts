@@ -139,12 +139,13 @@ export class WashLaundryComponent {
   readonly options = computed<DelayOption[]>(() => {
     const delays = this.delays();
     const recommendation = this.recommendation();
-    const maxCost = Math.max(...delays.map((delay) => this.total(delay)), 0);
+    // Bars show the spot energy cost: transfer, tax and margin are the same for every start
+    const maxCost = Math.max(...delays.map((delay) => delay.costCents), 0);
 
     return delays.map((delay) => {
       const label = delay.delayHours === 0 ? 'Nyt' : `+${delay.delayHours}`;
       const cost = cents(this.total(delay));
-      const ratio = maxCost > 0 ? Math.max(this.total(delay), 0) / maxCost : 0;
+      const ratio = maxCost > 0 ? Math.max(delay.costCents, 0) / maxCost : 0;
       const isRecommended = delay === recommendation?.recommended;
       const isCheapest = delay === recommendation?.cheapest;
       const roles = [isRecommended && 'suositus', isCheapest && 'halvin'].filter(Boolean);

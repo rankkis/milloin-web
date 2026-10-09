@@ -162,11 +162,13 @@ export class SaunaComponent {
   readonly bars = computed(() => {
     const plan = this.plan();
     if (!plan) return [];
-    const maxCost = this.total(plan.worst);
+    // Bars show the spot energy cost: transfer, tax and margin are the same for every start
+    const maxCost = plan.worst.window.costCents;
     const every = plan.starts.length > MAX_LABELLED_BARS ? 3 : 1;
     const picked = this.picked();
     const cheapestDiffers = plan.cheapest !== plan.recommended;
     return plan.starts.map((start, index) => {
+      const energy = start.window?.costCents;
       const cost = start.window && this.total({ window: start.window });
       const roles = [start === plan.recommended && 'suositus', cheapestDiffers && start === plan.cheapest && 'halvin'];
       const price = cost === undefined ? 'hinta ei vielä tiedossa' : formatEuros(cost);
@@ -174,7 +176,9 @@ export class SaunaComponent {
         hour: start.hour,
         label: index % every === 0 ? String(start.hour).padStart(2, '0') : '',
         heightPct:
-          cost === undefined ? 100 : Math.max(BAR_MIN_PCT, Math.round((Math.max(cost, 0) / maxCost) * 100) || 0),
+          energy === undefined
+            ? 100
+            : Math.max(BAR_MIN_PCT, Math.round((Math.max(energy, 0) / maxCost) * 100) || 0),
         missing: cost === undefined,
         best: start === plan.recommended,
         cheapest: cheapestDiffers && start === plan.cheapest,

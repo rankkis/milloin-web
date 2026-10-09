@@ -87,7 +87,7 @@ describe('WashLaundryComponent', () => {
     expect(text('.answer__value')).toBe('+1 h');
     expect(text('.answer__instruction')).toBe('Aseta koneen ajastus yhteen tuntiin.');
     expect(text('.answer__reason')).toBe('Säästät 5,0 senttiä verrattuna heti käynnistämiseen.');
-    expect(texts('.legend__item')).toEqual(['suositus']);
+    expect(texts('.legend__item')).toEqual(['suositus', 'pylväs: sähköenergia']);
   });
 
   it('starts now when a cheaper later start saves too little', () => {
@@ -153,8 +153,10 @@ describe('WashLaundryComponent', () => {
     expect(cells[5].classList).toContain('delay--cheapest');
     expect(cells[5].getAttribute('aria-label')).toBe('5 tunnin päästä: 15,4 senttiä, halvin');
     expect(cells[1].getAttribute('aria-label')).toBe('tunnin päästä: 23,3 senttiä');
+    // Bars scale to the energy cost: 5,0 of 14,8 snt
     expect((cells[0].querySelector('.delay__bar') as HTMLElement).style.height).toBe('64px');
-    expect(texts('.legend__item')).toEqual(['suositus', 'halvin']);
+    expect((cells[5].querySelector('.delay__bar') as HTMLElement).style.height).toBe('22px');
+    expect(texts('.legend__item')).toEqual(['suositus', 'halvin', 'pylväs: sähköenergia']);
   });
 
   it('says suositus ja halvin when the recommendation is the cheapest', () => {
