@@ -17,6 +17,8 @@ import {
   dayHasPrices,
   hasPrices,
   hourClock,
+  OFF_HOURS_MIN_SAVING_CENTS,
+  OFF_HOURS_MIN_SAVING_PCT,
   laterToday,
   readyClock,
   missingPricesNotice,
@@ -102,12 +104,18 @@ export class SaunaComponent {
   readonly answer = computed(() => {
     const plan = this.plan();
     if (!plan) return undefined;
-    const { best, worst } = plan;
+    const { recommended: best, cheapest, worst } = plan;
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
     const saving = worst.window.costCents - best.window.costCents;
     const durationHours = this.response()?.durationHours ?? 3;
     let reason = `Saunominen maksaa ${cents(best.window.costCents)} senttiä`;
     reason += saving >= 0.05 ? `, eli ${cents(saving)} senttiä vähemmän kuin jos lämmitys aloitetaan kello ${hourClock(worst.hour)}.` : '.';
+    const extra = best.window.costCents - cheapest.window.costCents;
+    if (extra >= 0.05) {
+      reason +=
+        ` Kello ${readyClock(cheapest.hour)} sauna olisi ${cents(extra)} senttiä halvempi, ` +
+        'mutta niin pieni säästö ei ole tavallisesta saunomisajasta luopumisen arvoinen.';
+    }
     return {
       value: readyClock(best.hour),
       instruction: `Aloita lämmitys ${day} kello ${hourClock(best.hour)}, niin sauna on lämmin kello ${readyClock(best.hour)}.`,
@@ -124,7 +132,7 @@ export class SaunaComponent {
     return (
       other && {
         day: other.day,
-        text: `${DAY_TEXT[other.day]} saunaan kello ${readyClock(other.hour)}, ${cents(plan.best.window.costCents - other.window.costCents)} snt halvempi`,
+        text: `${DAY_TEXT[other.day]} saunaan kello ${readyClock(other.hour)}, ${cents(plan.recommended.window.costCents - other.window.costCents)} snt halvempi`,
       }
     );
   });
@@ -149,27 +157,31 @@ export class SaunaComponent {
     const maxCost = plan.worst.window.costCents;
     const every = plan.starts.length > MAX_LABELLED_BARS ? 3 : 1;
     const picked = this.picked();
+    const cheapestDiffers = plan.cheapest !== plan.recommended;
     return plan.starts.map((start, index) => {
       const cost = start.window?.costCents;
+      const roles = [start === plan.recommended && 'suositus', cheapestDiffers && start === plan.cheapest && 'halvin'];
+      const price = cost === undefined ? 'hinta ei vielä tiedossa' : `${cents(cost)} senttiä`;
       return {
         hour: start.hour,
         label: index % every === 0 ? String(start.hour).padStart(2, '0') : '',
         heightPct:
           cost === undefined ? 100 : Math.max(BAR_MIN_PCT, Math.round((Math.max(cost, 0) / maxCost) * 100) || 0),
         missing: cost === undefined,
-        best: start === plan.best,
-        picked: start === picked && start !== plan.best,
-        ariaLabel: `Kello ${hourClock(start.hour)}: ${cost === undefined ? 'hinta ei vielä tiedossa' : `${cents(cost)} senttiä`}`,
+        best: start === plan.recommended,
+        cheapest: cheapestDiffers && start === plan.cheapest,
+        picked: start === picked && start !== plan.recommended,
+        ariaLabel: `Kello ${hourClock(start.hour)}: ${[price, ...roles.filter(Boolean)].join(', ')}`,
       };
     });
   });
 
   private readonly picked = computed(() => {
     const plan = this.plan();
-    return plan && (plan.starts.find((start) => start.hour === this.pickedHour()) ?? plan.best);
+    return plan && (plan.starts.find((start) => start.hour === this.pickedHour()) ?? plan.recommended);
   });
 
-  /** The tapped start: its total cost, and how it compares with the cheapest or the most expensive start */
+  /** The tapped start: its total cost, and how it compares with the recommended, the cheapest or the most expensive start */
   readonly pickedText = computed(() => {
     const plan = this.plan();
     const picked = this.picked();
@@ -177,10 +189,14 @@ export class SaunaComponent {
     const main = `Kiuas päälle klo ${hourClock(picked.hour)} · `;
     if (!picked.window) return { main: main + 'hinta ei vielä tiedossa', compare: undefined };
 
-    const { best, worst } = plan;
+    const { recommended, cheapest: best, worst } = plan;
     const cost = picked.window.costCents;
     let compare: string;
-    if (picked === best) {
+    if (picked === recommended && recommended !== best) {
+      compare =
+        `Suositus: sauna lämmin klo ${readyClock(picked.hour)}. ` +
+        `Halvin aloitus (klo ${hourClock(best.hour)}) olisi ${cents(cost - best.window.costCents)} snt halvempi.`;
+    } else if (picked === best) {
       const saving = worst.window.costCents - cost;
       const savedPct = Math.round((saving / worst.window.costCents) * 100);
       compare =
@@ -201,7 +217,9 @@ export class SaunaComponent {
     const kwh = formatNumber(response.energyKwh ?? 0, (response.energyKwh ?? 0) % 1 ? 1 : 0);
     return (
       `Laskettu ${formatNumber(response.durationHours, 0)} tunnin saunomiselle ja ${kwh} kWh:lle. ` +
-      'Päivä: kiuas päälle klo 6–16, ilta 17–21.'
+      'Päivä: kiuas päälle klo 6–16, ilta 17–21. ' +
+      'Illalla suosittelemme saunaa, joka on lämmin klo 19–21, ' +
+      `ellei muu aika ole vähintään ${OFF_HOURS_MIN_SAVING_CENTS} senttiä ja ${OFF_HOURS_MIN_SAVING_PCT} % halvempi.`
     );
   });
 

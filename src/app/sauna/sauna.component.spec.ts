@@ -16,7 +16,11 @@ const HOUR_MS = 60 * 60 * 1000;
 const at = (hour: number) => new Date(TODAY + hour * HOUR_MS).toISOString();
 
 /** A start every full hour from 14:00 today to lastStartHour; 21:00 today and 18:00 tomorrow are cheap */
-const response = (lastStartHour: number, pricesEndHour: number): OptimalWindowsDto => ({
+const response = (
+  lastStartHour: number,
+  pricesEndHour: number,
+  costOf = (hour: number): number => (hour === 21 ? 39.7 : hour === 42 ? 24 : 52),
+): OptimalWindowsDto => ({
   durationHours: 3,
   energyKwh: 8,
   earliestStart: NOW.toISOString(),
@@ -24,7 +28,7 @@ const response = (lastStartHour: number, pricesEndHour: number): OptimalWindowsD
   windows: [],
   startOffsets: Array.from({ length: lastStartHour - 13 }, (_, i): StartOffsetWindowDto => {
     const hour = 14 + i;
-    const costCents = hour === 21 ? 39.7 : hour === 42 ? 24 : 52;
+    const costCents = costOf(hour);
     return {
       offsetHours: i + 0.25,
       startTime: at(hour),
@@ -86,6 +90,24 @@ describe('SaunaComponent', () => {
     expect(button('sauna-part-evening').getAttribute('aria-pressed')).toBe('true');
     expect(button('sauna-part-day').disabled).toBeFalse();
     expect(element().querySelector('.notice')).toBeNull();
+  });
+
+  it('recommends the usual sauna time when a later start saves only a little', () => {
+    // Warm at 22:00 is 6 cents cheaper than warm at 20:00
+    render(of(response(45, 48, (hour) => (hour === 21 ? 44 : hour === 19 ? 50 : 52))));
+
+    expect(text('.answer__value')).toBe('20:00');
+    expect(text('.answer__instruction')).toBe('Aloita lämmitys tänään kello 19:00, niin sauna on lämmin kello 20:00.');
+    expect(text('.answer__reason')).toBe(
+      'Saunominen maksaa 50,0 senttiä, eli 2,0 senttiä vähemmän kuin jos lämmitys aloitetaan kello 17:00. ' +
+        'Kello 22:00 sauna olisi 6,0 senttiä halvempi, mutta niin pieni säästö ei ole tavallisesta ' +
+        'saunomisajasta luopumisen arvoinen.',
+    );
+    expect(element().querySelectorAll('.start__bar--best').length).toBe(1);
+    expect(element().querySelectorAll('.start__bar--cheapest').length).toBe(1);
+    expect(text('.starts__picked-compare')).toBe(
+      'Suositus: sauna lämmin klo 20:00. Halvin aloitus (klo 21:00) olisi 6,0 snt halvempi.',
+    );
   });
 
   it('switches to tomorrow from the cheaper-day button', () => {
