@@ -176,8 +176,10 @@ src/
 
 ### Google Analytics
 - **Tracking ID**: G-4J2DJ7V1SE
-- Google Analytics script is in `src/index.html` (lines 4-11)
-- Tracks page views and user behavior automatically
+- Loaded only after the visitor accepts the cookie banner (`shared/consent`): `ConsentService` adds the Google tag in the browser with Consent Mode v2 (analytics granted, ads always denied); nothing loads on the server or before a choice
+- The choice (Hyväksy / Hylkää, equal buttons) is kept in localStorage (`milloin-analytics-consent`); "Evästeasetukset" in the home and category page footers opens the banner again, and Hylkää after Hyväksy denies analytics storage and deletes the `_ga` cookies
+- The banner floats at the bottom of the screen, so it shifts no content
+- Tracks page views (including in-app navigation, through GA4 enhanced measurement)
 
 ### SEO Meta Tags
 Each route in `app.routes.ts` has its own `title` and `data.description`; `SeoTitleStrategy` (`shared/seo`) sets the title, description, canonical URL and `og:`/`twitter:` title, description and URL on every navigation. The tags in `src/index.html` are the home page's and the defaults:

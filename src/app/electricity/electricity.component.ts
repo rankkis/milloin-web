@@ -8,11 +8,12 @@ import { TrendTilesComponent } from '../shared/trend-tiles/trend-tiles.component
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { ElectricityAnswers } from './electricity-answers';
+import { ConsentSettingsLinkComponent } from '../shared/consent/consent-settings-link.component';
 
 /** The Sähkö category page: price now, hourly prices, trend tiles and the electricity questions */
 @Component({
   selector: 'app-electricity',
-  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, SpinnerComponent, TrendTilesComponent],
+  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, SpinnerComponent, TrendTilesComponent, ConsentSettingsLinkComponent],
   providers: [ElectricityAnswers],
   templateUrl: './electricity.component.html',
   styleUrl: './electricity.component.scss',

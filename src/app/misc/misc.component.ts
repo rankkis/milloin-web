@@ -5,11 +5,12 @@ import { IconComponent } from '../shared/icon/icon.component';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { formatDate } from '../shared/format/format';
 import { CATEGORIES } from '../topics';
+import { ConsentSettingsLinkComponent } from '../shared/consent/consent-settings-link.component';
 
 /** The Sekalaista category page: one row per question */
 @Component({
   selector: 'app-misc',
-  imports: [RouterLink, IconComponent, SpinnerComponent],
+  imports: [RouterLink, IconComponent, SpinnerComponent, ConsentSettingsLinkComponent],
   providers: [EnceAnswers],
   templateUrl: './misc.component.html',
   styleUrl: '../money/money.component.scss',

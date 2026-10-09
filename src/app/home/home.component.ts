@@ -8,6 +8,7 @@ import { IconComponent } from '../shared/icon/icon.component';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { CATEGORIES, QuestionId } from '../topics';
+import { ConsentSettingsLinkComponent } from '../shared/consent/consent-settings-link.component';
 
 /** Category filter value that shows every category */
 const ALL = 'all';
@@ -15,7 +16,7 @@ const ALL = 'all';
 /** Home: every question grouped by category, each with its answer */
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, IconComponent, SpinnerComponent],
+  imports: [RouterLink, IconComponent, SpinnerComponent, ConsentSettingsLinkComponent],
   providers: [ElectricityAnswers, EnceAnswers],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
