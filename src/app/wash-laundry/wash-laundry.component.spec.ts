@@ -70,7 +70,7 @@ describe('WashLaundryComponent', () => {
   it('recommends a delay that saves enough and tells about a cheaper later start', () => {
     render(of(schedule(delays(14.8, 12.9, 6.6, 6.1, 5.4, 5.0))));
 
-    expect(text('h1')).toBe('Milloin kannattaa pestä pyykkiä?');
+    expect(text('h1')).toBe('Milloin pestään pyykit?');
     expect(text('.answer__value')).toBe('+2 h');
     expect(text('.answer__instruction')).toBe('Aseta koneen ajastus kahteen tuntiin.');
     expect(text('.answer__reason')).toBe(

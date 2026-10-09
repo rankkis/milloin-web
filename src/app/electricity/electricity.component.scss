@@ -1,0 +1,450 @@
+@use 'colors' as *;
+
+$wide: 768px;
+$table: 960px;
+
+:host {
+  display: block;
+}
+
+p,
+h1,
+h2 {
+  margin: 0;
+}
+
+.page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.accent {
+  color: color(accent);
+}
+
+.label {
+  font-size: var(--text-label-size);
+  font-weight: 400;
+  letter-spacing: var(--text-label-tracking);
+  text-transform: uppercase;
+  color: color(text-muted);
+}
+
+// Header
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2) var(--space-6);
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  font-size: 15px;
+  color: color(text-muted);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: color(accent);
+  }
+}
+
+// Category name, styled like the question on the question pages
+.title {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: color(text-muted);
+}
+
+.clock {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: color(text-muted);
+}
+
+// Current price
+
+.price-and-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.now {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// Box around the label and the price, colored by the price category
+$tones: (
+  very-cheap: 16%,
+  cheap: 14%,
+  normal: 8%,
+  expensive: 16%,
+  very-expensive: 20%,
+);
+
+@each $tone, $fill in $tones {
+  .now__box--#{$tone} {
+    --tone: #{color(price-#{$tone})};
+    --tone-fill: #{$fill};
+  }
+}
+
+.now__box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-4) 18px;
+  background: color-mix(in srgb, var(--tone) var(--tone-fill), transparent);
+  border: 1px solid color-mix(in srgb, var(--tone) calc(var(--tone-fill) * 2), transparent);
+  border-radius: 14px;
+
+  .pill {
+    color: var(--tone);
+    background: color-mix(in srgb, var(--tone) 18%, transparent);
+    border-color: color-mix(in srgb, var(--tone) 55%, transparent);
+  }
+}
+
+// A normal price keeps the plain text color
+.now__box--normal .pill {
+  color: color(text);
+}
+
+.now__label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  min-height: 29px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 9px;
+  border: 1px solid color(border-strong);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tone);
+}
+
+.now__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-mono);
+}
+
+.now__value {
+  font-size: 84px;
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.now__unit {
+  font-size: 18px;
+  color: color(text-muted);
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  color: color(text-muted);
+}
+
+.retry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-weight: 500;
+  color: color(text);
+  background: color(surface);
+  border: 1px solid color(border);
+  border-radius: var(--radius);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: color(accent);
+  }
+}
+
+// Chart
+
+.reserved {
+  display: none;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// Questions
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: flex-end;
+}
+
+.questions__head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--space-2);
+}
+
+.questions__col-detail,
+.questions__col-price {
+  display: none;
+}
+
+.question {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'text answer'
+    'text short';
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  min-height: var(--tap-min);
+  padding: 14px 0;
+  border-top: 1px solid color(border);
+  color: inherit;
+  text-decoration: none;
+
+  &:last-of-type {
+    border-bottom: 1px solid color(border);
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: color(accent);
+  }
+}
+
+.question__text {
+  grid-area: text;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.question__icon {
+  color: color(text-muted);
+}
+
+.question__answer {
+  grid-area: answer;
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.question__short {
+  grid-area: short;
+  justify-self: end;
+  font-size: 13px;
+  white-space: nowrap;
+  color: color(text-muted);
+}
+
+.question__detail,
+.question__price {
+  display: none;
+}
+
+.footer {
+  font-size: 12px;
+  color: color(text-muted);
+}
+
+.footer__link {
+  color: inherit;
+
+  &:hover {
+    color: color(text);
+  }
+}
+
+// Wider screens: price and chart side by side
+
+@media (min-width: $wide) {
+  .page {
+    padding: var(--space-8) var(--space-6) var(--space-6);
+    gap: var(--space-8);
+  }
+
+  .clock {
+    font-size: 14px;
+  }
+
+  .price-and-chart {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 28px 64px;
+  }
+
+  // As wide as the price needs, so a long price never runs under the chart
+  .now {
+    flex: 1 0 auto;
+    min-width: 340px;
+    gap: var(--space-3);
+  }
+
+  .now__box {
+    gap: var(--space-3);
+    padding: var(--space-6) 28px 28px;
+  }
+
+  .now__label-row {
+    justify-content: flex-start;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+
+  .now__value {
+    font-size: 136px;
+    line-height: 0.9;
+  }
+
+  .now__unit {
+    font-size: 22px;
+  }
+
+  // Invisible slot for a future ad or price analysis: fills the column
+  // beside the chart and takes no space when the chart wraps below
+  .reserved {
+    display: block;
+    flex-grow: 1;
+  }
+
+  .chart {
+    flex: 999 1 480px;
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .chart__plot {
+    --plot-height: 190px;
+  }
+
+  .questions {
+    flex-grow: 0;
+  }
+
+  .footer {
+    font-size: 13px;
+  }
+}
+
+// Wide screens: questions as a table
+
+@media (min-width: $table) {
+  .questions__head,
+  .question {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px 190px 130px;
+    grid-template-areas: 'text answer detail price';
+    column-gap: var(--space-6);
+  }
+
+  .questions__head {
+    padding-bottom: 10px;
+
+    .label {
+      font-size: 12px;
+    }
+  }
+
+  .questions__col-detail {
+    display: block;
+  }
+
+  .questions__col-price {
+    display: block;
+    text-align: right;
+  }
+
+  .question {
+    padding: 18px 0;
+  }
+
+  .question__text {
+    gap: var(--space-3);
+    font-size: 20px;
+  }
+
+  .question__answer {
+    justify-self: start;
+    font-size: 36px;
+  }
+
+  .question__short {
+    display: none;
+  }
+
+  .question__detail {
+    display: block;
+    grid-area: detail;
+    font-size: 15px;
+    color: color(text-muted);
+  }
+
+  .question__price {
+    display: block;
+    grid-area: price;
+    justify-self: end;
+    font-family: var(--font-mono);
+    font-size: 16px;
+  }
+}

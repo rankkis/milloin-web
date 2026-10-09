@@ -88,7 +88,7 @@ describe('ChargeEvComponent', () => {
   it('answers with the charging window and when it starts', () => {
     render(of(schedule()));
 
-    expect(text('h1')).toBe('Milloin kannattaa ladata auto?');
+    expect(text('h1')).toBe('Milloin ladataan auto?');
     expect(text('.answer__value')).toBe('01:00–05:00');
     expect(text('.answer__sentence')).toBe('Ajasta lataus alkamaan kello 01:00.');
     expect(text('.answer__when')).toBe('ensi yönä · alkaa 11 h 18 min päästä');

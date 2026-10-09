@@ -1,0 +1,99 @@
+<div class="page">
+  <div class="top">
+    <header class="header">
+      <a class="back" routerLink="/" data-test-id="electricity-back">
+        <app-icon name="back" [size]="18" />
+        Takaisin
+      </a>
+      <p class="clock">{{ date() }}</p>
+    </header>
+    <h1 class="title">Sähkö</h1>
+  </div>
+
+  <div class="price-and-chart">
+    <section class="now" aria-label="Sähkön hinta nyt">
+      <div class="now__box" [class]="'now__box--' + tone()">
+        <div class="now__label-row">
+          <h2 class="label">Hintataso nyt</h2>
+          @if (current(); as current) {
+            <span class="pill"><span class="pill__dot" aria-hidden="true"></span>{{ current.category }}</span>
+          }
+        </div>
+
+        @if (overview.error(); as error) {
+          <div class="error" role="alert">
+            <p>{{ errorMessage(error) }}</p>
+            <button type="button" class="retry" data-test-id="electricity-retry" (click)="reload()">
+              <app-icon name="refresh" [size]="18" />
+              Yritä uudelleen
+            </button>
+          </div>
+        } @else {
+          <p class="now__price" [attr.aria-busy]="overview.isLoading()">
+            <span class="now__value">@if (current(); as current) { {{ current.price }} } @else if (overview.isLoading()) { <app-spinner /> } @else { – }</span>
+            <span class="now__unit">c/kWh</span>
+          </p>
+        }
+      </div>
+
+      <!-- Reserved for an ad or a price analysis on wide screens -->
+      <aside class="reserved" aria-hidden="true"></aside>
+    </section>
+
+    @if (overviewData(); as data) {
+      @if (upcoming().length > 0) {
+        <section class="chart">
+          <app-hourly-chart class="chart__plot" [hours]="upcoming()" [now]="now()" />
+          <app-trend-tiles [hours]="upcoming()" [current]="data.current.price" />
+        </section>
+      }
+    }
+  </div>
+
+  <nav class="questions" aria-labelledby="questions-title">
+    <div class="questions__head">
+      <h2 id="questions-title" class="label questions__col-question">Kysymys</h2>
+      <span class="label questions__col-answer" aria-hidden="true">Vastaus</span>
+      <span class="label questions__col-detail" aria-hidden="true">Tarkemmin</span>
+      <span class="label questions__col-price" aria-hidden="true">Hinta</span>
+    </div>
+
+    <a class="question" [routerLink]="'/' + paths.SAUNA" data-test-id="electricity-sauna">
+      <span class="question__text">
+        <app-icon class="question__icon" name="sauna" />
+        Milloin saunotaan?
+      </span>
+      <ng-container *ngTemplateOutlet="answer; context: { $implicit: saunaAnswer(), loading: sauna.isLoading() }" />
+    </a>
+
+    <a class="question" [routerLink]="'/' + paths.WASH_LAUNDRY" data-test-id="electricity-wash-laundry">
+      <span class="question__text">
+        <app-icon class="question__icon" name="washer" />
+        Milloin pestään pyykit?
+      </span>
+      <ng-container *ngTemplateOutlet="answer; context: { $implicit: laundryAnswer(), loading: laundry.isLoading() }" />
+    </a>
+
+    <a class="question" [routerLink]="'/' + paths.CHARGE_EV" data-test-id="electricity-charge-ev">
+      <span class="question__text">
+        <app-icon class="question__icon" name="car" />
+        Milloin ladataan auto?
+      </span>
+      <ng-container *ngTemplateOutlet="answer; context: { $implicit: evAnswer(), loading: ev.isLoading() }" />
+    </a>
+  </nav>
+
+  <footer class="footer">
+    © 2025 hurlumhei oy ·
+    <a class="footer__link" href="/api" data-test-id="electricity-api">Avoin rajapinta kehittäjille</a>
+  </footer>
+</div>
+
+<ng-template #answer let-answer let-loading="loading">
+  <span class="question__answer" [class.accent]="answer?.highlight">@if (answer) { {{ answer.value }} } @else if (loading) { <app-spinner label="" /> } @else { – }</span>
+  @if (answer) {
+    <span class="question__short">{{ answer.short }} · {{ answer.price }}</span>
+    <span class="question__detail">{{ answer.detail }}</span>
+    <span class="question__price">{{ answer.price }}</span>
+  }
+</ng-template>

@@ -11,8 +11,12 @@ const CACHE_HEADERS = {
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
-  { path: 'kannattaa-pesta-pyykkia', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
-  { path: 'kannattaa-ladata-auto', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  { path: 'sahko-on-halpaa', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  { path: 'pestaan-pyykit', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  { path: 'ladataan-auto', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'saunotaan', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  // Earlier addresses that redirect to the new ones
+  { path: 'kannattaa-pesta-pyykkia', renderMode: RenderMode.Server, status: 301 },
+  { path: 'kannattaa-ladata-auto', renderMode: RenderMode.Server, status: 301 },
   { path: '**', renderMode: RenderMode.Server, status: 404, headers: CACHE_HEADERS },
 ];
