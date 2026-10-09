@@ -8,7 +8,14 @@ import {
   WashLaundryService,
 } from '../wash-laundry/wash-laundry.service';
 import { ChargeEvService } from '../charge-ev/charge-ev.service';
-import { HourlyPriceDto, OptimalTimeDto, OptimalWindowsDto, StartDelayDto } from '../shared/models/price.model';
+import { SaunaService } from '../sauna/sauna.service';
+import {
+  HourlyPriceDto,
+  OptimalTimeDto,
+  OptimalWindowsDto,
+  StartDelayDto,
+  StartOffsetWindowDto,
+} from '../shared/models/price.model';
 
 // 2026-10-07 13:42 Finnish summer time (UTC+3)
 const NOW = new Date('2026-10-07T10:42:00.000Z');
@@ -64,6 +71,22 @@ const ev: OptimalWindowsDto = {
   windows: [optimal('2026-10-07T22:00:00.000Z', '2026-10-08T02:00:00.000Z', 2.2)],
 };
 
+// Sauna starts at 16:00 and 19:00 today (Finnish time); 19:00 is cheaper
+const saunaStart = (startTime: string, costCents: number): StartOffsetWindowDto => ({
+  ...optimal(startTime, startTime, costCents / 8),
+  offsetHours: 0,
+  costCents,
+});
+
+const sauna: OptimalWindowsDto = {
+  durationHours: 3,
+  energyKwh: 8,
+  earliestStart: '2026-10-07T10:30:00.000Z',
+  latestEnd: '2026-10-08T21:00:00.000Z',
+  windows: [],
+  startOffsets: [saunaStart('2026-10-07T13:00:00.000Z', 52), saunaStart('2026-10-07T16:00:00.000Z', 39.7)],
+};
+
 describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
 
@@ -78,6 +101,7 @@ describe('HomeComponent', () => {
         { provide: OverviewService, useValue: { getOverview: () => overview$ } },
         { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundrySchedule) } },
         { provide: ChargeEvService, useValue: { getOptimalWindows: () => of(ev) } },
+        { provide: SaunaService, useValue: { getStarts: () => of(sauna) } },
       ],
     });
     fixture = TestBed.createComponent(HomeComponent);
@@ -217,6 +241,14 @@ describe('HomeComponent', () => {
     const row = '[data-test-id="home-charge-ev"]';
     expect(text(`${row} .question__answer`)).toBe('01:00–05:00');
     expect(text(`${row} .question__short`)).toBe('ensi yönä · 0,24 €');
+  });
+
+  it('answers the sauna question with the cheapest afternoon start today', () => {
+    render();
+
+    const row = '[data-test-id="home-sauna"]';
+    expect(text(`${row} .question__answer`)).toBe('19:00');
+    expect(text(`${row} .question__short`)).toBe('tänään · 39,7 snt');
   });
 
   it('shows the error and retries', () => {

@@ -67,6 +67,14 @@
       </span>
       <ng-container *ngTemplateOutlet="answer; context: { $implicit: evAnswer(), loading: ev.isLoading() }" />
     </a>
+
+    <a class="question" [routerLink]="'/' + paths.SAUNA" data-test-id="home-sauna">
+      <span class="question__text">
+        <app-icon class="question__icon" name="sauna" />
+        …saunotaan?
+      </span>
+      <ng-container *ngTemplateOutlet="answer; context: { $implicit: saunaAnswer(), loading: sauna.isLoading() }" />
+    </a>
   </nav>
 
   <footer class="footer">

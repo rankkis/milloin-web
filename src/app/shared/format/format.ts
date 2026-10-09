@@ -100,6 +100,11 @@ export function formatTimeUntil(target: Date | string, now: Date): string | null
 const dayNumber = ({ year, month, day }: HelsinkiParts): number =>
   Date.UTC(year, month - 1, day) / (24 * 60 * MINUTE_MS);
 
+/** Finnish calendar days from now's day to the moment's day: 0 today, 1 tomorrow */
+export function dayOffset(date: Date | string, now: Date): number {
+  return dayNumber(helsinkiParts(new Date(date))) - dayNumber(helsinkiParts(now));
+}
+
 /**
  * When a window starts, relative to now: nyt, tänään, tänä yönä,
  * ensi yönä or huomenna.

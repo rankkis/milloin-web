@@ -21,6 +21,8 @@ import { OverviewService } from '../shared/services/overview.service';
 import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
+import { SaunaService } from '../sauna/sauna.service';
+import { cents, hourClock, planSauna } from '../sauna/sauna-plan';
 import { recommendDelay } from '../wash-laundry/laundry-recommendation';
 import { WashLaundryService } from '../wash-laundry/wash-laundry.service';
 
@@ -58,6 +60,7 @@ export class HomeComponent {
   private readonly overviewService = inject(OverviewService);
   private readonly washLaundryService = inject(WashLaundryService);
   private readonly chargeEvService = inject(ChargeEvService);
+  private readonly saunaService = inject(SaunaService);
 
   readonly paths = APP_NAVIGATION_PATHS;
   readonly now = signal(initialNow());
@@ -65,6 +68,7 @@ export class HomeComponent {
   readonly overview = rxResource({ stream: () => this.overviewService.getOverview() });
   readonly laundry = rxResource({ stream: () => this.washLaundryService.getOptimalSchedule() });
   readonly ev = rxResource({ stream: () => this.chargeEvService.getOptimalWindows() });
+  readonly sauna = rxResource({ stream: () => this.saunaService.getStarts() });
 
   private loadedAt = Date.now();
 
@@ -132,6 +136,15 @@ export class HomeComponent {
     };
   });
 
+  /** The sauna page's default answer: the cheapest afternoon start today */
+  readonly saunaAnswer = computed<Answer | undefined>(() => {
+    const plan = this.sauna.hasValue() ? planSauna(this.sauna.value(), this.now(), 0, 'pm') : undefined;
+    if (!plan) return undefined;
+    const day = plan.day === 0 ? 'tänään' : 'huomenna';
+    const price = `${cents(plan.best.window.costCents)} snt`;
+    return { value: hourClock(plan.best.hour), short: day, detail: day, price, highlight: false };
+  });
+
   constructor() {
     const destroyRef = inject(DestroyRef);
 
@@ -157,6 +170,7 @@ export class HomeComponent {
     this.overview.reload();
     this.laundry.reload();
     this.ev.reload();
+    this.sauna.reload();
   }
 
   readonly errorMessage = resourceErrorMessage;
