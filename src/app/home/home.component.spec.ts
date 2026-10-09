@@ -161,7 +161,7 @@ describe('HomeComponent', () => {
   it('shows the current spot price in the Sähkö heading, linked to the Sähkö page', () => {
     render();
 
-    expect(text('.group__meta')).toBe('Pörssisähkö nyt 4,82 c/kWh · normaali');
+    expect(text('.group__meta')).toBe('pörssisähkö nyt 4,82 c/kWh');
     expect(element('[data-test-id="home-electricity-price"]')?.getAttribute('href')).toBe('/sahko-on-halpaa');
   });
 
