@@ -248,7 +248,7 @@ describe('ElectricityComponent', () => {
 
     const row = '[data-test-id="electricity-sauna"]';
     expect(text(`${row} .question__answer`)).toBe('20:00');
-    expect(text(`${row} .question__short`)).toBe('tänään · 95,1 snt');
+    expect(text(`${row} .question__short`)).toBe('tänään · 0,95 €');
     expect(text(`${row} .question__detail`)).toBe('tänään, lämmitys 19:00');
   });
 

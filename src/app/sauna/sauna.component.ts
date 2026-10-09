@@ -25,7 +25,7 @@ import {
   planSauna,
   tomorrowNote,
 } from './sauna-plan';
-import { TARIFF_NOTE, costFormula, formatKwh, totalCents } from '../shared/tariffs/tariffs';
+import { TARIFF_NOTE, costFormula, formatEuros, formatKwh, totalCents } from '../shared/tariffs/tariffs';
 import { SaunaService } from './sauna.service';
 
 /** Bars of the start-time chart scale to the most expensive start */
@@ -116,7 +116,7 @@ export class SaunaComponent {
     const day = plan.day === 0 ? 'tänään' : 'huomenna';
     const saving = worst.window.costCents - best.window.costCents;
     const durationHours = this.response()?.durationHours ?? 3;
-    let reason = `Saunominen maksaa ${cents(this.total(best))} senttiä`;
+    let reason = `Saunominen maksaa ${formatEuros(this.total(best))}`;
     reason += saving >= 0.05 ? `, eli ${cents(saving)} senttiä vähemmän kuin jos lämmitys aloitetaan kello ${hourClock(worst.hour)}.` : '.';
     const extra = best.window.costCents - cheapest.window.costCents;
     if (extra >= 0.05) {
@@ -150,7 +150,7 @@ export class SaunaComponent {
     const response = this.response();
     const plan = this.plan();
     const start = response && plan && laterToday(response, this.now(), plan);
-    return start && `Saunotko vielä tänään? Saunaan kello ${readyClock(start.hour)}, ${cents(this.total(start))} snt`;
+    return start && `Saunotko vielä tänään? Saunaan kello ${readyClock(start.hour)}, ${formatEuros(this.total(start))}`;
   });
 
   readonly notice = computed(() => {
@@ -169,7 +169,7 @@ export class SaunaComponent {
     return plan.starts.map((start, index) => {
       const cost = start.window && this.total({ window: start.window });
       const roles = [start === plan.recommended && 'suositus', cheapestDiffers && start === plan.cheapest && 'halvin'];
-      const price = cost === undefined ? 'hinta ei vielä tiedossa' : `${cents(cost)} senttiä`;
+      const price = cost === undefined ? 'hinta ei vielä tiedossa' : formatEuros(cost);
       return {
         hour: start.hour,
         label: index % every === 0 ? String(start.hour).padStart(2, '0') : '',
@@ -218,7 +218,7 @@ export class SaunaComponent {
       const extraPct = bestCost > 0 ? ` (+${Math.round((extra / bestCost) * 100)} %)` : '';
       compare = `${cents(extra)} snt${extraPct} kalliimpi kuin halvin (klo ${hourClock(best.hour)}).`;
     }
-    return { main: `${main}yhteensä ${cents(cost)} snt`, compare };
+    return { main: `${main}yhteensä ${formatEuros(cost)}`, compare };
   });
 
   readonly basis = computed(() => {
@@ -236,7 +236,7 @@ export class SaunaComponent {
   /** How the price of the start shown under the chart is calculated */
   readonly formula = computed(() => {
     const window = this.picked()?.window;
-    return window && costFormula(window.costCents, this.kwh(), 'snt');
+    return window && costFormula(window.costCents, this.kwh(), '€');
   });
 
   readonly tariffNote = TARIFF_NOTE;

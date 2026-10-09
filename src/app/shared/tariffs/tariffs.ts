@@ -27,6 +27,10 @@ export function totalCents(energyCents: number, kwh: number): number {
   return energyCents + kwh * TARIFF_CENTS_PER_KWH;
 }
 
+/** Cents as euros with two decimals, e.g. 1,15 € */
+export const formatEuros = (cents: number): string =>
+  `${formatNumber(cents / 100, 2)} €`;
+
 /** Kilowatt-hours with a decimal only when needed, e.g. 1,5 or 8 */
 export const formatKwh = (kwh: number): string =>
   formatNumber(kwh, kwh % 1 ? 1 : 0);
@@ -43,9 +47,7 @@ export function costFormula(
   const spot = kwh > 0 ? energyCents / kwh : 0;
   const total = totalCents(energyCents, kwh);
   const result =
-    unit === '€'
-      ? `${formatNumber(total / 100, 2)} €`
-      : `${formatNumber(total, 1)} snt`;
+    unit === '€' ? formatEuros(total) : `${formatNumber(total, 1)} snt`;
   return (
     `Hinta = ${formatKwh(kwh)} kWh × (spot ${formatPrice(spot)} + siirto ${formatPrice(TARIFFS.transfer)} + ` +
     `sähkövero ${formatPrice(TARIFFS.tax)} + marginaali ${formatPrice(TARIFFS.margin)} c/kWh) = ${result}.`

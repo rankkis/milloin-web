@@ -15,13 +15,12 @@ import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
-import { TARIFF_NOTE, costFormula, totalCents } from '../shared/tariffs/tariffs';
+import { TARIFF_NOTE, costFormula, formatEuros as euros, totalCents } from '../shared/tariffs/tariffs';
 import { ChargeEvService } from './charge-ev.service';
 
 /** Hours on the chart */
 const CHART_HOURS = 24;
 
-const euros = (cents: number): string => `${formatNumber(cents / 100, 2)} €`;
 const capitalize = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
 
 @Component({
