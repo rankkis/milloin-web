@@ -177,10 +177,10 @@ src/
 
 ### SEO Meta Tags
 Each route in `app.routes.ts` has its own `title` and `data.description`; `SeoTitleStrategy` (`shared/seo`) sets the title, description, canonical URL and `og:`/`twitter:` title, description and URL on every navigation. The tags in `src/index.html` are the home page's and the defaults:
-- **Title**: "Milloin… – Pörssisähkön hinta nyt ja halvimmat tunnit"
+- **Title**: "Milloin… – Vastaukset arjen milloin-kysymyksiin"
 - **Description**: Optimized for search engines with relevant keywords
 - **Keywords**: electricity price, spot price, cheapest hour, EV charging, laundry, energy savings (in Finnish)
-- **Open Graph Tags**: For social media sharing (Facebook, LinkedIn); image `public/og-image.png` (1200x630, rendered from `src/og-image.svg`)
+- **Open Graph Tags**: For social media sharing (Facebook, LinkedIn); image `public/og-image.png` (1200x630, rendered from `src/og-image.svg`; when the image changes, bump the `?v=` in its `og:image`, `twitter:image` and JSON-LD URLs in `src/index.html`, because WhatsApp and others cache previews by URL)
 - **Twitter Card Tags**: For Twitter/X sharing
 
 **Important**: When adding new features or pages:
