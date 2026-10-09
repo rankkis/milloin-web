@@ -6,11 +6,12 @@ import { initialNow } from '../shared/render-time';
 import { CATEGORIES } from '../topics';
 import { finnishToday } from './banking-days';
 import { MONEY_QUESTIONS, MoneyQuestionId } from './money-questions';
+import { ConsentSettingsLinkComponent } from '../shared/consent/consent-settings-link.component';
 
 /** The Raha category page: when money comes in, one row per question */
 @Component({
   selector: 'app-money',
-  imports: [RouterLink, IconComponent],
+  imports: [RouterLink, IconComponent, ConsentSettingsLinkComponent],
   templateUrl: './money.component.html',
   styleUrl: './money.component.scss',
 })

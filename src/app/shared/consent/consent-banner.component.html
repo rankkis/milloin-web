@@ -1,0 +1,18 @@
+@if (consent.bannerOpen()) {
+  <section class="banner" role="region" aria-labelledby="consent-title">
+    <h2 class="banner__title" id="consent-title">Evästeet</h2>
+    <p class="banner__text">
+      Käytämme Google Analyticsia nähdäksemme, kuinka moni käy sivustolla ja millä sivuilla.
+      Analytiikan evästeet otetaan käyttöön vain, jos hyväksyt. Voit muuttaa valintaasi etusivun alalaidan
+      Evästeasetuksista.
+    </p>
+    <div class="banner__actions">
+      <button type="button" class="banner__button" data-test-id="consent-reject" (click)="consent.reject()">
+        Hylkää
+      </button>
+      <button type="button" class="banner__button" data-test-id="consent-accept" (click)="consent.accept()">
+        Hyväksy
+      </button>
+    </div>
+  </section>
+}

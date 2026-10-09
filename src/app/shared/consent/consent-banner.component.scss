@@ -1,0 +1,54 @@
+@use 'colors' as *;
+
+// Floats over the page so it moves nothing (no layout shift) and leaves
+// pages that fit the screen, like the sauna page, unscrolled.
+.banner {
+  position: fixed;
+  inset: auto var(--space-3) var(--space-3);
+  z-index: 10;
+  box-sizing: border-box;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  background: color(surface);
+  border: 1px solid color(border-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px alpha(bg, 60%);
+}
+
+.banner__title {
+  margin: 0 0 var(--space-1);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.banner__text {
+  margin: 0 0 var(--space-3);
+  font-size: 13px;
+  line-height: 1.45;
+  color: color(text-muted);
+}
+
+.banner__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+// Both choices look the same: neither is pushed
+.banner__button {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-weight: 500;
+  color: color(text);
+  background: color(bg);
+  border: 1px solid color(border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    border-color: color(accent);
+  }
+}
