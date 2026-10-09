@@ -10,6 +10,7 @@ import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
+import { TARIFF_NOTE, costFormula, formatKwh, totalCents } from '../shared/tariffs/tariffs';
 import { RULE_TEXT, recommendDelay } from './laundry-recommendation';
 import { WashLaundryService } from './wash-laundry.service';
 
@@ -84,6 +85,13 @@ export class WashLaundryComponent {
 
   readonly recommendation = computed(() => recommendDelay(this.delays()));
 
+  private readonly kwh = computed(() => (this.schedule.hasValue() ? this.schedule.value().energyKwh : 0));
+
+  /** Total cost of a start in cents: energy plus transfer, tax and margin */
+  private total(delay: StartDelayDto): number {
+    return totalCents(delay.costCents, this.kwh());
+  }
+
   readonly answer = computed(() => {
     const recommendation = this.recommendation();
     if (!recommendation) return undefined;
@@ -131,12 +139,12 @@ export class WashLaundryComponent {
   readonly options = computed<DelayOption[]>(() => {
     const delays = this.delays();
     const recommendation = this.recommendation();
-    const maxCost = Math.max(...delays.map((delay) => delay.costCents), 0);
+    const maxCost = Math.max(...delays.map((delay) => this.total(delay)), 0);
 
     return delays.map((delay) => {
       const label = delay.delayHours === 0 ? 'Nyt' : `+${delay.delayHours}`;
-      const cost = cents(delay.costCents);
-      const ratio = maxCost > 0 ? Math.max(delay.costCents, 0) / maxCost : 0;
+      const cost = cents(this.total(delay));
+      const ratio = maxCost > 0 ? Math.max(this.total(delay), 0) / maxCost : 0;
       const isRecommended = delay === recommendation?.recommended;
       const isCheapest = delay === recommendation?.cheapest;
       const roles = [isRecommended && 'suositus', isCheapest && 'halvin'].filter(Boolean);
@@ -175,7 +183,8 @@ export class WashLaundryComponent {
 
     let middle: { title: string; value: string; note: string; accent: boolean };
     if (recommended.delayHours > 0) {
-      const savedPct = now.costCents > 0 ? Math.round((saving / now.costCents) * 100) : 0;
+      const nowTotal = this.total(now);
+      const savedPct = nowTotal > 0 ? Math.round((saving / nowTotal) * 100) : 0;
       middle = {
         title: 'Säästö vs. nyt',
         value: `−${savedPct} %`,
@@ -202,7 +211,7 @@ export class WashLaundryComponent {
     }
 
     return {
-      cost: cents(recommended.costCents),
+      cost: cents(this.total(recommended)),
       middle,
       spot: formatPrice(recommended.priceAvg),
       category: PRICE_CATEGORY_TEXT[recommended.priceCategory]?.toLowerCase(),
@@ -212,10 +221,17 @@ export class WashLaundryComponent {
   readonly basis = computed(() => {
     const schedule = this.schedule.hasValue() ? this.schedule.value() : undefined;
     if (!schedule) return undefined;
-    const kwh = formatNumber(schedule.energyKwh, schedule.energyKwh % 1 ? 1 : 0);
     const hours = formatNumber(schedule.durationHours, schedule.durationHours % 1 ? 1 : 0);
-    return `Laskettu ${hours} tunnin ohjelmalle ja ${kwh} kWh:n kulutukselle.`;
+    return `Laskettu ${hours} tunnin ohjelmalle ja ${formatKwh(schedule.energyKwh)} kWh:n kulutukselle.`;
   });
+
+  /** How the recommended start's price is calculated */
+  readonly formula = computed(() => {
+    const recommendation = this.recommendation();
+    return recommendation && costFormula(recommendation.recommended.costCents, this.kwh(), 'snt');
+  });
+
+  readonly tariffNote = TARIFF_NOTE;
 
   /** Shows the tooltip for a mouse; touch and pen open it with a tap */
   hoverTip(open: boolean, event: PointerEvent): void {

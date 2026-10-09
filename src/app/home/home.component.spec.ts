@@ -168,11 +168,11 @@ describe('HomeComponent', () => {
     render();
 
     expect(text('[data-test-id="home-sauna"] .question__answer')).toBe('20:00');
-    expect(text('[data-test-id="home-sauna"] .question__short')).toBe('tänään · 39,7 snt');
+    expect(text('[data-test-id="home-sauna"] .question__short')).toBe('tänään · 95,1 snt');
     expect(text('[data-test-id="home-laundry"] .question__answer')).toBe('+1 h');
-    expect(text('[data-test-id="home-laundry"] .question__detail')).toBe('ajastus, käynnistyy 14:42 · 4,0 snt');
+    expect(text('[data-test-id="home-laundry"] .question__detail')).toBe('ajastus, käynnistyy 14:42 · 10,9 snt');
     expect(text('[data-test-id="home-ev"] .question__answer')).toBe('01:00–05:00');
-    expect(text('[data-test-id="home-ev"] .question__detail')).toBe('ensi yönä · 0,24 €');
+    expect(text('[data-test-id="home-ev"] .question__detail')).toBe('ensi yönä · 1,00 €');
   });
 
   it('answers the Raha questions with payment days, without a price', () => {

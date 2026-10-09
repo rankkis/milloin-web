@@ -116,7 +116,12 @@
     </details>
 
     @if (basis(); as basis) {
-      <p class="basis">{{ basis }}</p>
+      <div class="basis">
+        <p>{{ basis }}</p>
+        @if (formula(); as formula) {
+          <p>{{ formula }} {{ tariffNote }}</p>
+        }
+      </div>
     }
   </div>
 </div>

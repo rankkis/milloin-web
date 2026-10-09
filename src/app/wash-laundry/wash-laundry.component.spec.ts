@@ -140,19 +140,19 @@ describe('WashLaundryComponent', () => {
       '+5',
     ]);
     expect(cells.map((d) => d.querySelector('.delay__cost')?.textContent?.trim())).toEqual([
-      '14,8',
-      '12,9',
-      '6,6',
-      '6,1',
-      '5,4',
-      '5,0',
+      '25,2',
+      '23,3',
+      '17,0',
+      '16,5',
+      '15,8',
+      '15,4',
     ]);
     expect(cells[2].tagName).toBe('BUTTON');
     expect(cells[2].classList).toContain('delay--recommended');
-    expect(cells[2].getAttribute('aria-label')).toBe('2 tunnin päästä: 6,6 senttiä, suositus');
+    expect(cells[2].getAttribute('aria-label')).toBe('2 tunnin päästä: 17,0 senttiä, suositus');
     expect(cells[5].classList).toContain('delay--cheapest');
-    expect(cells[5].getAttribute('aria-label')).toBe('5 tunnin päästä: 5,0 senttiä, halvin');
-    expect(cells[1].getAttribute('aria-label')).toBe('tunnin päästä: 12,9 senttiä');
+    expect(cells[5].getAttribute('aria-label')).toBe('5 tunnin päästä: 15,4 senttiä, halvin');
+    expect(cells[1].getAttribute('aria-label')).toBe('tunnin päästä: 23,3 senttiä');
     expect((cells[0].querySelector('.delay__bar') as HTMLElement).style.height).toBe('64px');
     expect(texts('.legend__item')).toEqual(['suositus', 'halvin']);
   });
@@ -161,24 +161,28 @@ describe('WashLaundryComponent', () => {
     render(of(schedule(delays(3, 4))));
 
     const button = element().querySelector('[data-test-id="laundry-recommended-delay"]');
-    expect(button?.getAttribute('aria-label')).toBe('Nyt: 3,0 senttiä, suositus ja halvin');
+    expect(button?.getAttribute('aria-label')).toBe('Nyt: 13,4 senttiä, suositus ja halvin');
     expect(element().querySelector('.delay--cheapest')).toBeNull();
   });
 
   it('shows the cost, saving and spot price of the recommended delay', () => {
     render(of(schedule(delays(14.8, 12.9, 6.6, 6.1, 5.4, 5.0))));
 
-    expect(texts('.stat__value')).toEqual(['6,6', '−55 %', '6,60']);
+    expect(texts('.stat__value')).toEqual(['17,0', '−33 %', '6,60']);
     expect(text('.stat:nth-child(2) dt')).toBe('Säästö vs. nyt');
     expect(text('.stat:nth-child(2) .stat__note')).toBe('8,2 senttiä');
     expect(text('.stat:nth-child(3) .stat__note')).toBe('c/kWh · halpa');
-    expect(text('.basis')).toBe('Laskettu 2 tunnin ohjelmalle ja 1,5 kWh:n kulutukselle.');
+    expect(texts('.basis p')).toEqual([
+      'Laskettu 2 tunnin ohjelmalle ja 1,5 kWh:n kulutukselle.',
+      'Hinta = 1,5 kWh × (spot 4,40 + siirto 3,50 + sähkövero 2,92 + marginaali 0,50 c/kWh) = 17,0 snt. ' +
+        'Siirto ja marginaali ovat tyypillisiä arvoja. Hinnat sis. alv 25,5 %, kuukausimaksut eivät sisälly.',
+    ]);
   });
 
   it('shows the cheapest option when waiting is not worth it', () => {
     render(of(schedule(delays(7.6, 8.1, 6.9, 5.2, 4.5, 6.3))));
 
-    expect(texts('.stat__value')).toEqual(['7,6', '+4 h', '7,60']);
+    expect(texts('.stat__value')).toEqual(['18,0', '+4 h', '7,60']);
     expect(text('.stat:nth-child(2) dt')).toBe('Halvin vaihtoehto');
     expect(text('.stat:nth-child(2) .stat__note')).toBe('3,1 snt halvempi');
   });
