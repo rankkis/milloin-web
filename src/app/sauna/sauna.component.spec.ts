@@ -8,12 +8,14 @@ import { OptimalWindowsDto, StartOffsetWindowDto } from '../shared/models/price.
 
 // 2026-10-07 13:42 Finnish summer time (UTC+3)
 const NOW = new Date('2026-10-07T10:42:00.000Z');
+// 22:30 the same day, after the last evening start
+const LATE = new Date('2026-10-07T19:30:00.000Z');
 // Midnight starting 2026-10-07 in Finnish time
 const TODAY = Date.parse('2026-10-06T21:00:00.000Z');
 const HOUR_MS = 60 * 60 * 1000;
 const at = (hour: number) => new Date(TODAY + hour * HOUR_MS).toISOString();
 
-/** A start every full hour from 14:00 today to lastStartHour; 21:00 today and 12:00 tomorrow are cheap */
+/** A start every full hour from 14:00 today to lastStartHour; 21:00 today and 18:00 tomorrow are cheap */
 const response = (lastStartHour: number, pricesEndHour: number): OptimalWindowsDto => ({
   durationHours: 3,
   energyKwh: 8,
@@ -22,7 +24,7 @@ const response = (lastStartHour: number, pricesEndHour: number): OptimalWindowsD
   windows: [],
   startOffsets: Array.from({ length: lastStartHour - 13 }, (_, i): StartOffsetWindowDto => {
     const hour = 14 + i;
-    const costCents = hour === 21 ? 39.7 : hour === 36 ? 24 : 52;
+    const costCents = hour === 21 ? 39.7 : hour === 42 ? 24 : 52;
     return {
       offsetHours: i + 0.25,
       startTime: at(hour),
@@ -70,7 +72,7 @@ describe('SaunaComponent', () => {
 
   afterEach(() => jasmine.clock().uninstall());
 
-  it('answers with the cheapest afternoon start today', () => {
+  it('answers with the cheapest evening start today', () => {
     render(of(response(45, 48)));
 
     expect(text('h1')).toBe('Milloin saunotaan?');
@@ -78,18 +80,18 @@ describe('SaunaComponent', () => {
     expect(text('.answer__instruction')).toBe('Laita kiuas päälle tänään kello 21:00.');
     expect(text('.answer__times')).toBe('tänään · kiuas päällä 21:00–24:00');
     expect(button('sauna-day-today').getAttribute('aria-pressed')).toBe('true');
-    expect(button('sauna-part-pm').getAttribute('aria-pressed')).toBe('true');
-    expect(button('sauna-part-am').disabled).toBeTrue();
+    expect(button('sauna-part-evening').getAttribute('aria-pressed')).toBe('true');
+    expect(button('sauna-part-day').disabled).toBeFalse();
     expect(element().querySelector('.notice')).toBeNull();
   });
 
   it('switches to tomorrow from the cheaper-day button', () => {
     render(of(response(45, 48)));
 
-    expect(text('[data-test-id="sauna-other-day"]')).toBe('Huomenna kello 12:00 15,7 snt halvempi');
+    expect(text('[data-test-id="sauna-other-day"]')).toBe('Huomenna kello 18:00 15,7 snt halvempi');
     click('sauna-other-day');
 
-    expect(text('.answer__value')).toBe('12:00');
+    expect(text('.answer__value')).toBe('18:00');
     expect(button('sauna-day-tomorrow').getAttribute('aria-pressed')).toBe('true');
   });
 
@@ -97,8 +99,10 @@ describe('SaunaComponent', () => {
     render(of(response(39, 42)));
     click('sauna-day-tomorrow');
 
+    expect(button('sauna-part-evening').disabled).toBeTrue();
+    expect(button('sauna-part-day').getAttribute('aria-pressed')).toBe('true');
     expect(text('[data-test-id="sauna-day-tomorrow"] .choice__note')).toBe('hinnat klo 18:00 asti');
-    expect(element().querySelectorAll('.start__bar--missing').length).toBe(6);
+    expect(element().querySelectorAll('.start__bar--missing').length).toBe(1);
     expect(text('.notice')).toContain('Huomisen hinnat ovat tiedossa vain kello 18:00 asti');
   });
 
@@ -114,10 +118,27 @@ describe('SaunaComponent', () => {
   it('shows the price of a tapped start', () => {
     render(of(response(45, 48)));
 
-    expect(text('.starts__picked')).toBe('klo 21:00 · 39,7 snt · halvin');
+    expect(text('.starts__picked')).toBe('klo 21:00 · 39,7 snt · halvin, −24 %');
     element().querySelectorAll<HTMLButtonElement>('[data-test-id="sauna-start-bar"]')[0].click();
     fixture.detectChanges();
-    expect(text('.starts__picked')).toBe('klo 14:00 · 52,0 snt');
+    expect(text('.starts__picked')).toBe('klo 17:00 · 52,0 snt');
+  });
+
+  it('shows tomorrow once the evening is over, with a button for tonight', () => {
+    jasmine.clock().mockDate(LATE);
+    render(of(response(45, 48)));
+
+    expect(text('.answer__value')).toBe('18:00');
+    expect(button('sauna-day-tomorrow').getAttribute('aria-pressed')).toBe('true');
+    expect(text('.notice')).toBe('Tämän illan saunavuorot ovat jo ohi, joten näytämme huomisen.');
+    expect(element().querySelector('[data-test-id="sauna-other-day"]')).toBeNull();
+    expect(text('[data-test-id="sauna-tonight"]')).toBe('Saunotko vielä tänään? Kello 23:00: 52,0 snt');
+
+    click('sauna-tonight');
+    expect(text('.answer__value')).toBe('23:00');
+    expect(button('sauna-day-today').getAttribute('aria-pressed')).toBe('true');
+    expect(button('sauna-part-any').getAttribute('aria-pressed')).toBe('true');
+    expect(element().querySelector('[data-test-id="sauna-tonight"]')).toBeNull();
   });
 
   it('shows the error message', () => {

@@ -2,20 +2,20 @@ import { dayOffset, formatClock, formatNumber } from '../shared/format/format';
 import { OptimalWindowsDto, StartOffsetWindowDto } from '../shared/models/price.model';
 
 export type SaunaDay = 0 | 1;
-export type SaunaPart = 'am' | 'pm' | 'any';
+export type SaunaPart = 'day' | 'evening' | 'any';
 
 /** First and last hour the heater may be switched on, Finnish time */
 export const PART_HOURS: Record<SaunaPart, [number, number]> = {
-  am: [6, 11],
-  pm: [12, 21],
+  day: [6, 16],
+  evening: [17, 21],
   any: [0, 23],
 };
 
 export const DAYS: SaunaDay[] = [0, 1];
-export const PARTS: SaunaPart[] = ['am', 'pm', 'any'];
+export const PARTS: SaunaPart[] = ['day', 'evening', 'any'];
 
 /** The time of day tried first, then the others in this order */
-const PART_FALLBACK: SaunaPart[] = ['pm', 'any', 'am'];
+const PART_FALLBACK: SaunaPart[] = ['evening', 'day', 'any'];
 
 /** Another day is suggested when it is at least this many cents cheaper */
 const OTHER_DAY_MIN_SAVING_CENTS = 1;
@@ -32,6 +32,8 @@ export interface SaunaPlan {
   starts: SaunaStart[];
   best: SaunaStart & { window: NonNullable<SaunaStart['window']> };
   worst: SaunaStart & { window: NonNullable<SaunaStart['window']> };
+  /** Today's time of day is over, so tomorrow is shown without the visitor choosing it */
+  autoTomorrow: boolean;
 }
 
 type Priced = SaunaPlan['best'];
@@ -74,28 +76,39 @@ export function dayHasPrices(response: OptimalWindowsDto, now: Date, day: SaunaD
 }
 
 /**
- * The cheapest start of the chosen day and time of day. A choice without
- * prices falls back to today, then to the afternoon, any time and the
- * morning. Undefined when no start has a price.
+ * The cheapest start of the chosen day and time of day. Without a chosen
+ * day it is today, or tomorrow when today's time of day is over. A choice
+ * without prices falls back to today, then to the evening, the day and any
+ * time. Undefined when no start has a price.
  */
 export function planSauna(
   response: OptimalWindowsDto,
   now: Date,
-  wantedDay: SaunaDay,
+  wantedDay: SaunaDay | undefined,
   wantedPart: SaunaPart,
 ): SaunaPlan | undefined {
-  const day = [wantedDay, 0, 1].find((d): d is SaunaDay => dayHasPrices(response, now, d as SaunaDay));
+  const autoTomorrow =
+    wantedDay === undefined &&
+    !hasPrices(response, now, 0, wantedPart) &&
+    hasPrices(response, now, 1, wantedPart);
+  const day = [autoTomorrow ? 1 : (wantedDay ?? 0), 0, 1].find((d): d is SaunaDay =>
+    dayHasPrices(response, now, d as SaunaDay),
+  );
   if (day === undefined) return undefined;
   const part = [wantedPart, ...PART_FALLBACK].find((p) => hasPrices(response, now, day, p))!;
 
   const starts = saunaStarts(response, now, day, part);
   const priced = starts.filter(isPriced);
   const worst = priced.reduce((max, start) => (start.window.costCents > max.window.costCents ? start : max));
-  return { day, part, starts, best: cheapest(priced), worst };
+  return { day, part, starts, best: cheapest(priced), worst, autoTomorrow };
 }
 
-/** The other day's cheapest start at the same time of day, when it is clearly cheaper */
+/**
+ * The other day's cheapest start at the same time of day, when it is clearly
+ * cheaper. Not offered when today's time of day is already over.
+ */
 export function cheaperOtherDay(response: OptimalWindowsDto, now: Date, plan: SaunaPlan): Priced & { day: SaunaDay } | undefined {
+  if (plan.autoTomorrow) return undefined;
   const day: SaunaDay = plan.day === 0 ? 1 : 0;
   const priced = saunaStarts(response, now, day, plan.part).filter(isPriced);
   if (!priced.length) return undefined;
@@ -103,6 +116,13 @@ export function cheaperOtherDay(response: OptimalWindowsDto, now: Date, plan: Sa
   return best.window.costCents <= plan.best.window.costCents - OTHER_DAY_MIN_SAVING_CENTS
     ? { ...best, day }
     : undefined;
+}
+
+/** The cheapest start still left today, offered when tomorrow is shown because today's time of day is over */
+export function laterToday(response: OptimalWindowsDto, now: Date, plan: SaunaPlan): Priced | undefined {
+  if (!plan.autoTomorrow) return undefined;
+  const priced = saunaStarts(response, now, 0, 'any').filter(isPriced);
+  return priced.length ? cheapest(priced) : undefined;
 }
 
 /** Hour as a clock time, e.g. 09:00; 24 is midnight at the end of the day */
@@ -144,6 +164,10 @@ export function missingPricesNotice(
 
   if (!dayHasPrices(response, now, 1)) {
     return 'Huomisen hinnat julkaistaan noin kello 14. Silloin voit verrata, onko huominen halvempi.';
+  }
+  if (plan.autoTomorrow) {
+    const whose = plan.part === 'day' ? 'Tämän päivän' : 'Tämän illan';
+    return `${whose} saunavuorot ovat jo ohi, joten näytämme huomisen.`;
   }
   return undefined;
 }

@@ -3,7 +3,6 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { AnswerHeaderComponent } from '../shared/answer-header/answer-header.component';
 import { formatNumber, formatPrice } from '../shared/format/format';
 import { IconComponent } from '../shared/icon/icon.component';
-import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
 import { initialNow } from '../shared/render-time';
 import { resourceErrorMessage } from '../shared/resource-error';
 import { OverviewService } from '../shared/services/overview.service';
@@ -18,6 +17,7 @@ import {
   dayHasPrices,
   hasPrices,
   hourClock,
+  laterToday,
   missingPricesNotice,
   planSauna,
   tomorrowNote,
@@ -30,7 +30,7 @@ const BAR_MIN_PCT = 6;
 const MAX_LABELLED_BARS = 12;
 
 const DAY_TEXT: Record<SaunaDay, string> = { 0: 'Tänään', 1: 'Huomenna' };
-const PART_TEXT: Record<SaunaPart, string> = { am: 'Aamupäivä', pm: 'Iltapäivä', any: 'Ei väliä' };
+const PART_TEXT: Record<SaunaPart, string> = { day: 'Päivä', evening: 'Ilta', any: 'Ei väliä' };
 
 @Component({
   selector: 'app-sauna',
@@ -48,9 +48,12 @@ export class SaunaComponent {
   /** When the answer was calculated; start hours that have begun are left out */
   readonly now = signal(initialNow());
 
-  /** The visitor's choice; a choice without prices falls back to another */
-  readonly wantedDay = signal<SaunaDay>(0);
-  readonly wantedPart = signal<SaunaPart>('pm');
+  /**
+   * The visitor's choice; a choice without prices falls back to another.
+   * Without a chosen day it is today, or tomorrow once today's time of day is over.
+   */
+  readonly wantedDay = signal<SaunaDay | undefined>(undefined);
+  readonly wantedPart = signal<SaunaPart>('evening');
   /** Start hour whose price is shown under the chart; the cheapest by default */
   readonly pickedHour = signal<number | undefined>(undefined);
 
@@ -125,6 +128,14 @@ export class SaunaComponent {
     );
   });
 
+  /** Tomorrow is shown because this evening is over; the cheapest start still left tonight */
+  readonly tonight = computed(() => {
+    const response = this.response();
+    const plan = this.plan();
+    const start = response && plan && laterToday(response, this.now(), plan);
+    return start && `Saunotko vielä tänään? Kello ${hourClock(start.hour)}: ${cents(start.window.costCents)} snt`;
+  });
+
   readonly notice = computed(() => {
     const response = this.response();
     const plan = this.plan();
@@ -161,25 +172,14 @@ export class SaunaComponent {
     const plan = this.plan();
     const picked = this.picked();
     if (!plan || !picked) return undefined;
-    const price = picked.window
-      ? `${cents(picked.window.costCents)} snt${picked === plan.best ? ' · halvin' : ''}`
-      : 'hinta ei vielä tiedossa';
-    return `klo ${hourClock(picked.hour)} · ${price}`;
-  });
-
-  readonly stats = computed(() => {
-    const plan = this.plan();
-    if (!plan) return undefined;
     const { best, worst } = plan;
     const saving = worst.window.costCents - best.window.costCents;
-    const savedPct = worst.window.costCents > 0 ? Math.round((saving / worst.window.costCents) * 100) : 0;
-    return {
-      cost: cents(best.window.costCents),
-      savingPct: saving >= 0.05 ? `−${savedPct} %` : '–',
-      saving: cents(saving),
-      spot: formatPrice(best.window.priceAvg),
-      category: PRICE_CATEGORY_TEXT[best.window.priceCategory]?.toLowerCase(),
-    };
+    const savedPct = Math.round((saving / worst.window.costCents) * 100);
+    const bestText = ` · halvin${saving >= 0.05 && worst.window.costCents > 0 ? `, −${savedPct} %` : ''}`;
+    const price = picked.window
+      ? `${cents(picked.window.costCents)} snt${picked === best ? bestText : ''}`
+      : 'hinta ei vielä tiedossa';
+    return `klo ${hourClock(picked.hour)} · ${price}`;
   });
 
   readonly basis = computed(() => {
@@ -187,8 +187,8 @@ export class SaunaComponent {
     if (!response) return undefined;
     const kwh = formatNumber(response.energyKwh ?? 0, (response.energyKwh ?? 0) % 1 ? 1 : 0);
     return (
-      `Laskettu ${formatNumber(response.durationHours, 0)} tunnin saunomiselle ja ${kwh} kWh:n kulutukselle: ` +
-      'kiuas lämpenee noin tunnin ja pitää lämmön kaksi tuntia. Aamupäivä: kiuas päälle klo 6–11, iltapäivä 12–21.'
+      `Laskettu ${formatNumber(response.durationHours, 0)} tunnin saunomiselle ja ${kwh} kWh:lle. ` +
+      'Päivä: kiuas päälle klo 6–16, ilta 17–21.'
     );
   });
 
@@ -200,6 +200,12 @@ export class SaunaComponent {
   chooseDay(day: SaunaDay): void {
     this.wantedDay.set(day);
     this.pickedHour.set(undefined);
+  }
+
+  /** Today at any time, for a sauna still tonight */
+  chooseTonight(): void {
+    this.wantedDay.set(0);
+    this.choosePart('any');
   }
 
   choosePart(part: SaunaPart): void {
