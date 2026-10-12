@@ -1,10 +1,13 @@
 import { Component, inject, input } from '@angular/core';
 import { ConsentService } from './consent.service';
 
-/** Footer button that opens the consent banner again */
+/** Footer button that opens the consent banner again, after a separator; nothing while the banner is off */
 @Component({
   selector: 'app-consent-settings-link',
-  template: `<button type="button" class="link" [attr.data-test-id]="testId()" (click)="consent.openSettings()">Evästeasetukset</button>`,
+  template: `@if (consent.enabled) {
+    <span aria-hidden="true"> · </span>
+    <button type="button" class="link" [attr.data-test-id]="testId()" (click)="consent.openSettings()">Evästeasetukset</button>
+  }`,
   styles: `
     .link {
       padding: 0;

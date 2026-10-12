@@ -1,5 +1,7 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, afterNextRender, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { startAnalytics } from './shared/analytics/analytics';
 import { ConsentBannerComponent } from './shared/consent/consent-banner.component';
 import { ConsentService } from './shared/consent/consent.service';
 
@@ -11,6 +13,10 @@ import { ConsentService } from './shared/consent/consent.service';
 export class AppComponent {
   constructor() {
     const consent = inject(ConsentService);
-    afterNextRender(() => consent.init());
+    const document = inject(DOCUMENT);
+    afterNextRender(() => {
+      consent.init();
+      if (document.defaultView) startAnalytics(document.defaultView);
+    });
   }
 }
