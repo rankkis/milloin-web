@@ -105,13 +105,6 @@ Content-Type: application/problem+json
     <h2>Errors</h2>
     <p>Every error is <code>application/problem+json</code>; a validation error lists the fields that failed.</p>
     <app-code-block [code]="errorResponse" />
-
-    <h2>Earlier routes</h2>
-    <p>
-      <code>/overview</code>, <code>/optimal-window</code> and <code>/optimal-schedule</code> are deprecated and stop
-      answering on 31 December 2026. They send <code>Deprecation</code> and <code>Sunset</code> headers and a
-      <code>Link</code> to the <code>/v1</code> route that replaces them.
-    </p>
   `,
   styleUrl: '../docs-page.scss',
 })
