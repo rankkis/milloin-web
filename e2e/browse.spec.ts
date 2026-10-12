@@ -72,11 +72,19 @@ test('the developer docs open from the home footer', async ({ page }) => {
 });
 
 test('the API reference draws the OpenAPI document', async ({ page }) => {
+  const problems: string[] = [];
+  page.on('console', (message) => message.type() === 'error' && problems.push(message.text()));
+  page.on('requestfailed', (request) => problems.push(`${request.url()}: ${request.failure()?.errorText}`));
   await declineAnalytics(page);
   await page.goto('/docs/reference');
   await expect(page.locator('h1')).toHaveText('API reference');
   // Scalar loads from its CDN and draws the operations from the document
-  await expect(page.locator('.reference').getByText('/v1/prices/current').first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('.reference').getByText('/v1/prices/current').first())
+    .toBeVisible({ timeout: 20_000 })
+    .catch((error: Error) => {
+      // Name what failed in the browser, such as the CDN or the OpenAPI document
+      throw new Error(`${error.message}\n${problems.join('\n')}`);
+    });
 });
 
 test('milloin.xyz/api opens the docs', async ({ request, baseURL }) => {
