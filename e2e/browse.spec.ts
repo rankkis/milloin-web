@@ -23,7 +23,7 @@ test('home lists the questions and links to the Sähkö page', async ({ page }) 
 
   await page.getByTestId('home-electricity-price').click();
   await expect(page).toHaveURL(/\/sahko-on-halpaa$/);
-  await expect(page.locator('h1')).toHaveText('Sähkö');
+  await expect(page.locator('h1')).toHaveText('Sähkön hinta nyt');
   await expect(page.locator('app-hourly-chart')).toBeVisible();
   expect(errors).toEqual([]);
 });
