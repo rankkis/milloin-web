@@ -1,57 +1,51 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, timer } from 'rxjs';
-import { catchError, retry, timeout } from 'rxjs/operators';
-import { API_RETRY_COUNT } from '../shared/services/api-retry';
-import { environment } from '../../environments/environment';
-import { OptimalWindowsDto } from '../shared/models/price.model';
+import { Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { V1PlanDto, V1PlansDto } from '../shared/models/api-v1.model';
+import { OptimalWindowsDto, WindowDto } from '../shared/models/price.model';
+import { PricesService, apiError } from '../shared/services/prices.service';
 
 export type { OptimalWindowsDto };
+
+/** An 11 kW charger running the whole window: 4 h × 11 kW */
+export const CHARGE_HOURS = 4;
+export const CHARGE_KWH = 44;
+
+const toWindow = (plan: V1PlanDto): WindowDto => ({
+  startTime: plan.startTime,
+  endTime: plan.endTime,
+  priceAvg: plan.priceAvg,
+  priceCategory: plan.category,
+  pricePoints: [],
+  ...(plan.costCents !== undefined && { costCents: plan.costCents }),
+  ...(plan.savingsCents !== undefined && { savingsCents: plan.savingsCents }),
+});
+
+/** The API's continuous plans as charging windows, cheapest first */
+export function toChargeWindows(response: V1PlansDto): OptimalWindowsDto {
+  return {
+    durationHours: response.request.durationHours,
+    energyKwh: response.request.energyKwh,
+    earliestStart: response.request.earliestStart,
+    latestEnd: response.request.latestEnd,
+    ...(response.startNow && { startNow: toWindow(response.startNow) }),
+    windows: response.plans.map(toWindow),
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChargeEvService {
-  private readonly http = inject(HttpClient);
-  private readonly retryCount = inject(API_RETRY_COUNT);
-  private readonly apiUrl = `${environment.apiUrl}/optimal-window/presets/charge-ev`;
-
-  // Only CORS-safelisted headers, so the browser skips the preflight request
-
-  private readonly httpOptions = {
-    headers: new HttpHeaders({
-      'Accept': 'application/json'
-    })
-  };
+  private readonly prices = inject(PricesService);
 
   /** The cheapest 4-hour charging windows in all published prices, cheapest first */
   getOptimalWindows(): Observable<OptimalWindowsDto> {
-    const url = this.apiUrl;
-
-    return this.http.get<OptimalWindowsDto>(url, this.httpOptions).pipe(
-      timeout(30000), // 30 second timeout for iOS
-      retry({
-        count: this.retryCount,
-        delay: (_error, retryIndex) => {
-          const delayMs = Math.min(1000 * Math.pow(2, retryIndex), 10000);
-          return timer(delayMs);
-        }
-      }),
-      catchError((error: HttpErrorResponse) => {
-        console.error('[ChargeEvService] Error:', error.status, error.statusText);
-
-        let userMessage = 'Ennusteen lataaminen epäonnistui';
-
-        if (error.status === 0) {
-          userMessage = 'Verkkoyhteysvirhe - tarkista internetyhteys';
-        } else if (error.status >= 400 && error.status < 500) {
-          userMessage = `Palvelinvirhe (${error.status}) - yritä myöhemmin uudelleen`;
-        } else if (error.status >= 500) {
-          userMessage = 'Palvelinvirhe - yritä myöhemmin uudelleen';
-        }
-
-        return throwError(() => ({ userMessage }));
-      })
-    );
+    return this.prices
+      .getPlans({ durationHours: CHARGE_HOURS, energyKwh: CHARGE_KWH, limit: 3 })
+      .pipe(
+        map(toChargeWindows),
+        catchError(apiError('ChargeEvService', 'Ennusteen lataaminen epäonnistui')),
+      );
   }
 }

@@ -41,8 +41,6 @@ const optimal = (start: string, end: string, priceAvg: number): OptimalTimeDto =
 
 const overview: OverviewDto = {
   current: { price: 4.82, priceCategory: 'NORMAL' },
-  next12Hours: { priceAvg: 5, priceCategory: 'NORMAL', pricePoints: [] },
-  future: { priceAvg: 5, priceCategory: 'NORMAL', pricePoints: [] },
   upcomingHours: hours,
 };
 

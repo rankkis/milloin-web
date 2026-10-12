@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, timer } from 'rxjs';
-import { catchError, map, retry, timeout } from 'rxjs/operators';
-import { API_RETRY_COUNT } from '../shared/services/api-retry';
-import { environment } from '../../environments/environment';
+import { Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { V1PricesDto } from '../shared/models/api-v1.model';
+import { windowAt } from '../shared/models/price-windows';
 import { OptimalWindowsDto, StartDelayDto } from '../shared/models/price.model';
+import { PricesService, apiError } from '../shared/services/prices.service';
 
 export type { StartDelayDto };
 
@@ -17,7 +17,7 @@ export interface LaundrySchedule {
   energyKwh: number;
 }
 
-/** The preset's start offsets as timer delays; the cheapest (earliest on a tie) is isBest */
+/** The start offsets as timer delays; the cheapest (earliest on a tie) is isBest */
 export function toLaundrySchedule(response: OptimalWindowsDto): LaundrySchedule {
   const startDelays: StartDelayDto[] = (response.startOffsets ?? []).map((window) => ({
     delayHours: window.offsetHours,
@@ -36,51 +36,38 @@ export function toLaundrySchedule(response: OptimalWindowsDto): LaundrySchedule 
   return { startDelays, durationHours: response.durationHours, energyKwh: response.energyKwh ?? 0 };
 }
 
+/** A washing machine program */
+export const LAUNDRY_HOURS = 2;
+export const LAUNDRY_KWH = 1.5;
+/** Start now or with a timer delay of 1 to 5 hours */
+const TIMER_DELAYS_HOURS = [0, 1, 2, 3, 4, 5];
+
+/** The program started now and after each timer delay, from the current quarter hour */
+export function laundryWindows(response: V1PricesDto): OptimalWindowsDto {
+  const from = Date.parse(response.current.startTime);
+  return {
+    durationHours: LAUNDRY_HOURS,
+    energyKwh: LAUNDRY_KWH,
+    earliestStart: response.current.startTime,
+    latestEnd: response.meta.pricesUntil,
+    windows: [],
+    startOffsets: TIMER_DELAYS_HOURS.flatMap((delay) => {
+      const window = windowAt(response.prices, from, delay, LAUNDRY_HOURS, LAUNDRY_KWH);
+      return window ? [window] : [];
+    }),
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class WashLaundryService {
-  private readonly http = inject(HttpClient);
-  private readonly retryCount = inject(API_RETRY_COUNT);
-  private readonly apiUrl = `${environment.apiUrl}/optimal-window/presets/wash-laundry`;
-
-  // Only CORS-safelisted headers, so the browser skips the preflight request
-
-  private readonly httpOptions = {
-    headers: new HttpHeaders({
-      'Accept': 'application/json'
-    })
-  };
+  private readonly prices = inject(PricesService);
 
   getOptimalSchedule(): Observable<LaundrySchedule> {
-    const url = this.apiUrl;
-
-
-    return this.http.get<OptimalWindowsDto>(url, this.httpOptions).pipe(
-      map(toLaundrySchedule),
-      timeout(30000), // 30 second timeout for iOS
-      retry({
-        count: this.retryCount,
-        delay: (_error, retryIndex) => {
-          const delayMs = Math.min(1000 * Math.pow(2, retryIndex), 10000);
-          return timer(delayMs);
-        }
-      }),
-      catchError((error: HttpErrorResponse) => {
-        console.error('[WashLaundryService] Error:', error.status, error.statusText);
-
-        let userMessage = 'Aikataulun lataaminen epäonnistui';
-
-        if (error.status === 0) {
-          userMessage = 'Verkkoyhteysvirhe - tarkista internetyhteys';
-        } else if (error.status >= 400 && error.status < 500) {
-          userMessage = `Palvelinvirhe (${error.status}) - yritä myöhemmin uudelleen`;
-        } else if (error.status >= 500) {
-          userMessage = 'Palvelinvirhe - yritä myöhemmin uudelleen';
-        }
-
-        return throwError(() => ({ userMessage }));
-      })
+    return this.prices.getPrices().pipe(
+      map((response) => toLaundrySchedule(laundryWindows(response))),
+      catchError(apiError('WashLaundryService', 'Aikataulun lataaminen epäonnistui')),
     );
   }
 }
