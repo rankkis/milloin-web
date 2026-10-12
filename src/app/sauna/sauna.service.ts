@@ -1,57 +1,52 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, timer } from 'rxjs';
-import { catchError, retry, timeout } from 'rxjs/operators';
-import { API_RETRY_COUNT } from '../shared/services/api-retry';
-import { environment } from '../../environments/environment';
-import { OptimalWindowsDto } from '../shared/models/price.model';
+import { Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { V1PricesDto } from '../shared/models/api-v1.model';
+import { windowAt } from '../shared/models/price-windows';
+import { OptimalWindowsDto, StartOffsetWindowDto } from '../shared/models/price.model';
+import { PricesService, apiError } from '../shared/services/prices.service';
 
 export type { OptimalWindowsDto };
+
+/** Heating an electric sauna: about an hour to warm up and two hours of bathing */
+export const SAUNA_HOURS = 3;
+export const SAUNA_KWH = 8;
+
+const HOUR_MS = 60 * 60 * 1000;
+
+/**
+ * A session starting at every full hour from the next one on, as far as
+ * the published prices reach.
+ */
+export function saunaWindows(response: V1PricesDto): OptimalWindowsDto {
+  const from = Date.parse(response.current.startTime);
+  const lastStart = Date.parse(response.meta.pricesUntil) - SAUNA_HOURS * HOUR_MS;
+  const startOffsets: StartOffsetWindowDto[] = [];
+  for (let start = Math.ceil((from + 1) / HOUR_MS) * HOUR_MS; start <= lastStart; start += HOUR_MS) {
+    const window = windowAt(response.prices, from, (start - from) / HOUR_MS, SAUNA_HOURS, SAUNA_KWH);
+    if (window) startOffsets.push(window);
+  }
+  return {
+    durationHours: SAUNA_HOURS,
+    energyKwh: SAUNA_KWH,
+    earliestStart: response.current.startTime,
+    latestEnd: response.meta.pricesUntil,
+    windows: [],
+    startOffsets,
+  };
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class SaunaService {
-  private readonly http = inject(HttpClient);
-  private readonly retryCount = inject(API_RETRY_COUNT);
-  private readonly apiUrl = `${environment.apiUrl}/optimal-window/presets/sauna`;
-
-  // Only CORS-safelisted headers, so the browser skips the preflight request
-
-  private readonly httpOptions = {
-    headers: new HttpHeaders({
-      'Accept': 'application/json'
-    })
-  };
+  private readonly prices = inject(PricesService);
 
   /** 3-hour sauna sessions starting at every full hour, as far as the prices reach */
   getStarts(): Observable<OptimalWindowsDto> {
-    const url = this.apiUrl;
-
-    return this.http.get<OptimalWindowsDto>(url, this.httpOptions).pipe(
-      timeout(30000), // 30 second timeout for iOS
-      retry({
-        count: this.retryCount,
-        delay: (_error, retryIndex) => {
-          const delayMs = Math.min(1000 * Math.pow(2, retryIndex), 10000);
-          return timer(delayMs);
-        }
-      }),
-      catchError((error: HttpErrorResponse) => {
-        console.error('[SaunaService] Error:', error.status, error.statusText);
-
-        let userMessage = 'Ennusteen lataaminen epäonnistui';
-
-        if (error.status === 0) {
-          userMessage = 'Verkkoyhteysvirhe - tarkista internetyhteys';
-        } else if (error.status >= 400 && error.status < 500) {
-          userMessage = `Palvelinvirhe (${error.status}) - yritä myöhemmin uudelleen`;
-        } else if (error.status >= 500) {
-          userMessage = 'Palvelinvirhe - yritä myöhemmin uudelleen';
-        }
-
-        return throwError(() => ({ userMessage }));
-      })
+    return this.prices.getPrices().pipe(
+      map(saunaWindows),
+      catchError(apiError('SaunaService', 'Ennusteen lataaminen epäonnistui')),
     );
   }
 }
