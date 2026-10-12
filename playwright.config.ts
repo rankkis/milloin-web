@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { defineBddConfig } from 'playwright-bdd';
 
 /**
  * End-to-end tests against a running site: a Vercel deployment in CI
@@ -7,8 +8,16 @@ import { defineConfig, devices } from '@playwright/test';
  */
 const bypassSecret = process.env['VERCEL_AUTOMATION_BYPASS_SECRET'];
 
+/** Gherkin scenarios (e2e/features) with their steps (e2e/steps), generated into Playwright tests by bddgen */
+const featuresDir = defineBddConfig({
+  features: 'e2e/features/**/*.feature',
+  steps: 'e2e/steps/**/*.ts',
+  outputDir: '.features-gen',
+});
+
 export default defineConfig({
   testDir: 'e2e',
+  testIgnore: ['steps/**'],
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : 'list',
@@ -27,5 +36,7 @@ export default defineConfig({
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
     { name: 'phone', use: { ...devices['Pixel 7'] } },
+    { name: 'desktop-features', testDir: featuresDir, use: { ...devices['Desktop Chrome'] } },
+    { name: 'phone-features', testDir: featuresDir, use: { ...devices['Pixel 7'] } },
   ],
 });

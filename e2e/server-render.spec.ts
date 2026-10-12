@@ -16,11 +16,6 @@ const PAGES = [
   { path: '/elake-maksetaan', h1: 'Milloin eläke maksetaan?', prices: false },
   { path: '/mitakin-tapahtuu', h1: 'Sekalaista', prices: false },
   { path: '/ence-pelaa', h1: 'Milloin Ence pelaa?', prices: false },
-  { path: '/docs', h1: 'milloin.xyz API', prices: false },
-  { path: '/docs/home-assistant', h1: 'Home Assistant', prices: false },
-  { path: '/docs/presets', h1: 'Presets', prices: false },
-  { path: '/docs/custom-plans', h1: 'Custom plans', prices: false },
-  { path: '/docs/reference', h1: 'API reference', prices: false },
 ];
 
 const h1Of = (html: string): string | undefined =>

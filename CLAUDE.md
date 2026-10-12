@@ -55,6 +55,8 @@ npm run e2e          # Playwright end-to-end tests against BASE_URL (default htt
 
 End-to-end tests (`e2e/`, `playwright.config.ts`) test a running site: the server-rendered HTML of every page (`server-render.spec.ts`) and browsing in desktop and phone Chrome (`browse.spec.ts`). They find elements by `data-test-id` and start visits with analytics declined. Prices change, so tests check structure, not values.
 
+Every new feature or behavior change gets end-to-end tests, so later changes don't break it. Write them as Gherkin scenarios: a `.feature` file per feature in `e2e/features/` (plain English, one `Scenario` per behavior, `Scenario Outline` for the same steps over several pages) with its steps in `e2e/steps/` (playwright-bdd; `npm run e2e` runs `bddgen` first, which generates the tests into `.features-gen/`). Reuse existing steps before adding new ones. `e2e/steps/fixtures.ts` starts every scenario with analytics declined and fails it on any uncaught page error; tag a scenario `@vercel` when it needs Vercel's redirects or rewrites, and it skips on a local server. The earlier `*.spec.ts` tests stay until they are rewritten as scenarios.
+
 ### Code Quality
 ```bash
 npm run lint        # Run ESLint (same as ng lint)

@@ -55,43 +55,6 @@ for (const question of QUESTIONS) {
   });
 }
 
-test('the developer docs open from the home footer', async ({ page }) => {
-  const errors = watchErrors(page);
-  await declineAnalytics(page);
-  await page.goto('/');
-  await page.getByTestId('home-api').click();
-  await expect(page).toHaveURL(/\/docs$/);
-  await expect(page.locator('h1')).toHaveText('milloin.xyz API');
-
-  await page.getByTestId('docs-nav-home-assistant').click();
-  await expect(page.locator('h1')).toHaveText('Home Assistant');
-  await expect(page.locator('app-code-block').first()).toContainText('value_json.current.price');
-  expect(errors).toEqual([]);
-});
-
-test('the API reference draws the OpenAPI document', async ({ page }) => {
-  const problems: string[] = [];
-  page.on('console', (message) => message.type() === 'error' && problems.push(message.text()));
-  page.on('requestfailed', (request) => problems.push(`${request.url()}: ${request.failure()?.errorText}`));
-  await declineAnalytics(page);
-  await page.goto('/docs/reference');
-  await expect(page.locator('h1')).toHaveText('API reference');
-  // Scalar loads from its CDN and draws the operations from the document
-  await expect(page.locator('.reference').getByText('/v1/prices/current').first())
-    .toBeVisible({ timeout: 20_000 })
-    .catch((error: Error) => {
-      // Name what failed in the browser, such as the CDN or the OpenAPI document
-      throw new Error(`${error.message}\n${problems.join('\n')}`);
-    });
-});
-
-test('milloin.xyz/api opens the docs', async ({ request, baseURL }) => {
-  test.skip(baseURL?.includes('localhost') ?? true, 'needs a Vercel deployment');
-  const response = await request.get('/api', { maxRedirects: 0 });
-  expect([302, 307]).toContain(response.status());
-  expect(response.headers()['location']).toMatch(/\/docs$/);
-});
-
 test('the public API answers through milloin.xyz/api', async ({ request, baseURL }) => {
   // The /api rewrites are Vercel's, so a local server render has none
   test.skip(baseURL?.includes('localhost') ?? true, 'needs a Vercel deployment');

@@ -14,7 +14,7 @@
     "domain-deploy": "npx angular-cli-ghpages --dir=dist/milloin-web-app/browser --cname=milloin.xyz",
     "lint": "ng lint",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI",
-    "e2e": "playwright test",
+    "e2e": "bddgen && playwright test",
     "serve:ssr:milloin-web-app": "node dist/milloin-web-app/server/server.mjs"
   },
   "private": true,
@@ -54,6 +54,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "playwright-bdd": "9.2.1",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.33.1"
   }
