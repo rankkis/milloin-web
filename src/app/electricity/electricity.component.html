@@ -7,7 +7,7 @@
       </a>
       <p class="clock">{{ date() }}</p>
     </header>
-    <h1 class="title">Sähkö</h1>
+    <h1 class="title">Sähkön hinta nyt</h1>
   </div>
 
   <div class="price-and-chart">
@@ -82,6 +82,28 @@
       <ng-container *ngTemplateOutlet="answer; context: { $implicit: evAnswer(), loading: ev.isLoading() }" />
     </a>
   </nav>
+
+  @if (upcoming().length > 0) {
+    <app-hourly-prices class="hourly-prices" aria-labelledby="hourly-prices-title" role="region" [hours]="upcoming()" [now]="now()" />
+  }
+
+  <section class="explainer" aria-labelledby="explainer-title">
+    <h2 id="explainer-title" class="explainer__title">Mikä on pörssisähkö?</h2>
+    <p>
+      Pörssisähkön hinta vaihtelee tunneittain ja jopa varteittain sen mukaan, mitä sähkö maksaa pohjoismaisessa
+      sähköpörssissä (Nord Pool). Seuraavan päivän hinnat ratkeavat päivää aiemmin, ja ne julkaistaan yleensä noin
+      kello 14 Suomen aikaa.
+    </p>
+    <p>
+      Sähkölaskuun tulee pörssihinnan lisäksi myyjän marginaali, siirtomaksu ja sähkövero. Ne ovat yleensä samat joka
+      tunnille, joten pörssihinnaltaan halvin tunti on halvin myös kokonaishinnalla. Siksi pesukoneen, sähköauton
+      latauksen ja saunan ajoittaminen halpoihin tunteihin säästää rahaa.
+    </p>
+    <p>
+      Hintatasot: erittäin halpa alle 2,5 c/kWh, halpa 2,5–5, normaali 5–10, kallis 10–20 ja erittäin kallis yli
+      20 c/kWh. Hinnat tulevat ENTSO-E:n avoimesta datasta.
+    </p>
+  </section>
 
   <footer class="footer">
     © 2025 hurlumhei oy ·
