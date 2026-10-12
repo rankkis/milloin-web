@@ -18,6 +18,16 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Check that the tests can reach the deployment
+        env:
+          BASE_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" "$BASE_URL/")
+          if [ "$status" = 401 ] || [ "$status" = 403 ]; then
+            echo "::error::Vercel Deployment Protection blocks the tests ($status). Add the VERCEL_AUTOMATION_BYPASS_SECRET repository secret from Vercel: Settings, Deployment Protection, Protection Bypass for Automation."
+            exit 1
+          fi
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e
