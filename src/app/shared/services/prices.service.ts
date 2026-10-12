@@ -43,15 +43,15 @@ export class PricesService {
 
   /** 15-minute prices from midnight today (Finnish time) to the last published price */
   getPrices(): Observable<V1PricesDto> {
-    return this.get<V1PricesDto>(`${environment.apiUrl}/v1/prices`);
+    return this.get<V1PricesDto>(`${environment.apiUrl}/v1/electricity/prices`);
   }
 
-  /** GET /v1/plans with the given query */
+  /** GET /v1/electricity/plans with the given query */
   getPlans(query: Record<string, string | number>): Observable<V1PlansDto> {
     const params = new URLSearchParams(
       Object.entries(query).map(([key, value]) => [key, String(value)]),
     );
-    return this.get<V1PlansDto>(`${environment.apiUrl}/v1/plans?${params}`);
+    return this.get<V1PlansDto>(`${environment.apiUrl}/v1/electricity/plans?${params}`);
   }
 
   private get<T>(url: string): Observable<T> {

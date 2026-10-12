@@ -19,7 +19,7 @@ const stream = (name: string, language: string, official = false) => ({
 const ence: EnceDto = {
   updatedAt: '2026-10-09T10:12:00.000Z',
   source: 'PandaScore',
-  team: { name: 'ENCE', logo: 'ence/logos/0123456789abcdef' },
+  team: { name: 'ENCE', logo: 'v1/misc/ence/logos/0123456789abcdef' },
   nextMatch: {
     startTime: '2026-10-10T15:30:00.000Z',
     live: false,
@@ -99,7 +99,7 @@ describe('EnceComponent', () => {
     render(of(ence));
 
     expect(texts('.team__name')).toEqual(['ENCE', 'Sashi']);
-    expect(element('img.team__logo')?.getAttribute('src')).toBe('https://api.test/ence/logos/0123456789abcdef');
+    expect(element('img.team__logo')?.getAttribute('src')).toBe('https://api.test/v1/misc/ence/logos/0123456789abcdef');
     expect(element('.team__logo--none')).not.toBeNull();
     expect(texts('.match__facts span')).toEqual(['CCT Europe Series 9', 'Bo3', 'la 10.10. 18:30']);
   });

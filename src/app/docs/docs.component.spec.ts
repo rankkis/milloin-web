@@ -23,6 +23,6 @@ describe('DocsComponent', () => {
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).toContain('value_template: "{{ value_json.current.price }}"');
-    expect(text).toContain('https://milloin.xyz/api/v1/plans?pausable=true');
+    expect(text).toContain('https://milloin.xyz/api/v1/electricity/plans?pausable=true');
   });
 });

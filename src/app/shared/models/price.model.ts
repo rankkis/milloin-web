@@ -14,7 +14,7 @@ export interface OptimalTimeDto {
   pricePoints: PricePointDto[];
 }
 
-/** A window from the API's optimal-window endpoints */
+/** A cheapest window, built from the API's /v1 prices or plans */
 export interface WindowDto extends OptimalTimeDto {
   /** Present when the request had energyKwh */
   costCents?: number;

@@ -1,7 +1,7 @@
-/** GET /ence of milloin-server. Times are UTC. */
+/** GET /v1/misc/ence of milloin-server. Times are UTC. */
 export interface EnceTeamDto {
   name: string;
-  /** Logo path relative to the API root, e.g. ence/logos/3f2a9c0d1b7e4a55 */
+  /** Logo path relative to the API root, e.g. v1/misc/ence/logos/3f2a9c0d1b7e4a55 */
   logo?: string;
 }
 

@@ -57,18 +57,23 @@ Content-Type: application/problem+json
     </p>
 
     <h2>Endpoints</h2>
+    <p>
+      Paths are grouped by category: <code>/v1/electricity</code> for prices and plans, <code>/v1/misc</code> for the
+      rest.
+    </p>
     <div class="table-wrap">
       <table>
         <thead>
           <tr><th>Endpoint</th><th>What it answers</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>GET /v1/prices</code></td><td>Prices from a time to a time (<code>from</code>, <code>to</code>, <code>resolution=15min|hour</code>), with the price now. Defaults to midnight today, Finnish time, to the last published price.</td></tr>
-          <tr><td><code>GET /v1/prices/current</code></td><td>Just the price now.</td></tr>
-          <tr><td><code>GET /v1/plans</code></td><td>When to run a load: continuous (a washing machine) or pausable (an EV charger), with <code>activeNow</code> and <code>nextChangeAt</code> for switching a device.</td></tr>
-          <tr><td><code>POST /v1/plans/search</code></td><td>The same, plus a power profile (<code>profileKwh</code>) and the cost of given start times (<code>startTimes</code>).</td></tr>
-          <tr><td><code>GET /v1/plans/presets</code></td><td>Ready-made loads; <code>/v1/plans/presets/&#123;name&#125;</code> plans one.</td></tr>
-          <tr><td><code>GET /v1/health</code></td><td>Whether the prices are fresh and when tomorrow's arrive.</td></tr>
+          <tr><td><code>GET /v1/electricity/prices</code></td><td>Prices from a time to a time (<code>from</code>, <code>to</code>, <code>resolution=15min|hour</code>), with the price now. Defaults to midnight today, Finnish time, to the last published price.</td></tr>
+          <tr><td><code>GET /v1/electricity/prices/current</code></td><td>Just the price now.</td></tr>
+          <tr><td><code>GET /v1/electricity/plans</code></td><td>When to run a load: continuous (a washing machine) or pausable (an EV charger), with <code>activeNow</code> and <code>nextChangeAt</code> for switching a device.</td></tr>
+          <tr><td><code>POST /v1/electricity/plans/search</code></td><td>The same, plus a power profile (<code>profileKwh</code>) and the cost of given start times (<code>startTimes</code>).</td></tr>
+          <tr><td><code>GET /v1/electricity/plans/presets</code></td><td>Ready-made loads; <code>/v1/electricity/plans/presets/&#123;name&#125;</code> plans one.</td></tr>
+          <tr><td><code>GET /v1/electricity/health</code></td><td>Whether the prices are fresh and when tomorrow's arrive.</td></tr>
+          <tr><td><code>GET /v1/misc/ence</code></td><td>The next Counter-Strike match of ENCE, the Finnish CS2 team, with streams, results and news. Refreshed hourly.</td></tr>
         </tbody>
       </table>
     </div>
@@ -86,7 +91,7 @@ Content-Type: application/problem+json
     <p>
       Tomorrow's prices are published once a day at about 14:00 Finnish time. Each response's <code>meta</code> tells
       <code>pricesUntil</code>, <code>tomorrowPublished</code> and <code>nextPricesExpectedAt</code>, so polling every
-      15 minutes, or once after <code>nextPricesExpectedAt</code>, is plenty. <code>GET /v1/health</code> answers
+      15 minutes, or once after <code>nextPricesExpectedAt</code>, is plenty. <code>GET /v1/electricity/health</code> answers
       <code>late</code> when tomorrow's prices are over an hour late.
     </p>
 
@@ -105,19 +110,12 @@ Content-Type: application/problem+json
     <h2>Errors</h2>
     <p>Every error is <code>application/problem+json</code>; a validation error lists the fields that failed.</p>
     <app-code-block [code]="errorResponse" />
-
-    <h2>Earlier routes</h2>
-    <p>
-      <code>/overview</code>, <code>/optimal-window</code> and <code>/optimal-schedule</code> are deprecated and stop
-      answering on 31 December 2026. They send <code>Deprecation</code> and <code>Sunset</code> headers and a
-      <code>Link</code> to the <code>/v1</code> route that replaces them.
-    </p>
   `,
   styleUrl: '../docs-page.scss',
 })
 export class DocsOverviewComponent {
   readonly base = API_BASE;
-  readonly currentRequest = `curl ${API_BASE}/v1/prices/current`;
+  readonly currentRequest = `curl ${API_BASE}/v1/electricity/prices/current`;
   readonly currentResponse = CURRENT_RESPONSE;
   readonly errorResponse = ERROR_RESPONSE;
 }

@@ -29,7 +29,8 @@ Feature: Developer docs
   Scenario: The API reference lists the endpoints
     Given I open "/docs/reference"
     Then the heading is "API reference"
-    And the API reference lists "/v1/prices/current"
+    And the API reference lists "/v1/electricity/prices/current"
+    And the API reference lists "/v1/misc/ence"
 
   @vercel
   Scenario: milloin.xyz/api opens the docs

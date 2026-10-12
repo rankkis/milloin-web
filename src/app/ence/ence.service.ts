@@ -22,7 +22,7 @@ export class EnceService {
 
   /** ENCE's next match, streams, results and news */
   getEnce(): Observable<EnceDto> {
-    return this.http.get<EnceDto>(`${environment.apiUrl}/ence`, this.httpOptions).pipe(
+    return this.http.get<EnceDto>(`${environment.apiUrl}/v1/misc/ence`, this.httpOptions).pipe(
       timeout(30000),
       retry({
         count: this.retryCount,
