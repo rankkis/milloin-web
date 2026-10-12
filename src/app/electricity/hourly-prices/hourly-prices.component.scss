@@ -1,0 +1,132 @@
+@use 'colors' as *;
+
+$wide: 768px;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.days {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.day__title {
+  font-size: var(--text-label-size);
+  font-weight: 600;
+  letter-spacing: var(--text-label-tracking);
+  text-transform: uppercase;
+}
+
+.day__date {
+  font-weight: 400;
+  text-transform: none;
+  color: color(text-muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th,
+  td {
+    padding: 7px 0;
+    text-align: left;
+    font-weight: 400;
+    border-top: 1px solid color(border);
+  }
+
+  thead th {
+    padding-top: 0;
+    border-top: none;
+    font-size: 12px;
+    letter-spacing: var(--text-label-tracking);
+    text-transform: uppercase;
+    color: color(text-muted);
+  }
+
+  tbody tr:last-child > * {
+    border-bottom: 1px solid color(border);
+  }
+}
+
+.table__hours {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.table .table__price {
+  padding: 7px var(--space-6) 7px var(--space-4);
+  text-align: right;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.table__category {
+  color: color(text-muted);
+  white-space: nowrap;
+}
+
+.now {
+  color: color(accent);
+
+  .table__category {
+    color: inherit;
+  }
+}
+
+.now__tag {
+  font-size: 12px;
+}
+
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: var(--space-2);
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+@each $tone in (very-cheap, cheap, normal, expensive, very-expensive) {
+  .dot--#{$tone} {
+    background: color(price-#{$tone});
+  }
+}
+
+.note {
+  font-size: 13px;
+  color: color(text-muted);
+}
+
+@media (min-width: $wide) {
+  .title {
+    font-size: 20px;
+  }
+
+  .days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+    align-items: start;
+  }
+}

@@ -9,11 +9,15 @@ import { resourceErrorMessage } from '../shared/resource-error';
 import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { ElectricityAnswers } from './electricity-answers';
 import { ConsentSettingsLinkComponent } from '../shared/consent/consent-settings-link.component';
+import { HourlyPricesComponent } from './hourly-prices/hourly-prices.component';
 
-/** The Sähkö category page: price now, hourly prices, trend tiles and the electricity questions */
+/**
+ * The Sähkö category page: price now, hourly prices, trend tiles, the electricity
+ * questions, the hourly prices as tables and a short explainer of spot prices
+ */
 @Component({
   selector: 'app-electricity',
-  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, SpinnerComponent, TrendTilesComponent, ConsentSettingsLinkComponent],
+  imports: [NgTemplateOutlet, RouterLink, HourlyChartComponent, IconComponent, SpinnerComponent, TrendTilesComponent, ConsentSettingsLinkComponent, HourlyPricesComponent],
   providers: [ElectricityAnswers],
   templateUrl: './electricity.component.html',
   styleUrl: './electricity.component.scss',

@@ -132,10 +132,32 @@ describe('ElectricityComponent', () => {
     render();
 
     expect(text('.clock')).toBe('ke 7.10. · 13:42');
-    expect(text('h1')).toBe('Sähkö');
+    expect(text('h1')).toBe('Sähkön hinta nyt');
     expect(text('.now__value')).toBe('4,82');
     expect(text('.pill')).toBe('Normaali');
     expect(boxClasses()).toContain('now__box--normal');
+  });
+
+  it('lists the hourly prices of today and tomorrow as tables', () => {
+    render();
+
+    expect(texts('app-hourly-prices h3').map((title) => title.replace(/\s+/g, ' '))).toEqual([
+      'Tänään ke 7.10.',
+      'Huomenna to 8.10.',
+    ]);
+    const today = texts('app-hourly-prices .day:first-child tbody th');
+    expect(today.length).toBe(11);
+    expect(today[0].replace(/\s+/g, ' ')).toBe('13:00–14:00 nyt');
+    expect(today[10]).toBe('23:00–00:00');
+    expect(texts('app-hourly-prices .day:last-child tbody tr').length).toBe(24);
+    expect(texts('app-hourly-prices .day:first-child tbody .table__price').slice(0, 1)).toEqual(['6,00']);
+    expect(texts('app-hourly-prices .now')).toHaveSize(1);
+  });
+
+  it('explains spot prices', () => {
+    render();
+
+    expect(text('.explainer h2')).toBe('Mikä on pörssisähkö?');
   });
 
   it('colors the price box by the price category', () => {
