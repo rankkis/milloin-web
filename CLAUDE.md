@@ -50,7 +50,10 @@ npm run watch       # Build and watch for changes
 npm test            # Run unit tests (same as ng test)
 ng test             # Run unit tests with Karma
 npm run test:ci      # Run tests once in headless Chrome (also works as root in containers)
+npm run e2e          # Playwright end-to-end tests against BASE_URL (default http://localhost:4000, the local server render)
 ```
+
+End-to-end tests (`e2e/`, `playwright.config.ts`) test a running site: the server-rendered HTML of every page (`server-render.spec.ts`) and browsing in desktop and phone Chrome (`browse.spec.ts`). They find elements by `data-test-id` and start visits with analytics declined. Prices change, so tests check structure, not values.
 
 ### Code Quality
 ```bash
@@ -59,6 +62,7 @@ npm run lint        # Run ESLint (same as ng lint)
 
 ### CI
 `.github/workflows/ci.yml` runs lint, tests and build on every pull request.
+`.github/workflows/e2e.yml` runs the end-to-end tests against every Vercel deployment (pull request previews and production) when Vercel reports it ready (`deployment_status`). If Vercel Deployment Protection is on, it needs the `VERCEL_AUTOMATION_BYPASS_SECRET` repository secret (Vercel: Settings → Deployment Protection → Protection Bypass for Automation).
 
 ### Server-side rendering
 Every page is rendered on the server (Angular SSR, `outputMode: server`) so search engines and the first paint get the prices and answers in the HTML.
