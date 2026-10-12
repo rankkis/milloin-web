@@ -14,6 +14,7 @@
     "domain-deploy": "npx angular-cli-ghpages --dir=dist/milloin-web-app/browser --cname=milloin.xyz",
     "lint": "ng lint",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadlessCI",
+    "e2e": "playwright test",
     "serve:ssr:milloin-web-app": "node dist/milloin-web-app/server/server.mjs"
   },
   "private": true,
@@ -38,6 +39,7 @@
     "@angular-devkit/build-angular": "^22.2.2",
     "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.2.1",
+    "@playwright/test": "^1.56.1",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^22.12.0",
