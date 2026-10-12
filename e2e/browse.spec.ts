@@ -1,4 +1,4 @@
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from './support/test';
 
 /** Fails the test on any uncaught error in the page */
 const watchErrors = (page: Page): Error[] => {

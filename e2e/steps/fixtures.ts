@@ -1,5 +1,8 @@
-import { APIResponse, expect } from '@playwright/test';
-import { test as base } from 'playwright-bdd';
+import { APIResponse, mergeTests } from '@playwright/test';
+import { test as bddTest } from 'playwright-bdd';
+import { expect, test as siteTest } from '../support/test';
+
+const base = mergeTests(bddTest, siteTest);
 
 /** State a scenario's steps share */
 interface ScenarioContext {

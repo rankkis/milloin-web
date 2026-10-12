@@ -6,7 +6,6 @@ import { defineBddConfig } from 'playwright-bdd';
  * (BASE_URL from the deployment_status event), or the local server render
  * (`npm run serve:ssr:milloin-web-app`) by default.
  */
-const bypassSecret = process.env['VERCEL_AUTOMATION_BYPASS_SECRET'];
 
 /** Gherkin scenarios (e2e/features) with their steps (e2e/steps), generated into Playwright tests by bddgen */
 const featuresDir = defineBddConfig({
@@ -17,7 +16,7 @@ const featuresDir = defineBddConfig({
 
 export default defineConfig({
   testDir: 'e2e',
-  testIgnore: ['steps/**'],
+  testIgnore: ['steps/**', 'support/**'],
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : 'list',
@@ -25,12 +24,6 @@ export default defineConfig({
     // The site's templates mark links and buttons with data-test-id
     testIdAttribute: 'data-test-id',
     baseURL: process.env['BASE_URL'] ?? 'http://localhost:4000',
-    // Lets the tests through Vercel Deployment Protection on previews. Sent on
-    // every request, so no bypass cookie is needed (asking for one answers
-    // with a 307 that hides the site's own redirects).
-    extraHTTPHeaders: bypassSecret
-      ? { 'x-vercel-protection-bypass': bypassSecret }
-      : {},
     trace: 'retain-on-failure',
   },
   projects: [
