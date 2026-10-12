@@ -180,12 +180,10 @@ src/
 
 ## SEO & Analytics
 
-### Google Analytics
-- **Tracking ID**: G-4J2DJ7V1SE
-- Loaded only after the visitor accepts the cookie banner (`shared/consent`): `ConsentService` adds the Google tag in the browser with Consent Mode v2 (analytics granted, ads always denied); nothing loads on the server or before a choice
-- The choice (Hyväksy / Hylkää, equal buttons) is kept in localStorage (`milloin-analytics-consent`); "Evästeasetukset" in the home and category page footers opens the banner again, and Hylkää after Hyväksy denies analytics storage and deletes the `_ga` cookies
-- The banner floats at the bottom of the screen, so it shifts no content
-- Tracks page views (including in-app navigation, through GA4 enhanced measurement)
+### Analytics
+- **Vercel Web Analytics** counts page views (`shared/analytics/analytics.ts`, `@vercel/analytics`, started after the first render). It is cookieless and stores nothing on the device, so it needs no consent. Nothing is counted in development or from automated browsers (`navigator.webdriver`, the e2e tests). The Hobby plan includes 50 000 events a month; collection pauses above that
+- Google Analytics was removed in October 2026; `ConsentService` deletes the `_ga` cookies it left
+- The cookie banner (`shared/consent`) is kept but turned off (`CONSENT_BANNER_ENABLED = false`): no banner, and no "Evästeasetukset" in the footers. Turn it on, with its text and `accept()` updated, when ads are added (AdSense in the EEA needs a Google-certified consent platform). The choice is kept in localStorage (`milloin-analytics-consent`)
 
 ### SEO Meta Tags
 Each route in `app.routes.ts` has its own `title` and `data.description`; `SeoTitleStrategy` (`shared/seo`) sets the title, description, canonical URL and `og:`/`twitter:` title, description and URL on every navigation. The tags in `src/index.html` are the home page's and the defaults:

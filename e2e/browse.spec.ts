@@ -8,8 +8,8 @@ const watchErrors = (page: Page): Error[] => {
 };
 
 /**
- * Starts the visit with analytics already declined, as a returning visitor:
- * the banner stays closed and no test visit reaches Google Analytics.
+ * Starts the visit with cookies already declined, as a returning visitor, so
+ * the consent banner stays closed if it is turned on again.
  */
 const declineAnalytics = (page: Page): Promise<void> =>
   page.addInitScript(() => localStorage.setItem('milloin-analytics-consent', 'denied'));
@@ -28,13 +28,11 @@ test('home lists the questions and links to the Sähkö page', async ({ page }) 
   expect(errors).toEqual([]);
 });
 
-test('the consent banner closes and stays closed', async ({ page }) => {
+test('shows no consent banner and loads no Google Analytics', async ({ page }) => {
   await page.goto('/');
-  await page.getByTestId('consent-reject').click();
-  await expect(page.getByTestId('consent-reject')).toBeHidden();
-  await page.reload();
   await expect(page.locator('h1')).toHaveText('Milloin…');
-  await expect(page.getByTestId('consent-reject')).toBeHidden();
+  await expect(page.getByTestId('consent-reject')).toHaveCount(0);
+  await expect(page.locator('script[src*="googletagmanager.com"]')).toHaveCount(0);
 });
 
 const QUESTIONS = [
