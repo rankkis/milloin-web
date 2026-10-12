@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './support/test';
 
 /**
  * The HTML the server sends, before any script runs: what search engines

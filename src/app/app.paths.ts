@@ -9,6 +9,8 @@ export const APP_NAVIGATION_PATHS = {
   PENSION: 'elake-maksetaan',
   MISC: 'mitakin-tapahtuu',
   ENCE: 'ence-pelaa',
+  /** Developer docs of the public API, in English */
+  DOCS: 'docs',
 };
 
 /** Earlier addresses of moved pages, redirected permanently to the new ones (also in vercel.json) */

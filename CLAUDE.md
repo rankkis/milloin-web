@@ -55,6 +55,8 @@ npm run e2e          # Playwright end-to-end tests against BASE_URL (default htt
 
 End-to-end tests (`e2e/`, `playwright.config.ts`) test a running site: the server-rendered HTML of every page (`server-render.spec.ts`) and browsing in desktop and phone Chrome (`browse.spec.ts`). They find elements by `data-test-id` and start visits with analytics declined. Prices change, so tests check structure, not values.
 
+Every new feature or behavior change gets end-to-end tests, so later changes don't break it. Write them as Gherkin scenarios: a `.feature` file per feature in `e2e/features/` (plain English, one `Scenario` per behavior, `Scenario Outline` for the same steps over several pages) with its steps in `e2e/steps/` (playwright-bdd; `npm run e2e` runs `bddgen` first, which generates the tests into `.features-gen/`). Reuse existing steps before adding new ones. `e2e/steps/fixtures.ts` starts every scenario with analytics declined and fails it on any uncaught page error; tag a scenario `@vercel` when it needs Vercel's redirects or rewrites, and it skips on a local server. The earlier `*.spec.ts` tests stay until they are rewritten as scenarios.
+
 ### Code Quality
 ```bash
 npm run lint        # Run ESLint (same as ng lint)
@@ -125,6 +127,8 @@ src/
 │   │                             # (banking-days.ts: Finnish banking days; payment-days.ts: published payment rules and dates)
 │   ├── misc/                     # Sekalaista category page (/mitakin-tapahtuu)
 │   ├── ence/                     # Milloin Ence pelaa? (/ence-pelaa); ence-answer.ts: answers shared with home and Sekalaista
+│   ├── docs/                     # Developer docs of the public API (/docs, in English): overview, Home Assistant,
+│   │                             # presets, custom plans, API reference (Scalar); code samples are text (code-block.component)
 │   ├── not-found/                # Page for unknown addresses (noindex)
 │   ├── shared/
 │   │   ├── answer-header/        # Back link, current price and refresh on question pages
@@ -243,4 +247,4 @@ Rich snippets and search result enhancements via Schema.org structured data:
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests
 - Use inject from angular/core for dependency injection instead of legacy constructor way
 - Backend api documentation is located here https://milloin-server.vercel.app/api-json
-- **Public API**: `vercel.json` proxies `/api` to the backend's Swagger UI (https://milloin.xyz/api), `/api/openapi.json` to its OpenAPI document and `/api/<endpoint>` to its endpoints, so other developers can use `https://milloin.xyz/api/...`. These rewrites must stay above the `/(.*)` catch-all that sends pages to the SSR function (`/api/ssr` itself is a function, which Vercel serves before any rewrite). The home footer links to it.
+- **Public API**: developer docs at https://milloin.xyz/docs (`src/app/docs`, English; `lang="en"` on the page). `/docs/reference` draws the server's OpenAPI document (`/api-json` at `environment.apiUrl`) with Scalar, loaded in the browser from jsDelivr pinned to a version and its SRI hash (`reference.component.ts`; to upgrade, change both). `vercel.json` redirects `/api` to `/docs` and proxies `/api/openapi.json` to the backend's OpenAPI document and `/api/<endpoint>` to its endpoints, so other developers call `https://milloin.xyz/api/v1/...`. These rewrites must stay above the `/(.*)` catch-all that sends pages to the SSR function (`/api/ssr` itself is a function, which Vercel serves before any rewrite). The home and category page footers link to /docs. When the API changes, update the guides' examples too.
