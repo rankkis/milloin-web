@@ -1,0 +1,73 @@
+// Prose of the developer docs pages: headings, text, lists, tables and code
+
+@use 'colors' as *;
+
+:host {
+  display: block;
+  line-height: 1.6;
+}
+
+h1 {
+  margin: 0 0 var(--space-3);
+  font-size: 28px;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: var(--space-8) 0 var(--space-2);
+  font-size: 20px;
+}
+
+h3 {
+  margin: var(--space-6) 0 var(--space-2);
+  font-size: 16px;
+}
+
+p,
+ul,
+ol {
+  margin: 0 0 var(--space-3);
+  max-width: 70ch;
+}
+
+li + li {
+  margin-top: var(--space-1);
+}
+
+a {
+  color: color(accent);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+.lead {
+  font-size: 17px;
+  color: color(text-muted);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: var(--space-3);
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid color(border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: 500;
+  color: color(text-muted);
+}

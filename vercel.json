@@ -8,7 +8,8 @@
     "api/ssr.mjs": { "includeFiles": "dist/milloin-web-app/**" }
   },
   "redirects": [
-    { "source": "/api/", "destination": "/api", "permanent": true },
+    { "source": "/api", "destination": "/docs", "permanent": false },
+    { "source": "/api/", "destination": "/docs", "permanent": false },
     { "source": "/kannattaa-pesta-pyykkia", "destination": "/pestaan-pyykit", "permanent": true },
     { "source": "/kannattaa-ladata-auto", "destination": "/ladataan-auto", "permanent": true },
     {
@@ -20,10 +21,7 @@
   ],
   "rewrites": [
     { "source": "/", "destination": "/api/ssr" },
-    { "source": "/api", "destination": "https://milloin-server.vercel.app/api" },
     { "source": "/api/openapi.json", "destination": "https://milloin-server.vercel.app/api-json" },
-    { "source": "/api/:asset(swagger-ui.*)", "destination": "https://milloin-server.vercel.app/api/:asset" },
-    { "source": "/api/api/:asset(swagger-ui.*)", "destination": "https://milloin-server.vercel.app/api/api/:asset" },
     { "source": "/api/:path*", "destination": "https://milloin-server.vercel.app/:path*" },
     { "source": "/(.*)", "destination": "/api/ssr" }
   ],

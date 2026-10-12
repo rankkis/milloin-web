@@ -125,6 +125,8 @@ src/
 │   │                             # (banking-days.ts: Finnish banking days; payment-days.ts: published payment rules and dates)
 │   ├── misc/                     # Sekalaista category page (/mitakin-tapahtuu)
 │   ├── ence/                     # Milloin Ence pelaa? (/ence-pelaa); ence-answer.ts: answers shared with home and Sekalaista
+│   ├── docs/                     # Developer docs of the public API (/docs, in English): overview, Home Assistant,
+│   │                             # presets, custom plans, API reference (Scalar); code samples are text (code-block.component)
 │   ├── not-found/                # Page for unknown addresses (noindex)
 │   ├── shared/
 │   │   ├── answer-header/        # Back link, current price and refresh on question pages
@@ -245,4 +247,4 @@ Rich snippets and search result enhancements via Schema.org structured data:
 - Every "a" and "buttton" elements should have a data-test-id attribute in order to help e2e tests
 - Use inject from angular/core for dependency injection instead of legacy constructor way
 - Backend api documentation is located here https://milloin-server.vercel.app/api-json
-- **Public API**: `vercel.json` proxies `/api` to the backend's Swagger UI (https://milloin.xyz/api), `/api/openapi.json` to its OpenAPI document and `/api/<endpoint>` to its endpoints, so other developers can use `https://milloin.xyz/api/...`. These rewrites must stay above the `/(.*)` catch-all that sends pages to the SSR function (`/api/ssr` itself is a function, which Vercel serves before any rewrite). The home footer links to it.
+- **Public API**: developer docs at https://milloin.xyz/docs (`src/app/docs`, English; `lang="en"` on the page). `/docs/reference` draws the server's OpenAPI document (`/api-json` at `environment.apiUrl`) with Scalar, loaded in the browser from jsDelivr pinned to a version and its SRI hash (`reference.component.ts`; to upgrade, change both). `vercel.json` redirects `/api` to `/docs` and proxies `/api/openapi.json` to the backend's OpenAPI document and `/api/<endpoint>` to its endpoints, so other developers call `https://milloin.xyz/api/v1/...`. These rewrites must stay above the `/(.*)` catch-all that sends pages to the SSR function (`/api/ssr` itself is a function, which Vercel serves before any rewrite). The home and category page footers link to /docs. When the API changes, update the guides' examples too.

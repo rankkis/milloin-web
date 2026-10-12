@@ -1,0 +1,110 @@
+@use 'colors' as *;
+
+$wide: 768px;
+
+:host {
+  display: block;
+}
+
+.docs {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) 18px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+
+  p {
+    margin: 0;
+  }
+}
+
+.label {
+  font-size: var(--text-label-size);
+  letter-spacing: var(--text-label-tracking);
+  text-transform: uppercase;
+  color: color(text-muted);
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  font-size: 15px;
+  color: color(text-muted);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: color(text);
+  }
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid color(border);
+}
+
+.nav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid color(border);
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  color: color(text-muted);
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    color: color(text);
+    border-color: color(border-strong);
+  }
+}
+
+.nav__link--active {
+  color: color(on-accent);
+  background: color(accent);
+  border-color: color(accent);
+
+  &:hover,
+  &:focus-visible {
+    color: color(on-accent);
+    border-color: color(accent);
+  }
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.footer {
+  font-size: 13px;
+  color: color(text-muted);
+}
+
+.footer__link {
+  color: inherit;
+}
+
+@media (min-width: $wide) {
+  .docs {
+    padding-top: var(--space-6);
+  }
+}
