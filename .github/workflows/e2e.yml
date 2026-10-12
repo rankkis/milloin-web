@@ -23,9 +23,10 @@ jobs:
           BASE_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
-          status=$(curl -s -o /dev/null -w '%{http_code}' -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" "$BASE_URL/")
-          if [ "$status" = 401 ] || [ "$status" = 403 ]; then
-            echo "::error::Vercel Deployment Protection blocks the tests ($status). Add the VERCEL_AUTOMATION_BYPASS_SECRET repository secret from Vercel: Settings, Deployment Protection, Protection Bypass for Automation."
+          # A protected deployment answers with Vercel's login page (401, or a redirect to it)
+          status=$(curl -s -o page.html -w '%{http_code}' -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" "$BASE_URL/")
+          if [ "$status" != 200 ] || grep -q 'Log in to Vercel' page.html; then
+            echo "::error::The deployment answered $status instead of the site, probably Vercel Deployment Protection. Add the VERCEL_AUTOMATION_BYPASS_SECRET repository secret from Vercel: Settings, Deployment Protection, Protection Bypass for Automation."
             exit 1
           fi
       - run: npm ci
