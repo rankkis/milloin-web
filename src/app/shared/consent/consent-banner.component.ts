@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ConsentService } from './consent.service';
 
-/** Asks for consent to Google Analytics; shown until the visitor chooses */
+/** Asks for consent to cookies; shown until the visitor chooses, while CONSENT_BANNER_ENABLED */
 @Component({
   selector: 'app-consent-banner',
   templateUrl: './consent-banner.component.html',
