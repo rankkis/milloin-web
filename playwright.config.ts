@@ -16,9 +16,11 @@ export default defineConfig({
     // The site's templates mark links and buttons with data-test-id
     testIdAttribute: 'data-test-id',
     baseURL: process.env['BASE_URL'] ?? 'http://localhost:4000',
-    // Lets the tests through Vercel Deployment Protection on previews
+    // Lets the tests through Vercel Deployment Protection on previews. Sent on
+    // every request, so no bypass cookie is needed (asking for one answers
+    // with a 307 that hides the site's own redirects).
     extraHTTPHeaders: bypassSecret
-      ? { 'x-vercel-protection-bypass': bypassSecret, 'x-vercel-set-bypass-cookie': 'true' }
+      ? { 'x-vercel-protection-bypass': bypassSecret }
       : {},
     trace: 'retain-on-failure',
   },
