@@ -18,7 +18,7 @@ const quarters = (cents: number[]): V1PriceDto[] =>
     dayCategory: 'NORMAL',
   }));
 
-/** A /v1/prices response with the current quarter at `currentQuarter` */
+/** A /v1/electricity/prices response with the current quarter at `currentQuarter` */
 const response = (cents: number[], currentQuarter = 0): V1PricesDto => {
   const prices = quarters(cents);
   return {
@@ -51,7 +51,7 @@ describe('price windows', () => {
     expect(windowAt(prices, START, 0.25, 1, 2)).toBeUndefined();
   });
 
-  it('turns /v1/prices into the overview', () => {
+  it('turns /v1/electricity/prices into the overview', () => {
     const overview = toOverview(response([1, 2, 3, 4, 8, 8, 8, 8], 1));
 
     expect(overview.current).toEqual({ price: 2, priceCategory: 'VERY_CHEAP' });
@@ -81,7 +81,7 @@ describe('price windows', () => {
     expect(windows.startOffsets?.[0].costCents).toBe(40);
   });
 
-  it('reads charging windows from /v1/plans', () => {
+  it('reads charging windows from /v1/electricity/plans', () => {
     const windows = toChargeWindows({
       request: {
         durationHours: 4,

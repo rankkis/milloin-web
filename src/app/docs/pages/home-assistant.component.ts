@@ -5,7 +5,7 @@ import { API_BASE } from './docs-samples';
 
 const PRICE_SENSOR = `# configuration.yaml
 rest:
-  - resource: ${API_BASE}/v1/prices?resolution=hour
+  - resource: ${API_BASE}/v1/electricity/prices?resolution=hour
     scan_interval: 900
     sensor:
       - name: Electricity price
@@ -20,7 +20,7 @@ rest:
         value_template: "{{ value_json.current.dayCategory }}"`;
 
 const PLAN_SENSOR = `# configuration.yaml, under the same rest: key
-  - resource: ${API_BASE}/v1/plans?pausable=true&durationHours=4&minBlockHours=1&earliestStart=today&latestEnd=tomorrow
+  - resource: ${API_BASE}/v1/electricity/plans?pausable=true&durationHours=4&minBlockHours=1&earliestStart=today&latestEnd=tomorrow
     scan_interval: 60
     binary_sensor:
       - name: Water heater cheap hours

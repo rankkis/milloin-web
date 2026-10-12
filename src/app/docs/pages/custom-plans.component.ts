@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CodeBlockComponent } from '../code-block.component';
 import { API_BASE } from './docs-samples';
 
-const SEARCH_REQUEST = `curl -X POST ${API_BASE}/v1/plans/search \\
+const SEARCH_REQUEST = `curl -X POST ${API_BASE}/v1/electricity/plans/search \\
   -H "Content-Type: application/json" \\
   -d '{
     "resolution": "hour",
@@ -27,7 +27,7 @@ const SEARCH_RESPONSE = `{
   ...
 }`;
 
-/** /docs/custom-plans: GET /v1/plans parameters and POST /v1/plans/search */
+/** /docs/custom-plans: GET /v1/electricity/plans parameters and POST /v1/electricity/plans/search */
 @Component({
   selector: 'app-docs-custom-plans',
   imports: [RouterLink, CodeBlockComponent],
@@ -39,7 +39,7 @@ const SEARCH_RESPONSE = `{
       parameters filled in.
     </p>
 
-    <h2>Parameters of GET /v1/plans</h2>
+    <h2>Parameters of GET /v1/electricity/plans</h2>
     <div class="table-wrap">
       <table>
         <thead>
@@ -82,7 +82,7 @@ const SEARCH_RESPONSE = `{
 
     <h2>A power profile and given start times</h2>
     <p>
-      <code>POST /v1/plans/search</code> takes the same fields as a JSON body, plus <code>profileKwh</code>, the energy
+      <code>POST /v1/electricity/plans/search</code> takes the same fields as a JSON body, plus <code>profileKwh</code>, the energy
       for each slot of the run for a load whose power changes, and <code>startTimes</code> to cost given starts, such as
       the delays a washing machine's timer offers. A sauna heater that draws 4 kWh in its first hour and 2 kWh in the
       next two, compared with warming it at 17 or 19:
@@ -94,8 +94,8 @@ const SEARCH_RESPONSE = `{
   styleUrl: '../docs-page.scss',
 })
 export class DocsCustomPlansComponent {
-  readonly dishwasher = `curl "${API_BASE}/v1/plans?durationHours=3&energyKwh=1.2&latestEnd=tomorrow"`;
-  readonly ev = `curl "${API_BASE}/v1/plans?pausable=true&energyKwh=50&maxPowerKw=11&minBlockHours=1&latestEnd=2026-10-13T07:00:00%2B03:00"`;
+  readonly dishwasher = `curl "${API_BASE}/v1/electricity/plans?durationHours=3&energyKwh=1.2&latestEnd=tomorrow"`;
+  readonly ev = `curl "${API_BASE}/v1/electricity/plans?pausable=true&energyKwh=50&maxPowerKw=11&minBlockHours=1&latestEnd=2026-10-13T07:00:00%2B03:00"`;
   readonly searchRequest = SEARCH_REQUEST;
   readonly searchResponse = SEARCH_RESPONSE;
 }

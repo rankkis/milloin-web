@@ -55,7 +55,7 @@ const LAUNDRY_RESPONSE = `{
     <p>
       A continuous load runs from start to end without a break, and the answer is up to three runs that do not overlap,
       cheapest first. A pausable load can stop and go on later, and the answer is the single cheapest plan, in one or more
-      blocks. <code>GET /v1/plans/presets</code> lists the presets with their parameters.
+      blocks. <code>GET /v1/electricity/plans/presets</code> lists the presets with their parameters.
     </p>
 
     <h2>Example: the washing machine</h2>
@@ -68,7 +68,7 @@ const LAUNDRY_RESPONSE = `{
     </ul>
 
     <h2>Overriding a preset</h2>
-    <p>Any <code>GET /v1/plans</code> parameter replaces the preset's. Charge 30 kWh before 7:00 tomorrow morning:</p>
+    <p>Any <code>GET /v1/electricity/plans</code> parameter replaces the preset's. Charge 30 kWh before 7:00 tomorrow morning:</p>
     <app-code-block [code]="evRequest" />
     <p>
       A <code>durationHours</code> replaces the preset's power, and a <code>maxPowerKw</code> its duration. The other
@@ -78,7 +78,7 @@ const LAUNDRY_RESPONSE = `{
   styleUrl: '../docs-page.scss',
 })
 export class DocsPresetsComponent {
-  readonly laundryRequest = `curl "${API_BASE}/v1/plans/presets/laundry?limit=1"`;
+  readonly laundryRequest = `curl "${API_BASE}/v1/electricity/plans/presets/laundry?limit=1"`;
   readonly laundryResponse = LAUNDRY_RESPONSE;
-  readonly evRequest = `curl "${API_BASE}/v1/plans/presets/ev-charging?energyKwh=30&latestEnd=2026-10-13T07:00:00%2B03:00"`;
+  readonly evRequest = `curl "${API_BASE}/v1/electricity/plans/presets/ev-charging?energyKwh=30&latestEnd=2026-10-13T07:00:00%2B03:00"`;
 }

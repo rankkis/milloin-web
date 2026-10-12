@@ -1,6 +1,6 @@
 import { PriceCategory } from './price.model';
 
-/** A price from the API's GET /v1/prices */
+/** A price from the API's GET /v1/electricity/prices */
 export interface V1PriceDto {
   startTime: string;
   endTime: string;
@@ -10,7 +10,7 @@ export interface V1PriceDto {
   dayCategory: PriceCategory;
 }
 
-/** GET /v1/prices: the price now and prices from Finnish midnight today to the last published one */
+/** GET /v1/electricity/prices: the price now and prices from Finnish midnight today to the last published one */
 export interface V1PricesDto {
   current: V1PriceDto;
   prices: V1PriceDto[];
@@ -20,7 +20,7 @@ export interface V1PricesDto {
   };
 }
 
-/** A plan from GET /v1/plans */
+/** A plan from GET /v1/electricity/plans */
 export interface V1PlanDto {
   startTime: string;
   endTime: string;
@@ -30,7 +30,7 @@ export interface V1PlanDto {
   savingsCents?: number;
 }
 
-/** GET /v1/plans: ranked plans and the run starting now */
+/** GET /v1/electricity/plans: ranked plans and the run starting now */
 export interface V1PlansDto {
   request: {
     durationHours: number;
