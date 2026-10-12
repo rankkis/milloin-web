@@ -300,6 +300,25 @@ $tones: (
   display: none;
 }
 
+// Spot price explainer, plain text under the hourly prices
+
+.explainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: color(text-muted);
+}
+
+.explainer__title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: color(text);
+}
+
 .footer {
   font-size: 12px;
   color: color(text-muted);
@@ -380,6 +399,10 @@ $tones: (
 
   .questions {
     flex-grow: 0;
+  }
+
+  .explainer__title {
+    font-size: 20px;
   }
 
   .footer {
