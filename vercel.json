@@ -12,6 +12,10 @@
     { "source": "/api/", "destination": "/docs", "permanent": false },
     { "source": "/kannattaa-pesta-pyykkia", "destination": "/pestaan-pyykit", "permanent": true },
     { "source": "/kannattaa-ladata-auto", "destination": "/ladataan-auto", "permanent": true },
+    { "source": "/docs/home-assistant", "destination": "/docs/electricity/home-assistant", "permanent": true },
+    { "source": "/docs/presets", "destination": "/docs/electricity/presets", "permanent": true },
+    { "source": "/docs/custom-plans", "destination": "/docs/electricity/custom-plans", "permanent": true },
+    { "source": "/docs/reference", "destination": "/docs", "permanent": true },
     {
       "source": "/:path(.*)",
       "has": [{ "type": "host", "value": "www.milloin.xyz" }],

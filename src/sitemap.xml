@@ -68,32 +68,50 @@
   </url>
   <url>
     <loc>https://milloin.xyz/docs</loc>
-    <lastmod>2026-10-12</lastmod>
+    <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://milloin.xyz/docs/home-assistant</loc>
-    <lastmod>2026-10-12</lastmod>
+    <loc>https://milloin.xyz/docs/electricity</loc>
+    <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://milloin.xyz/docs/presets</loc>
-    <lastmod>2026-10-12</lastmod>
+    <loc>https://milloin.xyz/docs/electricity/home-assistant</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://milloin.xyz/docs/electricity/presets</loc>
+    <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://milloin.xyz/docs/custom-plans</loc>
-    <lastmod>2026-10-12</lastmod>
+    <loc>https://milloin.xyz/docs/electricity/custom-plans</loc>
+    <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://milloin.xyz/docs/reference</loc>
-    <lastmod>2026-10-12</lastmod>
+    <loc>https://milloin.xyz/docs/electricity/reference</loc>
+    <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://milloin.xyz/docs/misc</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://milloin.xyz/docs/misc/reference</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

@@ -1,17 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { IconComponent } from '../shared/icon/icon.component';
+import { DOCS_CATEGORIES } from './docs-categories';
 
-/** The pages of the developer docs, in the order the menu lists them */
-export const DOCS_PAGES = [
-  { path: '', label: 'Overview', testId: 'docs-nav-overview' },
-  { path: 'home-assistant', label: 'Home Assistant', testId: 'docs-nav-home-assistant' },
-  { path: 'presets', label: 'Presets', testId: 'docs-nav-presets' },
-  { path: 'custom-plans', label: 'Custom plans', testId: 'docs-nav-custom-plans' },
-  { path: 'reference', label: 'API reference', testId: 'docs-nav-reference' },
-];
-
-/** Developer docs for the public API (/docs), in English: menu and the page */
+/** Developer docs for the public API (/docs), in English: the category menu and the page */
 @Component({
   selector: 'app-docs',
   imports: [RouterLink, RouterLinkActive, RouterOutlet, IconComponent],
@@ -24,16 +16,23 @@ export const DOCS_PAGES = [
         </a>
         <p class="label">Developer docs</p>
       </header>
-      <nav class="nav" aria-label="Docs">
-        @for (page of pages; track page.path) {
+      <nav class="categories" aria-label="API categories">
+        <a
+          class="categories__link"
+          routerLink="/docs"
+          routerLinkActive="categories__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+          data-test-id="docs-category-all"
+          >All categories</a
+        >
+        @for (category of categories; track category.path) {
           <a
-            class="nav__link"
-            [routerLink]="page.path ? '/docs/' + page.path : '/docs'"
-            routerLinkActive="nav__link--active"
-            [routerLinkActiveOptions]="{ exact: true }"
-            ariaCurrentWhenActive="page"
-            [attr.data-test-id]="page.testId"
-            >{{ page.label }}</a
+            class="categories__link"
+            [routerLink]="'/docs/' + category.path"
+            routerLinkActive="categories__link--active"
+            [attr.data-test-id]="'docs-category-' + category.path"
+            >{{ category.label }}</a
           >
         }
       </nav>
@@ -49,5 +48,5 @@ export const DOCS_PAGES = [
   styleUrl: './docs.component.scss',
 })
 export class DocsComponent {
-  readonly pages = DOCS_PAGES;
+  readonly categories = DOCS_CATEGORIES;
 }

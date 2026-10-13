@@ -23,26 +23,16 @@ const CURRENT_RESPONSE = `{
   }
 }`;
 
-const ERROR_RESPONSE = `HTTP/1.1 400 Bad Request
-Content-Type: application/problem+json
-
-{
-  "type": "about:blank",
-  "title": "Bad Request",
-  "status": 400,
-  "detail": "durationHours must not be greater than 24",
-  "errors": [{ "field": "durationHours", "message": "durationHours must not be greater than 24" }]
-}`;
-
-/** /docs: what the API is, its endpoints, units, freshness, limits and errors */
+/** /docs/electricity: the quick start, endpoints, units and price freshness of the electricity category */
 @Component({
-  selector: 'app-docs-overview',
+  selector: 'app-docs-electricity',
   imports: [RouterLink, CodeBlockComponent],
   template: `
-    <h1>milloin.xyz API</h1>
+    <h1>Electricity</h1>
     <p class="lead">
-      Finnish electricity spot prices and the cheapest times to run a load, the same data that powers
-      <a href="https://milloin.xyz" data-test-id="docs-overview-site">milloin.xyz</a>. Free to use, no API key or sign-up.
+      Finnish electricity spot prices and the cheapest times to run a load, the same data that answers the
+      <a href="https://milloin.xyz/sahko-on-halpaa" data-test-id="docs-electricity-site">Sähkö</a> questions on
+      milloin.xyz.
     </p>
 
     <h2>Quick start</h2>
@@ -51,16 +41,13 @@ Content-Type: application/problem+json
     <app-code-block title="Response" [code]="currentResponse" />
     <p>
       Running a device in the cheap hours? Start with
-      <a routerLink="/docs/home-assistant" data-test-id="docs-overview-home-assistant">Home Assistant</a> or the
-      <a routerLink="/docs/presets" data-test-id="docs-overview-presets">presets</a>. Every field and parameter is in the
-      <a routerLink="/docs/reference" data-test-id="docs-overview-reference">API reference</a>.
+      <a routerLink="/docs/electricity/home-assistant" data-test-id="docs-electricity-home-assistant">Home Assistant</a> or the
+      <a routerLink="/docs/electricity/presets" data-test-id="docs-electricity-presets">presets</a>. Every field and parameter is in the
+      <a routerLink="/docs/electricity/reference" data-test-id="docs-electricity-reference">API reference</a>.
     </p>
 
     <h2>Endpoints</h2>
-    <p>
-      Paths are grouped by category: <code>/v1/electricity</code> for prices and plans, <code>/v1/misc</code> for the
-      rest.
-    </p>
+    <p>Every electricity path is under <code>/v1/electricity</code>.</p>
     <div class="table-wrap">
       <table>
         <thead>
@@ -73,17 +60,15 @@ Content-Type: application/problem+json
           <tr><td><code>POST /v1/electricity/plans/search</code></td><td>The same, plus a power profile (<code>profileKwh</code>) and the cost of given start times (<code>startTimes</code>).</td></tr>
           <tr><td><code>GET /v1/electricity/plans/presets</code></td><td>Ready-made loads; <code>/v1/electricity/plans/presets/&#123;name&#125;</code> plans one.</td></tr>
           <tr><td><code>GET /v1/electricity/health</code></td><td>Whether the prices are fresh and when tomorrow's arrive.</td></tr>
-          <tr><td><code>GET /v1/misc/ence</code></td><td>The next Counter-Strike match of ENCE, the Finnish CS2 team, with streams, results and news. Refreshed hourly.</td></tr>
         </tbody>
       </table>
     </div>
-    <p>The OpenAPI document is at <a [href]="base + '/openapi.json'" data-test-id="docs-overview-openapi">{{ base }}/openapi.json</a>, for generating a client.</p>
 
     <h2>Units and times</h2>
     <ul>
       <li>Prices are day-ahead spot prices for Finland (ENTSO-E Transparency Platform, spot-hinta.fi as fallback) in 15-minute resolution, in c/kWh including 25.5 % VAT. <code>vat=false</code> leaves VAT out.</li>
       <li>Money is in cents, energy in kWh and power in kW. Costs are the energy only: no transfer, tax or retailer margin.</li>
-      <li>Times in responses are UTC (ISO 8601, <code>Z</code>). Requests may give a UTC offset, such as <code>2026-10-13T07:00:00+03:00</code>; write the <code>+</code> as <code>%2B</code> in a URL (a plain <code>+</code> also works).</li>
+      <li>Times are UTC in responses and may carry a UTC offset in requests, as in <a routerLink="/docs" data-test-id="docs-electricity-basics">every category</a>.</li>
       <li><code>category</code> is fixed thresholds: VERY_CHEAP under 2.5, CHEAP under 5, NORMAL under 10, EXPENSIVE under 20 c/kWh, else VERY_EXPENSIVE. <code>dayCategory</code> is the price's fifth within its own Finnish day, so every day has cheap hours.</li>
     </ul>
 
@@ -91,31 +76,15 @@ Content-Type: application/problem+json
     <p>
       Tomorrow's prices are published once a day at about 14:00 Finnish time. Each response's <code>meta</code> tells
       <code>pricesUntil</code>, <code>tomorrowPublished</code> and <code>nextPricesExpectedAt</code>, so polling every
-      15 minutes, or once after <code>nextPricesExpectedAt</code>, is plenty. <code>GET /v1/electricity/health</code> answers
+      15 minutes, or once after <code>nextPricesExpectedAt</code>, is plenty: responses are cached up to the next
+      quarter hour, when the price now changes. <code>GET /v1/electricity/health</code> answers
       <code>late</code> when tomorrow's prices are over an hour late.
     </p>
-
-    <h2>Limits and caching</h2>
-    <p>
-      GET responses carry <code>Cache-Control</code> up to the next quarter hour, when the price now changes, and
-      repeated requests are answered from the CDN. Requests that reach the server count against 60 a minute for each IP
-      address; over that the API answers <code>429 Too Many Requests</code> with <code>Retry-After</code>. Any website may
-      call the API from the browser (CORS). A link back to milloin.xyz is appreciated.
-    </p>
-    <p>
-      For higher volumes, guaranteed availability or your own endpoints, write to
-      <a href="mailto:jarkko.peltola@hurlumhei.xyz" data-test-id="docs-overview-contact">jarkko.peltola&#64;hurlumhei.xyz</a>.
-    </p>
-
-    <h2>Errors</h2>
-    <p>Every error is <code>application/problem+json</code>; a validation error lists the fields that failed.</p>
-    <app-code-block [code]="errorResponse" />
   `,
   styleUrl: '../docs-page.scss',
 })
-export class DocsOverviewComponent {
+export class DocsElectricityComponent {
   readonly base = API_BASE;
   readonly currentRequest = `curl ${API_BASE}/v1/electricity/prices/current`;
   readonly currentResponse = CURRENT_RESPONSE;
-  readonly errorResponse = ERROR_RESPONSE;
 }

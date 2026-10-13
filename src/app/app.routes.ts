@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { APP_NAVIGATION_PATHS, LEGACY_PATH_REDIRECTS } from './app.paths';
+import { APP_NAVIGATION_PATHS, LEGACY_DOCS_REDIRECTS, LEGACY_PATH_REDIRECTS } from './app.paths';
 import { PaymentDayRouteData } from './money/payment-day/payment-day.component';
 import { SeoRouteData } from './shared/seo/seo-title-strategy';
 
@@ -116,48 +116,95 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./docs/pages/overview.component').then(m => m.DocsOverviewComponent),
-        title: 'milloin.xyz API – Finnish electricity spot prices and cheapest times',
+        loadComponent: () => import('./docs/pages/index.component').then(m => m.DocsIndexComponent),
+        title: 'milloin.xyz API – free API for everyday "when" questions',
         data: {
           description:
-            'Free API for Finnish electricity spot prices and the cheapest times to run a washing machine, sauna or EV charger. No API key needed.',
+            'Free public API behind milloin.xyz, grouped by category: Finnish electricity spot prices and cheapest times, and when ENCE plays. No API key needed.',
         } satisfies SeoRouteData,
       },
       {
-        path: 'home-assistant',
-        loadComponent: () => import('./docs/pages/home-assistant.component').then(m => m.DocsHomeAssistantComponent),
-        title: 'Home Assistant – Finnish spot price and cheapest hours | milloin.xyz API',
-        data: {
-          description:
-            'Show the Finnish electricity spot price in Home Assistant and switch a device on in the cheapest hours, with the RESTful integration and no API key.',
-        } satisfies SeoRouteData,
+        path: 'electricity',
+        loadComponent: () => import('./docs/docs-category.component').then(m => m.DocsCategoryComponent),
+        data: { docsCategory: 'electricity' },
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./docs/pages/electricity.component').then(m => m.DocsElectricityComponent),
+            title: 'Electricity – Finnish spot prices and cheapest times | milloin.xyz API',
+            data: {
+              description:
+                'Free API for Finnish electricity spot prices and the cheapest times to run a washing machine, sauna or EV charger. No API key needed.',
+            } satisfies SeoRouteData,
+          },
+          {
+            path: 'home-assistant',
+            loadComponent: () => import('./docs/pages/home-assistant.component').then(m => m.DocsHomeAssistantComponent),
+            title: 'Home Assistant – Finnish spot price and cheapest hours | milloin.xyz API',
+            data: {
+              description:
+                'Show the Finnish electricity spot price in Home Assistant and switch a device on in the cheapest hours, with the RESTful integration and no API key.',
+            } satisfies SeoRouteData,
+          },
+          {
+            path: 'presets',
+            loadComponent: () => import('./docs/pages/presets.component').then(m => m.DocsPresetsComponent),
+            title: 'Presets – laundry, sauna and EV charging | milloin.xyz API',
+            data: {
+              description:
+                'Ready-made loads for the milloin.xyz API: when to run the washing machine, heat the sauna or charge an EV at the cheapest spot price.',
+            } satisfies SeoRouteData,
+          },
+          {
+            path: 'custom-plans',
+            loadComponent: () => import('./docs/pages/custom-plans.component').then(m => m.DocsCustomPlansComponent),
+            title: 'Custom plans – the cheapest time for any load | milloin.xyz API',
+            data: {
+              description:
+                'Plan any continuous or pausable load on Finnish spot prices: duration, energy, power, deadline, power profiles and given start times.',
+            } satisfies SeoRouteData,
+          },
+          {
+            path: 'reference',
+            loadComponent: () => import('./docs/pages/reference.component').then(m => m.DocsReferenceComponent),
+            title: 'Electricity API reference | milloin.xyz API',
+            data: {
+              description:
+                'Every electricity endpoint, parameter and field of the milloin.xyz API: prices, plans, presets and health.',
+            } satisfies SeoRouteData,
+          },
+        ],
       },
       {
-        path: 'presets',
-        loadComponent: () => import('./docs/pages/presets.component').then(m => m.DocsPresetsComponent),
-        title: 'Presets – laundry, sauna and EV charging | milloin.xyz API',
-        data: {
-          description:
-            'Ready-made loads for the milloin.xyz API: when to run the washing machine, heat the sauna or charge an EV at the cheapest spot price.',
-        } satisfies SeoRouteData,
+        path: 'misc',
+        loadComponent: () => import('./docs/docs-category.component').then(m => m.DocsCategoryComponent),
+        data: { docsCategory: 'misc' },
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./docs/pages/misc.component').then(m => m.DocsMiscComponent),
+            title: 'Miscellaneous – when ENCE plays | milloin.xyz API',
+            data: {
+              description:
+                "Free API for ENCE's next Counter-Strike 2 match, its streams, results and news. No API key needed.",
+            } satisfies SeoRouteData,
+          },
+          {
+            path: 'reference',
+            loadComponent: () => import('./docs/pages/reference.component').then(m => m.DocsReferenceComponent),
+            title: 'Miscellaneous API reference | milloin.xyz API',
+            data: {
+              description: 'Every miscellaneous endpoint, parameter and field of the milloin.xyz API, such as ENCE.',
+            } satisfies SeoRouteData,
+          },
+        ],
       },
-      {
-        path: 'custom-plans',
-        loadComponent: () => import('./docs/pages/custom-plans.component').then(m => m.DocsCustomPlansComponent),
-        title: 'Custom plans – the cheapest time for any load | milloin.xyz API',
-        data: {
-          description:
-            'Plan any continuous or pausable load on Finnish spot prices: duration, energy, power, deadline, power profiles and given start times.',
-        } satisfies SeoRouteData,
-      },
-      {
-        path: 'reference',
-        loadComponent: () => import('./docs/pages/reference.component').then(m => m.DocsReferenceComponent),
-        title: 'API reference | milloin.xyz API',
-        data: {
-          description: 'Every endpoint, parameter and field of the milloin.xyz API, from its OpenAPI document.',
-        } satisfies SeoRouteData,
-      },
+      // Pages before the docs had categories; Vercel redirects these permanently before they reach the app
+      ...Object.entries(LEGACY_DOCS_REDIRECTS).map(([path, redirectTo]) => ({
+        path,
+        redirectTo: `/${APP_NAVIGATION_PATHS.DOCS}${redirectTo ? '/' + redirectTo : ''}`,
+        pathMatch: 'full' as const,
+      })),
     ],
   },
   // Earlier addresses; Vercel redirects these permanently before they reach the app

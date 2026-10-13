@@ -19,7 +19,8 @@ Then('I am on {string}', async ({ page }, path: string) => {
 });
 
 Then('the heading is {string}', async ({ page }, heading: string) => {
-  await expect(page.locator('h1')).toHaveText(heading);
+  // The page's own heading comes first; the API reference adds Scalar's below it
+  await expect(page.locator('h1').first()).toHaveText(heading);
 });
 
 Then('a code sample contains {string}', async ({ page }, text: string) => {
@@ -34,6 +35,11 @@ Then('the API reference lists {string}', async ({ page, browserProblems }, text:
       // Name what failed in the browser, such as the CDN or the OpenAPI document
       throw new Error(`${error.message}\n${browserProblems.join('\n')}`);
     });
+});
+
+Then('the API reference does not list {string}', async ({ page }, text: string) => {
+  // Checked once the reference has drawn, after a step that waited for it
+  await expect(page.locator('.reference').getByText(text)).toHaveCount(0);
 });
 
 When('the server renders {string}', async ({ ctx, request }, path: string) => {
