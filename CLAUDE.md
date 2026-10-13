@@ -179,6 +179,7 @@ src/
 5. Build: `ng build`
 6. Commit and push changes
 7. Create pull request
+8. Squash-merge it to master once every check is green (CI and the e2e run on its Vercel preview); no separate approval is needed
 
 ## SEO & Analytics
 
