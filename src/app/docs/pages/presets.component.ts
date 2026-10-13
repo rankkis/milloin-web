@@ -32,7 +32,7 @@ const LAUNDRY_RESPONSE = `{
   ]
 }`;
 
-/** /docs/presets: the ready-made loads and how to override them */
+/** /docs/electricity/presets: the ready-made loads and how to override them */
 @Component({
   selector: 'app-docs-presets',
   imports: [RouterLink, CodeBlockComponent],
@@ -72,7 +72,7 @@ const LAUNDRY_RESPONSE = `{
     <app-code-block [code]="evRequest" />
     <p>
       A <code>durationHours</code> replaces the preset's power, and a <code>maxPowerKw</code> its duration. The other
-      parameters are in <a routerLink="/docs/custom-plans" data-test-id="docs-presets-custom-plans">Custom plans</a>.
+      parameters are in <a routerLink="/docs/electricity/custom-plans" data-test-id="docs-presets-custom-plans">Custom plans</a>.
     </p>
   `,
   styleUrl: '../docs-page.scss',

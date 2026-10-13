@@ -27,7 +27,7 @@ const SEARCH_RESPONSE = `{
   ...
 }`;
 
-/** /docs/custom-plans: GET /v1/electricity/plans parameters and POST /v1/electricity/plans/search */
+/** /docs/electricity/custom-plans: GET /v1/electricity/plans parameters and POST /v1/electricity/plans/search */
 @Component({
   selector: 'app-docs-custom-plans',
   imports: [RouterLink, CodeBlockComponent],
@@ -35,7 +35,7 @@ const SEARCH_RESPONSE = `{
     <h1>Custom plans</h1>
     <p class="lead">
       Describe your own load and get the cheapest time to run it. The
-      <a routerLink="/docs/presets" data-test-id="docs-custom-presets">presets</a> are the same request with the
+      <a routerLink="/docs/electricity/presets" data-test-id="docs-custom-presets">presets</a> are the same request with the
       parameters filled in.
     </p>
 
@@ -76,7 +76,7 @@ const SEARCH_RESPONSE = `{
     <p>
       Switch the device on while <code>activeNow</code> is <code>true</code>, and ask again at <code>nextChangeAt</code>.
       Keep <code>earliestStart</code> and <code>latestEnd</code> fixed for the period, as the
-      <a routerLink="/docs/home-assistant" data-test-id="docs-custom-home-assistant">Home Assistant</a> example does
+      <a routerLink="/docs/electricity/home-assistant" data-test-id="docs-custom-home-assistant">Home Assistant</a> example does
       with <code>today</code> and <code>tomorrow</code>: a search from now would plan the whole load again each time.
     </p>
 

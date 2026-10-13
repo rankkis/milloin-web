@@ -18,3 +18,14 @@ export const LEGACY_PATH_REDIRECTS: Record<string, string> = {
   'kannattaa-pesta-pyykkia': APP_NAVIGATION_PATHS.WASH_LAUNDRY,
   'kannattaa-ladata-auto': APP_NAVIGATION_PATHS.CHARGE_EV,
 };
+
+/**
+ * Docs pages before the docs had categories, under /docs, redirected permanently (also in vercel.json).
+ * The reference covered every category, so it goes to the category choice.
+ */
+export const LEGACY_DOCS_REDIRECTS: Record<string, string> = {
+  'home-assistant': 'electricity/home-assistant',
+  presets: 'electricity/presets',
+  'custom-plans': 'electricity/custom-plans',
+  reference: '',
+};

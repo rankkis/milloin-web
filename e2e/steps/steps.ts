@@ -36,6 +36,11 @@ Then('the API reference lists {string}', async ({ page, browserProblems }, text:
     });
 });
 
+Then('the API reference does not list {string}', async ({ page }, text: string) => {
+  // Checked once the reference has drawn, after a step that waited for it
+  await expect(page.locator('.reference').getByText(text)).toHaveCount(0);
+});
+
 When('the server renders {string}', async ({ ctx, request }, path: string) => {
   ctx.response = await request.get(path);
 });

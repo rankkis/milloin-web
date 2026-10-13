@@ -45,7 +45,7 @@ template:
         unique_id: milloin_cheapest_fifth
         state: "{{ is_state('sensor.electricity_price_today', 'VERY_CHEAP') }}"`;
 
-/** /docs/home-assistant: REST sensors for the price and a plan, and an automation that follows the plan */
+/** /docs/electricity/home-assistant: REST sensors for the price and a plan, and an automation that follows the plan */
 @Component({
   selector: 'app-docs-home-assistant',
   imports: [RouterLink, CodeBlockComponent],
@@ -82,7 +82,7 @@ template:
     <app-code-block [code]="automation" />
     <p>
       Change <code>durationHours</code> to how long the device needs to run, or give <code>energyKwh</code> and
-      <code>maxPowerKw</code> instead. Every parameter is in <a routerLink="/docs/custom-plans" data-test-id="docs-ha-custom-plans">Custom plans</a>.
+      <code>maxPowerKw</code> instead. Every parameter is in <a routerLink="/docs/electricity/custom-plans" data-test-id="docs-ha-custom-plans">Custom plans</a>.
       Polling every minute is fine: the CDN answers the repeats, and <code>activeNow</code> changes on the quarter hour.
     </p>
 
