@@ -19,7 +19,8 @@ Then('I am on {string}', async ({ page }, path: string) => {
 });
 
 Then('the heading is {string}', async ({ page }, heading: string) => {
-  await expect(page.locator('h1')).toHaveText(heading);
+  // The page's own heading comes first; the API reference adds Scalar's below it
+  await expect(page.locator('h1').first()).toHaveText(heading);
 });
 
 Then('a code sample contains {string}', async ({ page }, text: string) => {
