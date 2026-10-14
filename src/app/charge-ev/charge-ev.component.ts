@@ -76,14 +76,11 @@ export class ChargeEvComponent {
     return (this.overview.value().upcomingHours ?? []).filter((hour) => Date.parse(hour.endTime) > now);
   });
 
-  /** Cheapest charging window in all published prices, whenever it ends */
-  readonly bestAvailable = computed(() => {
-    const best = this.schedule.hasValue() ? this.schedule.value().bestAvailable : undefined;
-    if (!best) return undefined;
-    return {
-      window: formatWindow(best.startTime, best.endTime),
-      note: `${formatDay(best.startTime, this.now())} · ${euros(this.costCents(best.priceAvg))}`,
-    };
+  /** Cheapest charging window in all published prices, when it is cheaper than the answer */
+  readonly cheaperLater = computed(() => {
+    const best = this.bestWindow();
+    const cheapest = this.schedule.hasValue() ? this.schedule.value().bestAvailable : undefined;
+    return best && cheapest && cheapest.priceAvg < best.priceAvg ? cheapest : undefined;
   });
 
   readonly stats = computed(() => {
@@ -117,6 +114,7 @@ export class ChargeEvComponent {
         window: formatWindow(best.startTime, best.endTime),
         cost: euros(this.costCents(best.priceAvg)),
         isBest: true,
+        testId: 'ev-compare-answer',
       },
     ];
     if (startNow) {
@@ -125,6 +123,17 @@ export class ChargeEvComponent {
         window: formatWindow(startNow.startTime, startNow.endTime),
         cost: euros(this.costCents(startNow.priceAvg)),
         isBest: false,
+        testId: 'ev-compare-now',
+      });
+    }
+    const cheaper = this.cheaperLater();
+    if (cheaper) {
+      rows.push({
+        label: `${capitalize(formatDay(cheaper.startTime, this.now()))}, halvin`,
+        window: formatWindow(cheaper.startTime, cheaper.endTime),
+        cost: euros(this.costCents(cheaper.priceAvg)),
+        isBest: false,
+        testId: 'ev-compare-cheapest',
       });
     }
     return rows;

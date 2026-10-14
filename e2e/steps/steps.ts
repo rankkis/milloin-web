@@ -82,8 +82,22 @@ Then('the EV charging answer starts by 04:00 the next morning', async ({ page })
   expect(start).toBeLessThanOrEqual(nextFourAm(new Date()));
 });
 
-Then('the box {string} shows a time window', async ({ page }, testId: string) => {
-  await expect(page.getByTestId(testId).locator('.stat__value')).toHaveText(/^\d{2}:\d{2}–\d{2}:\d{2}$/);
+Then('a cheaper published window, if there is one, is compared at the bottom and marked in white', async ({ page }) => {
+  const rows = page.locator('.comparison__row');
+  await expect(rows.first()).toBeVisible();
+  const cheapest = page.getByTestId('ev-compare-cheapest');
+  const euros = async (row: typeof rows) =>
+    Number(((await row.locator('.comparison__cost').textContent()) ?? '').replace(/[^\d,]/g, '').replace(',', '.'));
+  if ((await cheapest.count()) === 0) {
+    // No cheaper window: the current hour is white and nothing else
+    await expect(page.locator('.bar--secondary')).toHaveCount(0);
+    await expect(page.locator('.bar--current')).toHaveCount(1);
+    return;
+  }
+  await expect(rows.last()).toHaveAttribute('data-test-id', 'ev-compare-cheapest');
+  expect(await euros(cheapest)).toBeLessThanOrEqual(await euros(page.getByTestId('ev-compare-answer')));
+  await expect(page.locator('.bar--current')).toHaveCount(0);
+  await expect(page.locator('.bar--secondary').first()).toBeVisible();
 });
 
 Then('the chart {string} has a bar for every hour until the last published price', async ({ page, request }, testId: string) => {

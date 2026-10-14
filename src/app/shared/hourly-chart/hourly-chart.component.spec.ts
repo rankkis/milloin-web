@@ -48,4 +48,17 @@ describe('HourlyChartComponent', () => {
     const chart = render([0, -1, 4]);
     expect(chart.bars().map((bar) => bar.height)).toEqual([2, 2, 40]);
   });
+
+  it('marks the current hour in white without a second window', () => {
+    fixture.componentRef.setInput('highlight', { startTime: '2026-10-09T10:00:00Z', endTime: '2026-10-09T11:00:00Z' });
+    const chart = render([2, 5, 1, 3]);
+    expect(chart.bars().map((bar) => bar.state)).toEqual(['current', 'window', 'future', 'future']);
+  });
+
+  it('marks a second window in white instead of the current hour', () => {
+    fixture.componentRef.setInput('highlight', { startTime: '2026-10-09T10:00:00Z', endTime: '2026-10-09T11:00:00Z' });
+    fixture.componentRef.setInput('secondary', { startTime: '2026-10-09T12:00:00Z', endTime: '2026-10-09T13:00:00Z' });
+    const chart = render([2, 5, 1, 3]);
+    expect(chart.bars().map((bar) => bar.state)).toEqual(['future', 'window', 'future', 'secondary']);
+  });
 });
