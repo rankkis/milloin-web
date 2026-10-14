@@ -133,6 +133,7 @@ Given('a deploy removed the code of {string} before it was loaded', async ({ pag
   const definesComponent = new RegExp(`selectors:\\[\\[.${selector}.\\]\\]`);
   let refused = false;
   await page.route(/\/chunk-[^/]*\.js$/, async (route) => {
+    if (refused) return route.fallback();
     const response = await route.fetch();
     if (!refused && definesComponent.test(await response.text())) {
       refused = true;
