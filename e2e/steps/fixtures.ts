@@ -31,6 +31,8 @@ export const test = base.extend<{ ctx: ScenarioContext; browserProblems: string[
       const errors: Error[] = [];
       page.on('pageerror', (error) => errors.push(error));
       await use();
+      // Requests a step intercepts may still be in flight when the scenario ends
+      await page.unrouteAll({ behavior: 'ignoreErrors' });
       expect(errors).toEqual([]);
     },
     { auto: true },

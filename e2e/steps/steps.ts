@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
 import { test } from './fixtures';
 
@@ -109,4 +109,48 @@ Then('the chart {string} has a bar for every hour until the last published price
   // Hours from the current one to the last published price; the hour may turn meanwhile
   const hoursLeft = Math.ceil((until - Math.floor(Date.now() / HOUR_MS) * HOUR_MS) / HOUR_MS);
   expect([hoursLeft, hoursLeft + 1]).toContain(await bars.count());
+});
+
+/** What a deployment answers for a chunk of an earlier build: its not-found page */
+const goneChunk = { status: 404, contentType: 'text/html', body: '<!doctype html><title>Sivua ei löytynyt</title>' };
+/** Set on the loaded page, so a step can tell whether the site was loaded again */
+const SAME_PAGE_MARKER = '__milloinSamePage';
+
+Given("I open {string} and every page's code has loaded", async ({ page }, path: string) => {
+  await page.goto(path);
+  // The site loads every page's code once the first page is shown
+  await page.waitForLoadState('networkidle');
+  await page.evaluate((marker) => ((window as unknown as Record<string, boolean>)[marker] = true), SAME_PAGE_MARKER);
+});
+
+Given('a new build is deployed', async ({ page }) => {
+  await page.route(/\/chunk-[^/]*\.js$/, (route) => route.fulfill(goneChunk));
+});
+
+Given('a deploy removed the code of {string} before it was loaded', async ({ page }, selector: string) => {
+  // The first request for the chunk that defines the component is answered as
+  // after a deploy; a page loaded again from the server gets it
+  const definesComponent = new RegExp(`selectors:\\[\\[.${selector}.\\]\\]`);
+  let refused = false;
+  await page.route(/\/chunk-[^/]*\.js$/, async (route) => {
+    if (refused) return route.fallback();
+    const response = await route.fetch();
+    if (!refused && definesComponent.test(await response.text())) {
+      refused = true;
+      await route.fulfill(goneChunk);
+    } else {
+      await route.fulfill({ response });
+    }
+  });
+});
+
+const isSamePage = (page: Page): Promise<boolean> =>
+  page.evaluate((marker) => (window as unknown as Record<string, boolean>)[marker] === true, SAME_PAGE_MARKER);
+
+Then('the site was not loaded again', async ({ page }) => {
+  expect(await isSamePage(page)).toBe(true);
+});
+
+Then('the site was loaded again from the server', async ({ page }) => {
+  expect(await isSamePage(page)).toBe(false);
 });
