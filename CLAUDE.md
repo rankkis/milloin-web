@@ -74,6 +74,7 @@ Every page is rendered on the server (Angular SSR, `outputMode: server`) so sear
 - On the server the API services don't retry (`API_RETRY_COUNT`), and a failed API call marks the page `no-store` so the error page is not cached.
 - Server renders send `x-milloin-ssr-key` from the `SSR_API_KEY` environment variable (set in both Vercel projects) so the API's per-IP rate limit doesn't count them; the key is read only on the server.
 - Hosts allowed to render are listed in `security.allowedHosts` in `angular.json`.
+- Deploys: a deploy removes the previous build's chunks, so a visitor's open page can't load them. The browser loads every page's code once the first page is shown (`BrowserPreloading`), and if a page's code fails to load anyway ("error loading dynamically imported module"), the router loads that page from the server once (`reloadOnStaleChunk`, guarded against reloading over and over; `shared/stale-chunk/`).
 - Run the production server locally: `npm run build && npm run serve:ssr:milloin-web-app` (http://localhost:4000).
 
 ### Deployment to milloin.xyz
