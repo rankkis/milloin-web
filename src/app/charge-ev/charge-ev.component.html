@@ -11,7 +11,7 @@
     @if (schedule.error(); as error) {
       <p class="message" role="alert">{{ errorMessage(error) }}</p>
     } @else if (answer(); as answer) {
-      <p class="answer__value">{{ answer.window }}</p>
+      <p class="answer__value" data-test-id="ev-answer" [attr.data-start]="bestWindow()?.startTime">{{ answer.window }}</p>
       <p class="answer__sentence">{{ answer.sentence }}</p>
       <p class="answer__when">{{ answer.when }}</p>
     } @else {
@@ -22,7 +22,7 @@
   @if (chartHours().length > 0) {
     <section class="chart">
       <app-hourly-chart
-        heading="Seuraavat 24 tuntia"
+        data-test-id="ev-chart"
         [hours]="chartHours()"
         [now]="now()"
         [highlight]="bestWindow()"
@@ -47,6 +47,13 @@
         <dd class="stat__value">{{ stats.spot }}</dd>
         <dd class="stat__note">c/kWh{{ stats.category ? ' · ' + stats.category : '' }}</dd>
       </div>
+      @if (bestAvailable(); as best) {
+        <div class="stat stat--wide" data-test-id="ev-best-available">
+          <dt>Halvin julkaistu</dt>
+          <dd class="stat__value">{{ best.window }}</dd>
+          <dd class="stat__note">{{ best.note }}</dd>
+        </div>
+      }
     </dl>
   }
 

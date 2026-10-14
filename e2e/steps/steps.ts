@@ -61,3 +61,38 @@ Then('it redirects to {string}', async ({ ctx }, path: string) => {
   expect([301, 302, 307, 308]).toContain(ctx.response?.status());
   expect(new URL(ctx.response?.headers()['location'] ?? '', 'https://milloin.xyz').pathname).toBe(path);
 });
+
+const HOUR_MS = 60 * 60 * 1000;
+/** The API the site reads its prices from */
+const API_URL = 'https://milloin-server.vercel.app';
+
+const finnishHour = new Intl.DateTimeFormat('fi-FI', { timeZone: 'Europe/Helsinki', hour: 'numeric', hourCycle: 'h23' });
+
+/** The first 04:00 Finnish time after now: today's before 04:00, otherwise tomorrow's */
+const nextFourAm = (now: Date): number => {
+  let time = Math.floor(now.getTime() / HOUR_MS) * HOUR_MS + HOUR_MS;
+  while (Number(finnishHour.format(new Date(time))) !== 4) time += HOUR_MS;
+  return time;
+};
+
+Then('the EV charging answer starts by 04:00 the next morning', async ({ page }) => {
+  const answer = page.getByTestId('ev-answer');
+  await expect(answer).toHaveText(/^\d{2}:\d{2}–\d{2}:\d{2}$/);
+  const start = Date.parse((await answer.getAttribute('data-start')) ?? '');
+  expect(start).toBeLessThanOrEqual(nextFourAm(new Date()));
+});
+
+Then('the box {string} shows a time window', async ({ page }, testId: string) => {
+  await expect(page.getByTestId(testId).locator('.stat__value')).toHaveText(/^\d{2}:\d{2}–\d{2}:\d{2}$/);
+});
+
+Then('the chart {string} has a bar for every hour until the last published price', async ({ page, request }, testId: string) => {
+  const bars = page.getByTestId(testId).locator('.bar');
+  await expect(bars.first()).toBeVisible();
+  // The same request the page makes, so the API's cache answers both alike
+  const prices = await (await request.get(`${API_URL}/v1/electricity/prices`)).json();
+  const until = Date.parse(prices.meta.pricesUntil);
+  // Hours from the current one to the last published price; the hour may turn meanwhile
+  const hoursLeft = Math.ceil((until - Math.floor(Date.now() / HOUR_MS) * HOUR_MS) / HOUR_MS);
+  expect([hoursLeft, hoursLeft + 1]).toContain(await bars.count());
+});

@@ -18,9 +18,6 @@ import { SpinnerComponent } from '../shared/spinner/spinner.component';
 import { TARIFF_NOTE, costFormula, formatEuros as euros, totalCents } from '../shared/tariffs/tariffs';
 import { ChargeEvService } from './charge-ev.service';
 
-/** Hours on the chart */
-const CHART_HOURS = 24;
-
 const capitalize = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
 
 @Component({
@@ -44,7 +41,7 @@ export class ChargeEvComponent {
     this.overview.hasValue() ? formatPrice(this.overview.value().current.price) : undefined,
   );
 
-  /** Cheapest charging window in all published prices */
+  /** Cheapest charging window that starts by 04:00 next morning, so the car is charged at 08:00 */
   readonly bestWindow = computed(() =>
     this.schedule.hasValue() ? this.schedule.value().windows[0] : undefined,
   );
@@ -72,13 +69,21 @@ export class ChargeEvComponent {
     };
   });
 
-  /** The next 24 hours from the current hour */
+  /** Every published hour from the current one */
   readonly chartHours = computed(() => {
     if (!this.overview.hasValue()) return [];
     const now = this.now().getTime();
-    return (this.overview.value().upcomingHours ?? [])
-      .filter((hour) => Date.parse(hour.endTime) > now)
-      .slice(0, CHART_HOURS);
+    return (this.overview.value().upcomingHours ?? []).filter((hour) => Date.parse(hour.endTime) > now);
+  });
+
+  /** Cheapest charging window in all published prices, whenever it ends */
+  readonly bestAvailable = computed(() => {
+    const best = this.schedule.hasValue() ? this.schedule.value().bestAvailable : undefined;
+    if (!best) return undefined;
+    return {
+      window: formatWindow(best.startTime, best.endTime),
+      note: `${formatDay(best.startTime, this.now())} · ${euros(this.costCents(best.priceAvg))}`,
+    };
   });
 
   readonly stats = computed(() => {
@@ -128,10 +133,14 @@ export class ChargeEvComponent {
   readonly basis = computed(() => {
     const schedule = this.schedule.hasValue() ? this.schedule.value() : undefined;
     if (!schedule) return undefined;
-    return (
+    const charge =
       `Laskettu ${formatNumber(schedule.durationHours, 0)} tunnin lataukselle ja ` +
-      `${formatNumber(schedule.energyKwh ?? 0, 0)} kWh:n energialle.`
-    );
+      `${formatNumber(schedule.energyKwh ?? 0, 0)} kWh:n energialle`;
+    const readyBy = formatClock(schedule.readyBy);
+    return schedule.fitsReadyBy
+      ? `${charge}, joka on valmis viimeistään kello ${readyBy}.`
+      : `${charge}. Kello ${readyBy} mennessä valmista latausta ei löydy julkaistuista hinnoista, ` +
+          'joten vastaus on halvin julkaistu jakso.';
   });
 
   /** How the cheapest window's price is calculated */
