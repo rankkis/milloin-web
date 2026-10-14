@@ -16,7 +16,7 @@
   color: color(text-muted);
 }
 
-// Next 24 hours
+// Every published hour
 
 .chart {
   --plot-height: 110px;
@@ -72,4 +72,9 @@
 .basis {
   flex-grow: 1;
   justify-content: flex-end;
+}
+
+// The cheapest window in all published prices, under the answer's three boxes
+.stat--wide {
+  grid-column: 1 / -1;
 }

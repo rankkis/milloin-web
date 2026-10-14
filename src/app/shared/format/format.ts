@@ -43,6 +43,16 @@ export function helsinkiParts(date: Date): HelsinkiParts {
   };
 }
 
+/**
+ * The moment a Finnish calendar day reaches a full hour, e.g. 08:00 on
+ * 8.10.2026. Days past the end of the month roll over to the next.
+ */
+export function helsinkiTime(year: number, month: number, day: number, hour: number): Date {
+  // Finnish time is UTC+3 in summer and UTC+2 in winter
+  const candidates = [3, 2].map((offset) => new Date(Date.UTC(year, month - 1, day, hour - offset)));
+  return candidates.find((date) => helsinkiParts(date).hour === hour) ?? candidates[1];
+}
+
 const pad = (value: number): string => String(value).padStart(2, '0');
 
 /** Number with a decimal comma, e.g. 4,82 */

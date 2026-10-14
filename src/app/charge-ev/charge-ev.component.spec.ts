@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { ChargeEvComponent } from './charge-ev.component';
-import { ChargeEvService } from './charge-ev.service';
+import { ChargeEvService, ChargeWindowsDto } from './charge-ev.service';
 import { OverviewDto, OverviewService } from '../shared/services/overview.service';
-import { HourlyPriceDto, OptimalTimeDto, OptimalWindowsDto } from '../shared/models/price.model';
+import { HourlyPriceDto, OptimalTimeDto } from '../shared/models/price.model';
 
 // 2026-10-07 13:42 Finnish summer time (UTC+3)
 const NOW = new Date('2026-10-07T10:42:00.000Z');
@@ -20,6 +20,9 @@ const optimal = (startTime: string, endTime: string, priceAvg: number): OptimalT
 // 01:00–05:00 Finnish time
 const tonight = optimal('2026-10-07T22:00:00.000Z', '2026-10-08T02:00:00.000Z', 2.23);
 
+// 21:00–01:00 Finnish time tomorrow, after the car should be charged
+const tomorrowEvening = optimal('2026-10-08T18:00:00.000Z', '2026-10-08T22:00:00.000Z', 1.2);
+
 const schedule = (
   windows: OptimalTimeDto[] = [tonight],
   startNow: OptimalTimeDto | null = optimal(
@@ -27,12 +30,17 @@ const schedule = (
     '2026-10-07T14:30:00.000Z',
     3.36,
   ),
-): OptimalWindowsDto => ({
+  bestAvailable: OptimalTimeDto | null = tomorrowEvening,
+): ChargeWindowsDto => ({
   durationHours: 4,
   energyKwh: 11,
   earliestStart: '2026-10-07T10:30:00.000Z',
-  latestEnd: '2026-10-08T21:00:00.000Z',
+  latestEnd: '2026-10-08T05:00:00.000Z',
+  // 08:00 Finnish time tomorrow
+  readyBy: '2026-10-08T05:00:00.000Z',
+  fitsReadyBy: true,
   ...(startNow && { startNow }),
+  ...(bestAvailable && { bestAvailable }),
   windows,
 });
 
@@ -57,7 +65,7 @@ const overview = {
 describe('ChargeEvComponent', () => {
   let fixture: ComponentFixture<ChargeEvComponent>;
 
-  const render = (schedule$: Observable<OptimalWindowsDto>) => {
+  const render = (schedule$: Observable<ChargeWindowsDto>) => {
     TestBed.configureTestingModule({
       imports: [ChargeEvComponent],
       providers: [
@@ -95,7 +103,7 @@ describe('ChargeEvComponent', () => {
   });
 
   it('shows a spinner while the answer loads', () => {
-    render(new Observable<OptimalWindowsDto>());
+    render(new Observable<ChargeWindowsDto>());
 
     expect(element().querySelector('.answer__value app-spinner[role="status"]')).not.toBeNull();
   });
@@ -110,13 +118,31 @@ describe('ChargeEvComponent', () => {
   it('shows the cost, saving and spot price for 11 kWh', () => {
     render(of(schedule()));
 
-    expect(texts('.stat__value')).toEqual(['1,01 €', '−11 %', '2,23']);
-    expect(texts('.stat__note')).toEqual(['11 kWh', '0,12 €', 'c/kWh · halpa']);
+    expect(texts('.stat__value').slice(0, 3)).toEqual(['1,01 €', '−11 %', '2,23']);
+    expect(texts('.stat__note').slice(0, 3)).toEqual(['11 kWh', '0,12 €', 'c/kWh · halpa']);
     expect(texts('.basis p')).toEqual([
-      'Laskettu 4 tunnin lataukselle ja 11 kWh:n energialle.',
+      'Laskettu 4 tunnin lataukselle ja 11 kWh:n energialle, joka on valmis viimeistään kello 08:00.',
       'Hinta = 11 kWh × (spot 2,23 + siirto 3,50 + sähkövero 2,92 + marginaali 0,50 c/kWh) = 1,01 €. ' +
         'Siirto ja marginaali ovat tyypillisiä arvoja. Hinnat sis. alv 25,5 %, kuukausimaksut eivät sisälly.',
     ]);
+  });
+
+  it('shows the cheapest window in all published prices in a box of its own', () => {
+    render(of(schedule()));
+
+    const box = element().querySelector('[data-test-id="ev-best-available"]');
+    expect(box?.querySelector('dt')?.textContent?.trim()).toBe('Halvin julkaistu');
+    expect(box?.querySelector('.stat__value')?.textContent?.trim()).toBe('21:00–01:00');
+    expect(box?.querySelector('.stat__note')?.textContent?.trim()).toBe('huomenna · 0,89 €');
+  });
+
+  it('says so when no charge is ready by 08:00 in the published prices', () => {
+    render(of({ ...schedule(), fitsReadyBy: false }));
+
+    expect(text('.basis p')).toBe(
+      'Laskettu 4 tunnin lataukselle ja 11 kWh:n energialle. Kello 08:00 mennessä valmista latausta ' +
+        'ei löydy julkaistuista hinnoista, joten vastaus on halvin julkaistu jakso.',
+    );
   });
 
   it('compares the window with charging right away', () => {
@@ -131,18 +157,18 @@ describe('ChargeEvComponent', () => {
     render(of(schedule([tonight], null)));
 
     expect(texts('.comparison__label')).toEqual(['Ensi yönä']);
-    expect(texts('.stat__value')).toEqual(['1,01 €', '0 %', '2,23']);
+    expect(texts('.stat__value').slice(0, 3)).toEqual(['1,01 €', '0 %', '2,23']);
   });
 
-  it('charts the next 24 hours with the window highlighted', () => {
+  it('charts every published hour with the window highlighted', () => {
     render(of(schedule()));
 
     const bars = Array.from(element().querySelectorAll('.bar')).map((bar) => bar.className);
-    expect(bars.length).toBe(24);
+    expect(bars.length).toBe(30);
     expect(bars[0]).toBe('bar bar--current');
     // 01:00 Finnish time is the 12th hour after 13:00
     expect(bars.slice(12, 16)).toEqual(Array(4).fill('bar bar--window'));
-    expect(text('app-hourly-chart h2')).toBe('Seuraavat 24 tuntia');
+    expect(text('app-hourly-chart h2')).toBe('Nyt → to 18:00');
     expect(
       Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.tick')).map((tick) =>
         Array.from(tick.children)
@@ -153,7 +179,8 @@ describe('ChargeEvComponent', () => {
       'nyt 13:42',
       '+6 h 19:00',
       '+12 h 01:00',
-      'to 12:00',
+      '+24 h 13:00',
+      'to 18:00',
     ]);
   });
 
