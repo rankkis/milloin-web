@@ -2,7 +2,7 @@ import { Component, computed, input, signal } from '@angular/core';
 import { HourlyPriceDto } from '../models/price.model';
 import { formatClock, formatPrice, formatWeekday, formatWindow, isSameDay } from '../format/format';
 
-type BarState = 'current' | 'window' | 'future';
+type BarState = 'current' | 'window' | 'secondary' | 'future';
 type TipAlign = 'start' | 'center' | 'end';
 
 interface Bar {
@@ -49,6 +49,11 @@ export class HourlyChartComponent {
   readonly now = input.required<Date>();
   /** Window to show in the accent color, e.g. the cheapest charging time */
   readonly highlight = input<{ startTime: string; endTime: string }>();
+  /**
+   * A second window to show in white, e.g. a cheaper one later on. The white
+   * then marks only this window, not the current hour.
+   */
+  readonly secondary = input<{ startTime: string; endTime: string }>();
   /** Chart heading; defaults to the range, e.g. Nyt → to 23:00 */
   readonly heading = input<string>();
 
@@ -78,6 +83,9 @@ export class HourlyChartComponent {
     const highlight = this.highlight();
     const windowStart = highlight ? Date.parse(highlight.startTime) : NaN;
     const windowEnd = highlight ? Date.parse(highlight.endTime) : NaN;
+    const secondary = this.secondary();
+    const secondaryStart = secondary ? Date.parse(secondary.startTime) : NaN;
+    const secondaryEnd = secondary ? Date.parse(secondary.endTime) : NaN;
 
     return hours.map((hour, index) => {
       const start = Date.parse(hour.startTime);
@@ -86,6 +94,7 @@ export class HourlyChartComponent {
 
       let state: BarState = 'future';
       if (start < windowEnd && end > windowStart) state = 'window';
+      else if (secondary) state = start < secondaryEnd && end > secondaryStart ? 'secondary' : 'future';
       else if (index === 0) state = 'current';
 
       const day = isSameDay(hour.startTime, now) ? '' : `${formatWeekday(hour.startTime)} `;

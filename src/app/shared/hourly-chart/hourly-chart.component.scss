@@ -84,7 +84,8 @@
   background: color(border-strong);
 }
 
-.bar--current {
+.bar--current,
+.bar--secondary {
   background: color(text);
 }
 

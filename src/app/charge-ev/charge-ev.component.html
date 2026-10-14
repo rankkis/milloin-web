@@ -26,6 +26,7 @@
         [hours]="chartHours()"
         [now]="now()"
         [highlight]="bestWindow()"
+        [secondary]="cheaperLater()"
       />
     </section>
   }
@@ -47,13 +48,6 @@
         <dd class="stat__value">{{ stats.spot }}</dd>
         <dd class="stat__note">c/kWh{{ stats.category ? ' · ' + stats.category : '' }}</dd>
       </div>
-      @if (bestAvailable(); as best) {
-        <div class="stat stat--wide" data-test-id="ev-best-available">
-          <dt>Halvin julkaistu</dt>
-          <dd class="stat__value">{{ best.window }}</dd>
-          <dd class="stat__note">{{ best.note }}</dd>
-        </div>
-      }
     </dl>
   }
 
@@ -61,7 +55,7 @@
     <section class="comparison" aria-labelledby="comparison-title">
       <h2 id="comparison-title" class="label comparison__title">Vertailu</h2>
       @for (row of comparison(); track row.label) {
-        <div class="comparison__row">
+        <div class="comparison__row" [attr.data-test-id]="row.testId">
           <span class="comparison__label">{{ row.label }}</span>
           <span class="comparison__window" [class.accent]="row.isBest">{{ row.window }}</span>
           <span class="comparison__cost" [class.comparison__cost--best]="row.isBest">{{ row.cost }}</span>

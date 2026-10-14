@@ -20,8 +20,8 @@ const optimal = (startTime: string, endTime: string, priceAvg: number): OptimalT
 // 01:00–05:00 Finnish time
 const tonight = optimal('2026-10-07T22:00:00.000Z', '2026-10-08T02:00:00.000Z', 2.23);
 
-// 21:00–01:00 Finnish time tomorrow, after the car should be charged
-const tomorrowEvening = optimal('2026-10-08T18:00:00.000Z', '2026-10-08T22:00:00.000Z', 1.2);
+// 13:00–17:00 Finnish time tomorrow, after the car should be charged
+const tomorrowEvening = optimal('2026-10-08T10:00:00.000Z', '2026-10-08T14:00:00.000Z', 1.2);
 
 const schedule = (
   windows: OptimalTimeDto[] = [tonight],
@@ -127,15 +127,6 @@ describe('ChargeEvComponent', () => {
     ]);
   });
 
-  it('shows the cheapest window in all published prices in a box of its own', () => {
-    render(of(schedule()));
-
-    const box = element().querySelector('[data-test-id="ev-best-available"]');
-    expect(box?.querySelector('dt')?.textContent?.trim()).toBe('Halvin julkaistu');
-    expect(box?.querySelector('.stat__value')?.textContent?.trim()).toBe('21:00–01:00');
-    expect(box?.querySelector('.stat__note')?.textContent?.trim()).toBe('huomenna · 0,89 €');
-  });
-
   it('says so when no charge is ready by 08:00 in the published prices', () => {
     render(of({ ...schedule(), fitsReadyBy: false }));
 
@@ -148,26 +139,37 @@ describe('ChargeEvComponent', () => {
   it('compares the window with charging right away', () => {
     render(of(schedule()));
 
+    expect(texts('.comparison__label')).toEqual(['Ensi yönä', 'Jos lataat heti', 'Huomenna, halvin']);
+    expect(texts('.comparison__window')).toEqual(['01:00–05:00', '13:30–17:30', '13:00–17:00']);
+    expect(texts('.comparison__cost')).toEqual(['1,01 €', '1,13 €', '0,89 €']);
+  });
+
+  it('leaves the cheapest published window out unless it is cheaper than the answer', () => {
+    render(of(schedule([tonight], undefined, optimal('2026-10-08T10:00:00.000Z', '2026-10-08T14:00:00.000Z', 2.23))));
+
     expect(texts('.comparison__label')).toEqual(['Ensi yönä', 'Jos lataat heti']);
-    expect(texts('.comparison__window')).toEqual(['01:00–05:00', '13:30–17:30']);
-    expect(texts('.comparison__cost')).toEqual(['1,01 €', '1,13 €']);
+    expect(element().querySelector('.bar--secondary')).toBeNull();
+    expect(element().querySelector('.bar')?.className).toBe('bar bar--current');
   });
 
   it('leaves charging right away out when prices do not reach far enough', () => {
-    render(of(schedule([tonight], null)));
+    render(of(schedule([tonight], null, null)));
 
     expect(texts('.comparison__label')).toEqual(['Ensi yönä']);
     expect(texts('.stat__value').slice(0, 3)).toEqual(['1,01 €', '0 %', '2,23']);
   });
 
-  it('charts every published hour with the window highlighted', () => {
+  it('charts every published hour with the answer in green and the cheaper window in white', () => {
     render(of(schedule()));
 
     const bars = Array.from(element().querySelectorAll('.bar')).map((bar) => bar.className);
     expect(bars.length).toBe(30);
-    expect(bars[0]).toBe('bar bar--current');
+    // White marks the cheaper window, not the current hour
+    expect(bars[0]).toBe('bar bar--future');
     // 01:00 Finnish time is the 12th hour after 13:00
     expect(bars.slice(12, 16)).toEqual(Array(4).fill('bar bar--window'));
+    // 13:00 tomorrow is the 24th
+    expect(bars.slice(24, 28)).toEqual(Array(4).fill('bar bar--secondary'));
     expect(text('app-hourly-chart h2')).toBe('Nyt → to 18:00');
     expect(
       Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('.tick')).map((tick) =>
