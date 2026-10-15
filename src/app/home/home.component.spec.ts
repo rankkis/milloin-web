@@ -155,6 +155,7 @@ describe('HomeComponent', () => {
 
     expect(texts('.group__link')).toEqual(['Sähkö', 'Raha', 'Sekalaista']);
     expect(texts('.question__text')).toEqual([
+      'Milloin sähkö on halpaa?',
       'Milloin saunotaan?',
       'Milloin pestään pyykit?',
       'Milloin ladataan auto?',
@@ -168,7 +169,8 @@ describe('HomeComponent', () => {
   it('links each category heading to its page and each question to its answer page', () => {
     render();
 
-    expect(element('[data-test-id="home-category-sahko"]')?.getAttribute('href')).toBe('/sahko-on-halpaa');
+    expect(element('[data-test-id="home-category-sahko"]')?.getAttribute('href')).toBe('/sahkoa-kannattaa-kayttaa');
+    expect(element('[data-test-id="home-price"]')?.getAttribute('href')).toBe('/sahko-on-halpaa');
     expect(element('[data-test-id="home-sauna"]')?.getAttribute('href')).toBe('/saunotaan');
     expect(element('[data-test-id="home-laundry"]')?.getAttribute('href')).toBe('/pestaan-pyykit');
     expect(element('[data-test-id="home-ev"]')?.getAttribute('href')).toBe('/ladataan-auto');
@@ -188,7 +190,7 @@ describe('HomeComponent', () => {
     expect(text('[data-test-id="home-ence"] .question__detail')).toBe('huomenna vs. Sashi · CCT Europe Series 9, Bo3');
   });
 
-  it('shows the current spot price in the Sähkö heading, linked to the Sähkö page', () => {
+  it('shows the current spot price in the Sähkö heading, linked to the price page', () => {
     render();
 
     expect(text('.group__meta')).toBe('pörssisähkö nyt 4,82 c/kWh');
@@ -198,6 +200,8 @@ describe('HomeComponent', () => {
   it('answers each question in its row', () => {
     render();
 
+    expect(text('[data-test-id="home-price"] .question__answer')).toBe('19:00');
+    expect(text('[data-test-id="home-price"] .question__detail')).toBe('halvin tunti tänään · 3,00 c/kWh');
     expect(text('[data-test-id="home-sauna"] .question__answer')).toBe('20:00');
     expect(text('[data-test-id="home-sauna"] .question__short')).toBe('tänään · 0,95 €');
     expect(text('[data-test-id="home-laundry"] .question__answer')).toBe('+1 h');
@@ -231,6 +235,6 @@ describe('HomeComponent', () => {
 
     expect(text('.error p')).toBe('Palvelinvirhe - yritä myöhemmin uudelleen');
     expect(text('[data-test-id="home-retry"]')).toBe('Yritä uudelleen');
-    expect(texts('.question__text').length).toBe(7);
+    expect(texts('.question__text').length).toBe(8);
   });
 });

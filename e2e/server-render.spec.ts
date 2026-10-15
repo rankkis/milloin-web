@@ -6,6 +6,7 @@ import { expect, test } from './support/test';
  */
 const PAGES = [
   { path: '/', h1: 'Milloin', prices: true },
+  { path: '/sahkoa-kannattaa-kayttaa', h1: 'Sähkö', prices: true },
   { path: '/sahko-on-halpaa', h1: 'Sähkön hinta nyt', prices: true },
   { path: '/pestaan-pyykit', h1: 'Milloin pestään pyykit?', prices: true },
   { path: '/ladataan-auto', h1: 'Milloin ladataan auto?', prices: true },

@@ -1,0 +1,51 @@
+<div class="page">
+  <div class="top">
+    <header class="header">
+      <a class="back" routerLink="/" data-test-id="electricity-category-back">
+        <app-icon name="back" [size]="18" />
+        Takaisin
+      </a>
+      <p class="clock">{{ date() }}</p>
+    </header>
+    <h1 class="title">Sähkö</h1>
+  </div>
+
+  @if (overview.error(); as error) {
+    <div class="error" role="alert">
+      <p>{{ errorMessage(error) }}</p>
+      <button type="button" class="retry" data-test-id="electricity-category-retry" (click)="reload()">
+        <app-icon name="refresh" [size]="18" />
+        Yritä uudelleen
+      </button>
+    </div>
+  }
+
+  <nav class="questions" aria-labelledby="questions-title">
+    <div class="questions__head">
+      <h2 id="questions-title" class="label questions__col-question">Kysymys</h2>
+      <span class="label questions__col-answer" aria-hidden="true">Vastaus</span>
+      <span class="label questions__col-detail" aria-hidden="true">Tarkemmin</span>
+    </div>
+
+    @for (question of questions; track question.id) {
+      <a class="question" [routerLink]="'/' + question.path" [attr.data-test-id]="'electricity-category-' + question.id">
+        <span class="question__text">
+          <app-icon class="question__icon" [name]="question.icon" />
+          {{ question.title }}
+        </span>
+        @let reply = answer(question.id);
+        <span class="question__answer" [class.accent]="reply?.highlight">@if (reply) { {{ reply.value }} } @else if (loading(question.id)) { <app-spinner label="" /> } @else { – }</span>
+        @if (reply) {
+          <span class="question__short">{{ reply.short }} · {{ reply.price }}</span>
+          <span class="question__detail">{{ reply.detail }} · {{ reply.price }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  <footer class="footer">
+    © 2025 hurlumhei oy ·
+    <a class="footer__link" routerLink="/docs" data-test-id="electricity-category-api">Avoin rajapinta kehittäjille</a>
+    <app-consent-settings-link testId="electricity-category-consent" />
+  </footer>
+</div>

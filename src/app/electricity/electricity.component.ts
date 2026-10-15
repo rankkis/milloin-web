@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { APP_NAVIGATION_PATHS } from '../app.paths';
 import { HourlyChartComponent } from '../shared/hourly-chart/hourly-chart.component';
 import { IconComponent } from '../shared/icon/icon.component';
@@ -12,8 +12,9 @@ import { ConsentSettingsLinkComponent } from '../shared/consent/consent-settings
 import { HourlyPricesComponent } from './hourly-prices/hourly-prices.component';
 
 /**
- * The Sähkö category page: price now, hourly prices, trend tiles, the electricity
- * questions, the hourly prices as tables and a short explainer of spot prices
+ * The price page (/sahko-on-halpaa, "Milloin sähkö on halpaa?"): price now, hourly prices,
+ * trend tiles, the electricity questions, the hourly prices as tables and a short
+ * explainer of spot prices
  */
 @Component({
   selector: 'app-electricity',
@@ -24,6 +25,12 @@ import { HourlyPricesComponent } from './hourly-prices/hourly-prices.component';
 })
 export class ElectricityComponent {
   private readonly answers = inject(ElectricityAnswers);
+  private readonly router = inject(Router);
+
+  /** The page the visitor came from in this app (home or the Sähkö category page); home when opened directly */
+  readonly backUrl = computed(
+    () => this.router.lastSuccessfulNavigation()?.previousNavigation?.finalUrl ?? '/',
+  );
 
   readonly paths = APP_NAVIGATION_PATHS;
   readonly now = this.answers.now;

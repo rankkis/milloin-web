@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { APP_NAVIGATION_PATHS } from '../app.paths';
 import { ElectricityAnswers, Answer } from '../electricity/electricity-answers';
 import { EnceAnswers } from '../ence/ence-answer';
 import { finnishToday } from '../money/banking-days';
@@ -26,6 +27,7 @@ export class HomeComponent {
   private readonly ence = inject(EnceAnswers);
 
   readonly categories = CATEGORIES;
+  readonly pricePath = APP_NAVIGATION_PATHS.ELECTRICITY_PRICE;
   readonly all = ALL;
   /** The filter is only worth showing once there is more than one category */
   readonly showFilter = CATEGORIES.length > 1;
@@ -57,6 +59,7 @@ export class HomeComponent {
   }
 
   private readonly answerOf: Record<QuestionId, () => Answer | undefined> = {
+    price: this.answers.priceAnswer,
     sauna: this.answers.saunaAnswer,
     laundry: this.answers.laundryAnswer,
     ev: this.answers.evAnswer,
@@ -67,6 +70,7 @@ export class HomeComponent {
   };
 
   private readonly loadingOf: Partial<Record<QuestionId, () => boolean>> = {
+    price: this.answers.overview.isLoading,
     sauna: this.answers.sauna.isLoading,
     laundry: this.answers.laundry.isLoading,
     ev: this.answers.ev.isLoading,

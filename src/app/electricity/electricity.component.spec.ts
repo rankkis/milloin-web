@@ -152,6 +152,12 @@ describe('ElectricityComponent', () => {
     expect(texts('app-hourly-prices .now')).toHaveSize(1);
   });
 
+  it('links Takaisin to home when the page was opened directly', () => {
+    render();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('[data-test-id="electricity-back"]')?.getAttribute('href')).toBe('/');
+  });
+
   it('explains spot prices', () => {
     render();
 

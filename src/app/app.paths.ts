@@ -1,5 +1,8 @@
 export const APP_NAVIGATION_PATHS = {
-  ELECTRICITY: 'sahko-on-halpaa',
+  /** The Sähkö category page: the electricity questions */
+  ELECTRICITY: 'sahkoa-kannattaa-kayttaa',
+  /** Price now, hourly prices and averages: "Milloin sähkö on halpaa?" */
+  ELECTRICITY_PRICE: 'sahko-on-halpaa',
   WASH_LAUNDRY: 'pestaan-pyykit',
   CHARGE_EV: 'ladataan-auto',
   SAUNA: 'saunotaan',

@@ -14,7 +14,7 @@ const watchErrors = (page: Page): Error[] => {
 const declineAnalytics = (page: Page): Promise<void> =>
   page.addInitScript(() => localStorage.setItem('milloin-analytics-consent', 'denied'));
 
-test('home lists the questions and links to the Sähkö page', async ({ page }) => {
+test('home lists the questions and links its spot price to the price page', async ({ page }) => {
   const errors = watchErrors(page);
   await declineAnalytics(page);
   await page.goto('/');
@@ -42,7 +42,7 @@ const QUESTIONS = [
 ];
 
 for (const question of QUESTIONS) {
-  test(`${question.h1} answers from the Sähkö page`, async ({ page }) => {
+  test(`${question.h1} answers from the price page`, async ({ page }) => {
     const errors = watchErrors(page);
     await declineAnalytics(page);
     await page.goto('/sahko-on-halpaa');

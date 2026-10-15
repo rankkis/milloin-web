@@ -11,6 +11,7 @@ const CACHE_HEADERS = {
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
+  { path: 'sahkoa-kannattaa-kayttaa', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'sahko-on-halpaa', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'pestaan-pyykit', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'ladataan-auto', renderMode: RenderMode.Server, headers: CACHE_HEADERS },

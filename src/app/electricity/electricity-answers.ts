@@ -3,7 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { ChargeEvService } from '../charge-ev/charge-ev.service';
 import { formatClock, formatDate, formatDay, formatNumber, formatPrice, formatWindow } from '../shared/format/format';
 import { PRICE_CATEGORY_TEXT } from '../shared/format/price-category';
-import { PriceCategory } from '../shared/models/price.model';
+import { HourlyPriceDto, PriceCategory } from '../shared/models/price.model';
 import { OverviewService } from '../shared/services/overview.service';
 import { initialNow } from '../shared/render-time';
 import { formatEuros, totalCents } from '../shared/tariffs/tariffs';
@@ -38,7 +38,7 @@ export interface Answer {
 
 /**
  * The current price and the answers to the electricity questions, shared by
- * the home page and the Sähkö page. Provide it in the component that shows them:
+ * the home page, the Sähkö page and the price page. Provide it in the component that shows them:
  * it keeps the clock running and reloads when the tab comes back after a while.
  */
 @Injectable()
@@ -82,6 +82,21 @@ export class ElectricityAnswers {
   readonly upcoming = computed(() => {
     const now = this.now().getTime();
     return (this.overviewData()?.upcomingHours ?? []).filter((hour) => Date.parse(hour.endTime) > now);
+  });
+
+  /** "Milloin sähkö on halpaa?": the cheapest hour from now to the last published price */
+  readonly priceAnswer = computed<Answer | undefined>(() => {
+    const cheapest = this.upcoming().reduce<HourlyPriceDto | undefined>(
+      (best, hour) => (!best || hour.priceAvg < best.priceAvg ? hour : best),
+      undefined,
+    );
+    if (!cheapest) return undefined;
+    const price = `${formatPrice(cheapest.priceAvg)} c/kWh`;
+    const day = formatDay(cheapest.startTime, this.now());
+    if (day === 'nyt') {
+      return { value: 'Nyt', short: 'halvin tunti', detail: 'nyt on halvin tunti', price, highlight: true };
+    }
+    return { value: formatClock(cheapest.startTime), short: day, detail: `halvin tunti ${day}`, price, highlight: false };
   });
 
   readonly laundryAnswer = computed<Answer | undefined>(() => {

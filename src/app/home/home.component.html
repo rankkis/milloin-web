@@ -54,7 +54,7 @@
             <app-icon name="chevron" [size]="16" />
           </a>
           @if (category.id === 'sahko' && electricityNow(); as now) {
-            <a class="group__meta" [routerLink]="'/' + category.path" data-test-id="home-electricity-price">{{ now }}</a>
+            <a class="group__meta" [routerLink]="'/' + pricePath" data-test-id="home-electricity-price">{{ now }}</a>
           }
         </h2>
 

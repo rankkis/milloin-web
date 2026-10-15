@@ -42,6 +42,28 @@ Then('the API reference does not list {string}', async ({ page }, text: string) 
   await expect(page.locator('.reference').getByText(text)).toHaveCount(0);
 });
 
+Then('the questions are {string}', async ({ page }, list: string) => {
+  await expect(page.locator('.question__text')).toHaveText(list.split(', '));
+});
+
+Then('every question has an answer', async ({ page }) => {
+  const answers = page.locator('.question__answer');
+  await expect(answers.first()).toBeVisible();
+  // The answers replace the loading spinners; "–" would mean no answer
+  await expect(page.locator('.question__answer app-spinner')).toHaveCount(0);
+  for (const answer of await answers.all()) await expect(answer).not.toHaveText('–');
+});
+
+Then('the page has no price chart', async ({ page }) => {
+  await expect(page.locator('app-hourly-chart')).toHaveCount(0);
+  await expect(page.locator('app-hourly-prices')).toHaveCount(0);
+});
+
+Then('the page shows the price now and the price chart', async ({ page }) => {
+  await expect(page.locator('.now__value')).toHaveText(/^\s*-?\d+,\d{2}\s*$/);
+  await expect(page.locator('app-hourly-chart')).toBeVisible();
+});
+
 When('the server renders {string}', async ({ ctx, request }, path: string) => {
   ctx.response = await request.get(path);
 });

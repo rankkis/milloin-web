@@ -31,7 +31,7 @@ const CURRENT_RESPONSE = `{
     <h1>Electricity</h1>
     <p class="lead">
       Finnish electricity spot prices and the cheapest times to run a load, the same data that answers the
-      <a href="https://milloin.xyz/sahko-on-halpaa" data-test-id="docs-electricity-site">Sähkö</a> questions on
+      <a href="https://milloin.xyz/sahkoa-kannattaa-kayttaa" data-test-id="docs-electricity-site">Sähkö</a> questions on
       milloin.xyz.
     </p>
 
