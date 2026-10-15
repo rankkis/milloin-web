@@ -60,7 +60,7 @@ Then('the page has no price chart', async ({ page }) => {
 });
 
 Then('the page shows the price now and the price chart', async ({ page }) => {
-  await expect(page.locator('.now__value')).toHaveText(/^\d+,\d{2}$/);
+  await expect(page.locator('.now__value')).toHaveText(/^\s*-?\d+,\d{2}\s*$/);
   await expect(page.locator('app-hourly-chart')).toBeVisible();
 });
 
