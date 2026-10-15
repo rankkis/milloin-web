@@ -9,6 +9,8 @@ import {
 } from '../wash-laundry/wash-laundry.service';
 import { ChargeEvService } from '../charge-ev/charge-ev.service';
 import { SaunaService } from '../sauna/sauna.service';
+import { PricesService } from '../shared/services/prices.service';
+import { ForecastDto } from '../shared/models/forecast';
 import {
   HourlyPriceDto,
   OptimalTimeDto,
@@ -85,12 +87,27 @@ const sauna: OptimalWindowsDto = {
   startOffsets: [saunaStart('2026-10-07T13:00:00.000Z', 52), saunaStart('2026-10-07T16:00:00.000Z', 39.7)],
 };
 
+/** Forecast hours from 21:00 today (published) to 22:00 the day after tomorrow, 8 c/kWh */
+const FORECAST_START = HOUR_START + 8 * HOUR_MS;
+const forecast: ForecastDto = {
+  horizon: '72h',
+  resolution: 'hour',
+  issuedAt: '2026-10-07T09:00:00.000Z',
+  points: Array.from({ length: 50 }, (_, hour) => ({
+    startTime: new Date(FORECAST_START + hour * HOUR_MS).toISOString(),
+    endTime: new Date(FORECAST_START + (hour + 1) * HOUR_MS).toISOString(),
+    price: 8,
+    published: hour < 27,
+  })),
+};
+
 describe('ElectricityComponent', () => {
   let fixture: ComponentFixture<ElectricityComponent>;
 
   const render = (
     overview$: Observable<OverviewDto> = of(overview),
     laundrySchedule: LaundrySchedule = laundry,
+    forecast$: Observable<ForecastDto> = throwError(() => new Error('503')),
   ) => {
     TestBed.configureTestingModule({
       imports: [ElectricityComponent],
@@ -100,6 +117,7 @@ describe('ElectricityComponent', () => {
         { provide: WashLaundryService, useValue: { getOptimalSchedule: () => of(laundrySchedule) } },
         { provide: ChargeEvService, useValue: { getOptimalWindows: () => of(ev) } },
         { provide: SaunaService, useValue: { getStarts: () => of(sauna) } },
+        { provide: PricesService, useValue: { getForecast: () => forecast$ } },
       ],
     });
     fixture = TestBed.createComponent(ElectricityComponent);
@@ -209,6 +227,42 @@ describe('ElectricityComponent', () => {
       '+24 h 13:00',
       'to 23:00',
     ]);
+  });
+
+  it('goes on with the forecast after the last published price, striped and tagged arvio', () => {
+    render(of(overview), laundry, of(forecast));
+
+    const element = fixture.nativeElement as HTMLElement;
+    // 35 published hours to 23:00 tomorrow, then 23 estimated hours to 22:00 the day after
+    expect(element.querySelectorAll('.bar').length).toBe(58);
+    expect(element.querySelectorAll('.bar--estimate').length).toBe(23);
+    expect(element.querySelector('.bar:nth-child(1)')?.className).not.toContain('bar--estimate');
+    expect(text('app-hourly-chart h2')).toBe('Nyt → pe 22:00');
+    expect(text('[data-test-id="electricity-forecast-note"]')).toContain('milloin.xyz:n oma ennuste');
+    expect(element.querySelector('[data-test-id="electricity-forecast-contact"]')?.getAttribute('href')).toBe(
+      'mailto:jarkko.peltola@hurlumhei.xyz',
+    );
+
+    expect(texts('app-hourly-prices h3').map((title) => title.replace(/\s+/g, ' '))).toEqual([
+      'Tänään ke 7.10.',
+      'Huomenna to 8.10.',
+      'Ylihuomenna pe 9.10. · arvio',
+    ]);
+    const estimates = texts('app-hourly-prices tr.estimate');
+    expect(estimates.length).toBe(23);
+    expect(texts('app-hourly-prices tr.estimate th')[0].replace(/\s+/g, ' ')).toBe('00:00–01:00 arvio');
+    expect(texts('app-hourly-prices tr.estimate .table__price')[0]).toBe('≈ 8,00');
+    expect(text('app-hourly-prices .note')).toContain('Arvio-tunnit ovat milloin.xyz:n oma ennuste');
+    // The averages stay on published prices
+    expect(texts('.tile__value').map((value) => value.split(' ')[0])).toEqual(['6,00', '4,50', '3,75']);
+  });
+
+  it('shows only published prices when the forecast is unavailable', () => {
+    render();
+
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('.bar--estimate').length).toBe(0);
+    expect(text('[data-test-id="electricity-forecast-note"]')).toBe('');
+    expect(text('app-hourly-prices .note')).not.toContain('Arvio');
   });
 
   it('shows the price of an hour under the pointer', () => {

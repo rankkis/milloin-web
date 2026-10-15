@@ -99,6 +99,19 @@ p {
   font-size: 12px;
 }
 
+// milloin.xyz's forecast, not a published price
+.estimate {
+  font-style: italic;
+  color: color(text-muted);
+}
+
+.estimate__tag {
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: var(--text-label-tracking);
+  text-transform: uppercase;
+}
+
 .dot {
   display: inline-block;
   width: 7px;

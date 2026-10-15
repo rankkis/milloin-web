@@ -5,6 +5,7 @@ import { retry, timeout } from 'rxjs/operators';
 import { API_RETRY_COUNT } from './api-retry';
 import { environment } from '../../../environments/environment';
 import { V1PlansDto, V1PricesDto } from '../models/api-v1.model';
+import { ForecastDto } from '../models/forecast';
 
 /** The API's error as a Finnish message for the page */
 export function apiError(source: string, failure: string) {
@@ -52,6 +53,11 @@ export class PricesService {
       Object.entries(query).map(([key, value]) => [key, String(value)]),
     );
     return this.get<V1PlansDto>(`${environment.apiUrl}/v1/electricity/plans?${params}`);
+  }
+
+  /** milloin.xyz's own price forecast for the next 72 hours */
+  getForecast(): Observable<ForecastDto> {
+    return this.get<ForecastDto>(`${environment.apiUrl}/v1/electricity/forecasts/72h`);
   }
 
   private get<T>(url: string): Observable<T> {

@@ -43,7 +43,10 @@
     @if (overviewData(); as data) {
       @if (upcoming().length > 0) {
         <section class="chart">
-          <app-hourly-chart class="chart__plot" [hours]="upcoming()" [now]="now()" />
+          <app-hourly-chart class="chart__plot" [hours]="hours()" [now]="now()" data-test-id="electricity-chart" />
+          @if (estimates().length > 0) {
+            <app-forecast-note data-test-id="electricity-forecast-note" />
+          }
           <app-trend-tiles [hours]="upcoming()" [current]="data.current.price" />
         </section>
       }
@@ -84,7 +87,7 @@
   </nav>
 
   @if (upcoming().length > 0) {
-    <app-hourly-prices class="hourly-prices" aria-labelledby="hourly-prices-title" role="region" [hours]="upcoming()" [now]="now()" />
+    <app-hourly-prices class="hourly-prices" aria-labelledby="hourly-prices-title" role="region" [hours]="hours()" [now]="now()" />
   }
 
   <section class="explainer" aria-labelledby="explainer-title">

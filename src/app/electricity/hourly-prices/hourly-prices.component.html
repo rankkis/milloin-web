@@ -3,7 +3,7 @@
 <div class="days">
   @for (day of days(); track day.title) {
     <section class="day" [attr.aria-labelledby]="'hourly-prices-' + $index">
-      <h3 class="day__title" [id]="'hourly-prices-' + $index">{{ day.title }} <span class="day__date">{{ day.date }}</span></h3>
+      <h3 class="day__title" [id]="'hourly-prices-' + $index">{{ day.title }} <span class="day__date">{{ day.date }}@if (day.estimate) { · arvio}</span></h3>
       <table class="table">
         <thead>
           <tr>
@@ -14,9 +14,9 @@
         </thead>
         <tbody>
           @for (row of day.rows; track row.start) {
-            <tr [class.now]="row.isNow">
-              <th scope="row" class="table__hours">{{ row.hours }}@if (row.isNow) {<span class="now__tag"> nyt</span>}</th>
-              <td class="table__price">{{ row.price }}</td>
+            <tr [class.now]="row.isNow" [class.estimate]="row.estimate" [attr.data-test-id]="row.estimate ? 'hourly-prices-estimate' : null">
+              <th scope="row" class="table__hours">{{ row.hours }}@if (row.isNow) {<span class="now__tag"> nyt</span>}@if (row.estimate) {<span class="estimate__tag"> arvio</span>}</th>
+              <td class="table__price">@if (row.estimate) {<span aria-hidden="true">≈ </span>}{{ row.price }}</td>
               <td class="table__category">
                 <span [class]="'dot dot--' + row.tone" aria-hidden="true"></span>{{ row.category }}
               </td>
@@ -28,4 +28,4 @@
   }
 </div>
 
-<p class="note">Hinnat sisältävät arvonlisäveron 25,5 %. Tunnin hinta on sen neljän 15 minuutin hinnan keskiarvo.</p>
+<p class="note">Hinnat sisältävät arvonlisäveron 25,5 %. Tunnin hinta on sen neljän 15 minuutin hinnan keskiarvo.@if (hasEstimates()) { Arvio-tunnit ovat milloin.xyz:n oma ennuste, eivät julkaistuja pörssihintoja.}</p>

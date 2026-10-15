@@ -1,0 +1,23 @@
+@use 'colors' as *;
+
+:host {
+  display: flex;
+  gap: var(--space-2);
+  font-size: 13px;
+  line-height: 1.45;
+  color: color(text-muted);
+}
+
+// The same stripes as .bar--estimate in the chart
+.swatch {
+  flex: 0 0 10px;
+  height: 14px;
+  margin-top: 2px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(to top, color(marker) 0 2px, transparent 2px 4px);
+}
+
+.link {
+  color: color(text);
+  overflow-wrap: anywhere;
+}

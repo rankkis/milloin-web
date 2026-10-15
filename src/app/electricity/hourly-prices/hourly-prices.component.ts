@@ -10,15 +10,27 @@ interface HourRow {
   category: string;
   tone: string;
   isNow: boolean;
+  /** milloin.xyz's forecast, not a published price */
+  estimate: boolean;
 }
 
 interface DayTable {
   title: string;
   date: string;
+  /** Every hour of the day is an estimate */
+  estimate: boolean;
   rows: HourRow[];
 }
 
-const DAY_TITLES = ['Tänään', 'Huomenna'];
+const DAY_TITLES = ['Tänään', 'Huomenna', 'Ylihuomenna'];
+
+const weekdayFormat = new Intl.DateTimeFormat('fi-FI', { timeZone: 'Europe/Helsinki', weekday: 'long' });
+
+/** Tänään, Huomenna, Ylihuomenna, then the weekday, e.g. Lauantai */
+function dayTitle(offset: number, date: Date): string {
+  const weekday = weekdayFormat.format(date);
+  return DAY_TITLES[offset] ?? weekday.charAt(0).toUpperCase() + weekday.slice(1);
+}
 
 /** Dot color of each price category, matching the price box */
 const PRICE_TONE: Record<PriceCategory, string> = {
@@ -32,7 +44,8 @@ const PRICE_TONE: Record<PriceCategory, string> = {
 /**
  * Hourly spot prices as text, one table per day: today from the current hour
  * and tomorrow once its prices are published. Search engines read these, and
- * they match searches like "sähkön hinta tänään" and "…huomenna".
+ * they match searches like "sähkön hinta tänään" and "…huomenna". Estimated
+ * hours (milloin.xyz's forecast) follow, marked "arvio".
  */
 @Component({
   selector: 'app-hourly-prices',
@@ -43,14 +56,22 @@ export class HourlyPricesComponent {
   readonly hours = input.required<HourlyPriceDto[]>();
   readonly now = input.required<Date>();
 
+  readonly hasEstimates = computed(() => this.hours().some((hour) => hour.estimate));
+
   readonly days = computed<DayTable[]>(() => {
     const now = this.now();
     const nowMs = now.getTime();
-    return DAY_TITLES.map((title, offset) => {
-      const hours = this.hours().filter((hour) => dayOffset(hour.startTime, now) === offset);
+    const byDay = new Map<number, HourlyPriceDto[]>();
+    for (const hour of this.hours()) {
+      const offset = dayOffset(hour.startTime, now);
+      byDay.set(offset, [...(byDay.get(offset) ?? []), hour]);
+    }
+    return [...byDay.entries()].map(([offset, hours]) => {
+      const first = new Date(hours[0].startTime);
       return {
-        title,
-        date: hours.length > 0 ? formatDate(new Date(hours[0].startTime)) : '',
+        title: dayTitle(offset, first),
+        date: formatDate(first),
+        estimate: hours.every((hour) => hour.estimate),
         rows: hours.map((hour) => ({
           start: hour.startTime,
           hours: `${formatClock(hour.startTime)}–${formatClock(hour.endTime)}`,
@@ -58,8 +79,9 @@ export class HourlyPricesComponent {
           category: PRICE_CATEGORY_TEXT[hour.priceCategory] ?? PRICE_CATEGORY_TEXT.NORMAL,
           tone: PRICE_TONE[hour.priceCategory] ?? PRICE_TONE.NORMAL,
           isNow: Date.parse(hour.startTime) <= nowMs && nowMs < Date.parse(hour.endTime),
+          estimate: !!hour.estimate,
         })),
       };
-    }).filter((day) => day.rows.length > 0);
+    });
   });
 }

@@ -97,6 +97,21 @@
   background: color(bar-hover);
 }
 
+// An estimate (forecast), not a published price: striped
+.bar--estimate,
+.bar--estimate.bar--future {
+  background: repeating-linear-gradient(to top, color(marker) 0 2px, transparent 2px 4px);
+}
+
+.bar--estimate.bar--hovered {
+  background: repeating-linear-gradient(to top, color(bar-hover) 0 2px, transparent 2px 4px);
+}
+
+// Many hours (a forecast): thinner gaps so the bars stay visible
+.plot--dense {
+  --bar-gap: 1px;
+}
+
 .tip {
   position: absolute;
   z-index: 3;
