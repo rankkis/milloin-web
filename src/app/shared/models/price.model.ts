@@ -46,6 +46,8 @@ export interface HourlyPriceDto {
   endTime: string;
   priceAvg: number;
   priceCategory: PriceCategory;
+  /** milloin.xyz's forecast of an hour whose price is not published yet */
+  estimate?: boolean;
 }
 
 /** Cost of starting a program now or after a timer delay */

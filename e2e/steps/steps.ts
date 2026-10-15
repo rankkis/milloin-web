@@ -176,3 +176,58 @@ Then('the site was not loaded again', async ({ page }) => {
 Then('the site was loaded again from the server', async ({ page }) => {
   expect(await isSamePage(page)).toBe(false);
 });
+
+const FORECAST_URL = /\/v1\/electricity\/forecasts\/72h$/;
+
+Given("milloin.xyz's forecast reaches {int} hours past the published prices", async ({ page, request }, hours: number) => {
+  // The same request the page makes, so the API's cache answers both alike
+  const prices = await (await request.get(`${API_URL}/v1/electricity/prices`)).json();
+  const until = Date.parse(prices.meta.pricesUntil);
+  // Six hours the forecaster had already published, which the page must not show as estimates
+  const points = Array.from({ length: hours + 6 }, (_, index) => {
+    const start = until + (index - 6) * HOUR_MS;
+    return {
+      startTime: new Date(start).toISOString(),
+      endTime: new Date(start + HOUR_MS).toISOString(),
+      price: 4 + (index % 5),
+      priceEurMwh: 30,
+      published: start < until,
+    };
+  });
+  const forecast = { horizon: '72h', resolution: 'hour', issuedAt: new Date().toISOString(), modelVersion: 'e2e', change: 'e2e', points };
+  await page.route(FORECAST_URL, (route) => route.fulfill({ json: forecast }));
+});
+
+Given("milloin.xyz's forecast is unavailable", async ({ page }) => {
+  await page.route(FORECAST_URL, (route) =>
+    route.fulfill({ status: 503, contentType: 'application/problem+json', json: { status: 503, title: 'Service Unavailable' } }),
+  );
+});
+
+Then('the chart ends with {int} striped estimate bars', async ({ page }, count: number) => {
+  const bars = page.getByTestId('electricity-chart').locator('.bar');
+  await expect(bars.and(page.locator('.bar--estimate'))).toHaveCount(count);
+  const total = await bars.count();
+  await expect(bars.nth(total - count)).toHaveClass(/bar--estimate/);
+  await expect(bars.nth(total - count - 1)).not.toHaveClass(/bar--estimate/);
+});
+
+Then('the hourly price tables list {int} hours tagged {string}', async ({ page }, count: number, tag: string) => {
+  const rows = page.getByTestId('hourly-prices-estimate');
+  await expect(rows).toHaveCount(count);
+  await expect(rows.first()).toContainText(tag);
+  await expect(page.locator('app-hourly-prices .note')).toContainText('milloin.xyz:n oma ennuste');
+});
+
+Then('the forecast note says the estimates are made by milloin.xyz and links an email for a longer forecast', async ({ page }) => {
+  const note = page.getByTestId('electricity-forecast-note');
+  await expect(note).toContainText('milloin.xyz:n oma ennuste');
+  await expect(note).toContainText('pidemmän ennusteen');
+  await expect(page.getByTestId('electricity-forecast-contact')).toHaveAttribute('href', /^mailto:/);
+});
+
+Then('the page shows no estimates', async ({ page }) => {
+  await expect(page.locator('.bar--estimate')).toHaveCount(0);
+  await expect(page.getByTestId('hourly-prices-estimate')).toHaveCount(0);
+  await expect(page.getByTestId('electricity-forecast-note')).toHaveCount(0);
+});

@@ -9,6 +9,8 @@ interface Bar {
   /** Bar height as a percentage of the plot */
   height: number;
   state: BarState;
+  /** A forecast, not a published price */
+  estimate: boolean;
   tip: string;
   tipAlign: TipAlign;
 }
@@ -25,7 +27,9 @@ interface Marker {
 /** Minimum bar height so free and negative hours still show */
 const MIN_HEIGHT_PCT = 2;
 /** Hours from now that get a dashed marker */
-const MARKER_HOURS = [6, 12, 24];
+const MARKER_HOURS = [6, 12, 24, 48];
+/** From this many bars on, the gaps between them get thinner */
+const DENSE_FROM = 40;
 /** A gridline every this many c/kWh */
 const GRID_STEP = 10;
 /** The scale reaches at least this many c/kWh so low prices look low */
@@ -35,8 +39,8 @@ const HOUR_MS = 60 * 60 * 1000;
 /**
  * Hourly price bars from the current hour onwards, scaled to the highest
  * price but at least 10 c/kWh, with gridlines every 10 c/kWh, dashed
- * markers at +6, +12 and +24 hours and a tooltip on hover or tap. The
- * first hour is the current one.
+ * markers at +6, +12, +24 and +48 hours and a tooltip on hover or tap. The
+ * first hour is the current one. Estimated hours (a forecast) are striped.
  */
 @Component({
   selector: 'app-hourly-chart',
@@ -99,14 +103,18 @@ export class HourlyChartComponent {
 
       const day = isSameDay(hour.startTime, now) ? '' : `${formatWeekday(hour.startTime)} `;
       const position = index / hours.length;
+      const price = `${hour.estimate ? 'arvio ' : ''}${formatPrice(hour.priceAvg)} c/kWh`;
       return {
         height: Math.max(pct, MIN_HEIGHT_PCT),
         state,
-        tip: `${day}${formatWindow(hour.startTime, hour.endTime)} · ${formatPrice(hour.priceAvg)} c/kWh`,
+        estimate: !!hour.estimate,
+        tip: `${day}${formatWindow(hour.startTime, hour.endTime)} · ${price}`,
         tipAlign: position < 0.2 ? 'start' : position > 0.8 ? 'end' : 'center',
       };
     });
   });
+
+  readonly dense = computed(() => this.hours().length >= DENSE_FROM);
 
   /** Baseline and a line at every 10 c/kWh up to the top of the scale */
   readonly gridlines = computed(() => {
@@ -144,10 +152,11 @@ export class HourlyChartComponent {
     const byPrice = [...hours].sort((a, b) => a.priceAvg - b.priceAvg);
     const cheapest = byPrice[0];
     const priciest = byPrice[byPrice.length - 1];
+    const estimate = (hour: HourlyPriceDto) => (hour.estimate ? ' (arvio)' : '');
     return (
       `${this.title()}. Halvin tunti ${formatClock(cheapest.startTime)}, ` +
-      `${formatPrice(cheapest.priceAvg)} c/kWh. Kallein tunti ` +
-      `${formatClock(priciest.startTime)}, ${formatPrice(priciest.priceAvg)} c/kWh.`
+      `${formatPrice(cheapest.priceAvg)} c/kWh${estimate(cheapest)}. Kallein tunti ` +
+      `${formatClock(priciest.startTime)}, ${formatPrice(priciest.priceAvg)} c/kWh${estimate(priciest)}.`
     );
   });
 
