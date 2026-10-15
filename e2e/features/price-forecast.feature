@@ -1,9 +1,9 @@
 Feature: Price forecast on the price page
   After the last published spot price, the price page's chart and hourly
   tables go on with milloin.xyz's own forecast. Forecast hours are striped in
-  the chart and grey in the tables, where each day's estimates open with a
-  button. A note says who made them and whom to contact for a longer forecast.
-  Without the forecast the page shows the published prices only.
+  the chart and grey in the tables, where they all open with one button. A
+  note says who made them and whom to contact for a longer forecast. Without
+  the forecast the page shows the published prices only.
 
   Scenario: Estimated hours follow the published prices, marked as estimates
     Given milloin.xyz's forecast reaches 24 hours past the published prices

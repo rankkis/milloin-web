@@ -19,8 +19,6 @@ interface DayTable {
   date: string;
   /** Every hour of the day is an estimate */
   estimate: boolean;
-  /** Estimated hours, shown once the visitor opens them */
-  estimates: number;
   rows: HourRow[];
 }
 
@@ -47,7 +45,7 @@ const PRICE_TONE: Record<PriceCategory, string> = {
  * Hourly spot prices as text, one table per day: today from the current hour
  * and tomorrow once its prices are published. Search engines read these, and
  * they match searches like "sähkön hinta tänään" and "…huomenna". Estimated
- * hours (milloin.xyz's forecast) follow in grey, folded behind a button per day.
+ * hours (milloin.xyz's forecast) follow in grey, behind one button.
  */
 @Component({
   selector: 'app-hourly-prices',
@@ -58,17 +56,13 @@ export class HourlyPricesComponent {
   readonly hours = input.required<HourlyPriceDto[]>();
   readonly now = input.required<Date>();
 
-  readonly hasEstimates = computed(() => this.hours().some((hour) => hour.estimate));
+  /** Estimated hours, shown once the visitor opens them */
+  readonly estimates = computed(() => this.hours().filter((hour) => hour.estimate).length);
 
-  /** Dates of the days whose estimated hours the visitor opened */
-  readonly opened = signal<ReadonlySet<string>>(new Set());
+  readonly showEstimates = signal(false);
 
-  toggleEstimates(date: string): void {
-    this.opened.update((opened) => {
-      const next = new Set(opened);
-      if (!next.delete(date)) next.add(date);
-      return next;
-    });
+  toggleEstimates(): void {
+    this.showEstimates.update((show) => !show);
   }
 
   readonly days = computed<DayTable[]>(() => {
@@ -85,7 +79,6 @@ export class HourlyPricesComponent {
         title: dayTitle(offset, first),
         date: formatDate(first),
         estimate: hours.every((hour) => hour.estimate),
-        estimates: hours.filter((hour) => hour.estimate).length,
         rows: hours.map((hour) => ({
           start: hour.startTime,
           hours: `${formatClock(hour.startTime)}–${formatClock(hour.endTime)}`,
