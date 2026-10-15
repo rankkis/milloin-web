@@ -239,9 +239,7 @@ describe('ElectricityComponent', () => {
     expect(element.querySelector('.bar:nth-child(1)')?.className).not.toContain('bar--estimate');
     expect(text('app-hourly-chart h2')).toBe('Nyt → pe 22:00');
     expect(text('[data-test-id="electricity-forecast-note"]')).toContain('milloin.xyz:n oma ennuste');
-    expect(element.querySelector('[data-test-id="electricity-forecast-contact"]')?.getAttribute('href')).toBe(
-      'mailto:jarkko.peltola@hurlumhei.xyz',
-    );
+    expect(text('[data-test-id="electricity-forecast-note"]')).not.toContain('Ota yhteyttä');
 
     // Folded behind one button; the estimate-only day is hidden until opened
     expect(texts('app-hourly-prices tr.estimate').length).toBe(0);

@@ -244,11 +244,11 @@ Then('the hourly price tables list {int} estimated hours in grey, without a tag 
   await expect(rows.first().locator('th')).toHaveText(/^\s*\d{2}:\d{2}–\d{2}:\d{2}\s*$/);
 });
 
-Then('the forecast note says the estimates are made by milloin.xyz and links an email for a longer forecast', async ({ page }) => {
+Then('the forecast note says the estimates are made by milloin.xyz, without a contact', async ({ page }) => {
   const note = page.getByTestId('electricity-forecast-note');
-  await expect(note).toContainText('milloin.xyz:n oma ennuste');
-  await expect(note).toContainText('pidemmän ennusteen');
-  await expect(page.getByTestId('electricity-forecast-contact')).toHaveAttribute('href', /^mailto:/);
+  await expect(note).toContainText('milloin.xyz:n oma ennuste tunneille, joiden pörssihintaa ei ole vielä julkaistu.');
+  await expect(note).not.toContainText('pidemmän ennusteen');
+  await expect(note.locator('a')).toHaveCount(0);
 });
 
 Then('the page shows no estimates', async ({ page }) => {
