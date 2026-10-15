@@ -2,7 +2,7 @@ Feature: Price forecast on the price page
   After the last published spot price, the price page's chart and hourly
   tables go on with milloin.xyz's own forecast. Forecast hours are striped in
   the chart and grey in the tables, where they all open with one button. A
-  note says who made them and whom to contact for a longer forecast. Without
+  note says who made them, with no contact details. Without
   the forecast the page shows the published prices only.
 
   Scenario: Estimated hours follow the published prices, marked as estimates
@@ -10,7 +10,7 @@ Feature: Price forecast on the price page
     And I open "/sahko-on-halpaa"
     Then the chart ends with 24 striped estimate bars
     And the hourly price tables hide the estimated hours behind "Näytä arviot"
-    And the forecast note says the estimates are made by milloin.xyz and links an email for a longer forecast
+    And the forecast note says the estimates are made by milloin.xyz, without a contact
 
   Scenario: The visitor opens and closes the estimated hours in the tables
     Given milloin.xyz's forecast reaches 24 hours past the published prices
