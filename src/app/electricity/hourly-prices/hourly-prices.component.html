@@ -4,26 +4,42 @@
   @for (day of days(); track day.title) {
     <section class="day" [attr.aria-labelledby]="'hourly-prices-' + $index">
       <h3 class="day__title" [id]="'hourly-prices-' + $index">{{ day.title }} <span class="day__date">{{ day.date }}@if (day.estimate) { · arvio}</span></h3>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Klo</th>
-            <th scope="col" class="table__price">c/kWh</th>
-            <th scope="col">Hintataso</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of day.rows; track row.start) {
-            <tr [class.now]="row.isNow" [class.estimate]="row.estimate" [attr.data-test-id]="row.estimate ? 'hourly-prices-estimate' : null">
-              <th scope="row" class="table__hours">{{ row.hours }}@if (row.isNow) {<span class="now__tag"> nyt</span>}@if (row.estimate) {<span class="estimate__tag"> arvio</span>}</th>
-              <td class="table__price">@if (row.estimate) {<span aria-hidden="true">≈ </span>}{{ row.price }}</td>
-              <td class="table__category">
-                <span [class]="'dot dot--' + row.tone" aria-hidden="true"></span>{{ row.category }}
-              </td>
+      @let open = opened().has(day.date);
+      @if (!day.estimate || open) {
+        <table class="table" [id]="'hourly-prices-table-' + $index">
+          <thead>
+            <tr>
+              <th scope="col">Klo</th>
+              <th scope="col" class="table__price">c/kWh</th>
+              <th scope="col">Hintataso</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (row of day.rows; track row.start) {
+              @if (!row.estimate || open) {
+                <tr [class.now]="row.isNow" [class.estimate]="row.estimate" [attr.data-test-id]="row.estimate ? 'hourly-prices-estimate' : null">
+                  <th scope="row" class="table__hours">{{ row.hours }}@if (row.isNow) {<span class="now__tag"> nyt</span>}</th>
+                  <td class="table__price">@if (row.estimate) {<span aria-hidden="true">≈ </span>}{{ row.price }}</td>
+                  <td class="table__category">
+                    <span [class]="'dot dot--' + row.tone" aria-hidden="true"></span>{{ row.category }}
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      }
+      @if (day.estimates > 0) {
+        <button
+          type="button"
+          class="more"
+          data-test-id="hourly-prices-show-estimates"
+          [attr.aria-expanded]="open"
+          (click)="toggleEstimates(day.date)"
+        >
+          @if (open) { Piilota arviot } @else { Näytä arviot ({{ day.estimates }} h) }
+        </button>
+      }
     </section>
   }
 </div>

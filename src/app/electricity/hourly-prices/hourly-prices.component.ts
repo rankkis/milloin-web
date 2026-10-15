@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { HourlyPriceDto, PriceCategory } from '../../shared/models/price.model';
 import { dayOffset, formatClock, formatDate, formatPrice } from '../../shared/format/format';
 import { PRICE_CATEGORY_TEXT } from '../../shared/format/price-category';
@@ -19,6 +19,8 @@ interface DayTable {
   date: string;
   /** Every hour of the day is an estimate */
   estimate: boolean;
+  /** Estimated hours, shown once the visitor opens them */
+  estimates: number;
   rows: HourRow[];
 }
 
@@ -45,7 +47,7 @@ const PRICE_TONE: Record<PriceCategory, string> = {
  * Hourly spot prices as text, one table per day: today from the current hour
  * and tomorrow once its prices are published. Search engines read these, and
  * they match searches like "sähkön hinta tänään" and "…huomenna". Estimated
- * hours (milloin.xyz's forecast) follow, marked "arvio".
+ * hours (milloin.xyz's forecast) follow in grey, folded behind a button per day.
  */
 @Component({
   selector: 'app-hourly-prices',
@@ -57,6 +59,17 @@ export class HourlyPricesComponent {
   readonly now = input.required<Date>();
 
   readonly hasEstimates = computed(() => this.hours().some((hour) => hour.estimate));
+
+  /** Dates of the days whose estimated hours the visitor opened */
+  readonly opened = signal<ReadonlySet<string>>(new Set());
+
+  toggleEstimates(date: string): void {
+    this.opened.update((opened) => {
+      const next = new Set(opened);
+      if (!next.delete(date)) next.add(date);
+      return next;
+    });
+  }
 
   readonly days = computed<DayTable[]>(() => {
     const now = this.now();
@@ -72,6 +85,7 @@ export class HourlyPricesComponent {
         title: dayTitle(offset, first),
         date: formatDate(first),
         estimate: hours.every((hour) => hour.estimate),
+        estimates: hours.filter((hour) => hour.estimate).length,
         rows: hours.map((hour) => ({
           start: hour.startTime,
           hours: `${formatClock(hour.startTime)}–${formatClock(hour.endTime)}`,

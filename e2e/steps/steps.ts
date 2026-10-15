@@ -212,11 +212,38 @@ Then('the chart ends with {int} striped estimate bars', async ({ page }, count: 
   await expect(bars.nth(total - count - 1)).not.toHaveClass(/bar--estimate/);
 });
 
-Then('the hourly price tables list {int} hours tagged {string}', async ({ page }, count: number, tag: string) => {
+const estimateButtons = (page: Page) => page.getByTestId('hourly-prices-show-estimates');
+
+Then('the hourly price tables hide the estimated hours behind {string}', async ({ page }, label: string) => {
+  await expect(estimateButtons(page).first()).toContainText(label);
+  await expect(page.getByTestId('hourly-prices-estimate')).toHaveCount(0);
+  await expect(page.locator('app-hourly-prices .note')).toContainText('milloin.xyz:n oma ennuste');
+});
+
+/** Clicks every day's button that is in the given state */
+const toggleEstimates = async (page: Page, expanded: boolean) => {
+  const buttons = estimateButtons(page).and(page.locator(`[aria-expanded="${expanded}"]`));
+  await expect(buttons.first()).toBeVisible();
+  // A clicked button leaves the set, so always click the first one left
+  for (let left = await buttons.count(); left > 0; left--) {
+    await buttons.first().click();
+    await expect(buttons).toHaveCount(left - 1);
+  }
+};
+
+When('I open the estimated hours in the tables', async ({ page }) => {
+  await toggleEstimates(page, false);
+});
+
+When('I close the estimated hours in the tables', async ({ page }) => {
+  await toggleEstimates(page, true);
+});
+
+Then('the hourly price tables list {int} estimated hours in grey, without a tag on each row', async ({ page }, count: number) => {
   const rows = page.getByTestId('hourly-prices-estimate');
   await expect(rows).toHaveCount(count);
-  await expect(rows.first()).toContainText(tag);
-  await expect(page.locator('app-hourly-prices .note')).toContainText('milloin.xyz:n oma ennuste');
+  await expect(rows.first()).toHaveClass(/estimate/);
+  await expect(rows.first().locator('th')).toHaveText(/^\s*\d{2}:\d{2}–\d{2}:\d{2}\s*$/);
 });
 
 Then('the forecast note says the estimates are made by milloin.xyz and links an email for a longer forecast', async ({ page }) => {
