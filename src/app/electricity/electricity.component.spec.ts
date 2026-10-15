@@ -229,7 +229,7 @@ describe('ElectricityComponent', () => {
     ]);
   });
 
-  it('goes on with the forecast after the last published price, striped and tagged arvio', () => {
+  it('goes on with the forecast after the last published price, striped and folded in the tables', () => {
     render(of(overview), laundry, of(forecast));
 
     const element = fixture.nativeElement as HTMLElement;
@@ -248,10 +248,25 @@ describe('ElectricityComponent', () => {
       'Huomenna to 8.10.',
       'Ylihuomenna pe 9.10. · arvio',
     ]);
-    const estimates = texts('app-hourly-prices tr.estimate');
-    expect(estimates.length).toBe(23);
-    expect(texts('app-hourly-prices tr.estimate th')[0].replace(/\s+/g, ' ')).toBe('00:00–01:00 arvio');
+    // Folded: one button per day with estimates, the estimate-only day has no table yet
+    expect(texts('app-hourly-prices tr.estimate').length).toBe(0);
+    expect(texts('app-hourly-prices table').length).toBe(2);
+    const buttons = () =>
+      Array.from(element.querySelectorAll<HTMLButtonElement>('[data-test-id="hourly-prices-show-estimates"]'));
+    expect(buttons().map((button) => button.textContent?.trim())).toEqual(['Näytä arviot (23 h)']);
+    expect(buttons()[0].getAttribute('aria-expanded')).toBe('false');
+
+    buttons()[0].click();
+    fixture.detectChanges();
+    expect(texts('app-hourly-prices tr.estimate').length).toBe(23);
+    expect(texts('app-hourly-prices tr.estimate th')[0]).toBe('00:00–01:00');
     expect(texts('app-hourly-prices tr.estimate .table__price')[0]).toBe('≈ 8,00');
+    expect(buttons()[0].textContent?.trim()).toBe('Piilota arviot');
+    expect(buttons()[0].getAttribute('aria-expanded')).toBe('true');
+
+    buttons()[0].click();
+    fixture.detectChanges();
+    expect(texts('app-hourly-prices tr.estimate').length).toBe(0);
     expect(text('app-hourly-prices .note')).toContain('Arvio-tunnit ovat milloin.xyz:n oma ennuste');
     // The averages stay on published prices
     expect(texts('.tile__value').map((value) => value.split(' ')[0])).toEqual(['6,00', '4,50', '3,75']);

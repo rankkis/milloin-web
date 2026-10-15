@@ -105,11 +105,24 @@ p {
   color: color(text-muted);
 }
 
-.estimate__tag {
-  font-size: 12px;
-  font-style: normal;
-  letter-spacing: var(--text-label-tracking);
-  text-transform: uppercase;
+// Opens and closes a day's estimated hours
+.more {
+  align-self: flex-start;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-size: 14px;
+  color: color(text-muted);
+  background: none;
+  border: 1px dashed color(border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: color(text);
+    border-color: color(accent);
+  }
 }
 
 .dot {
