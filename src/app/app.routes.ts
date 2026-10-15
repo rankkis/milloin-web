@@ -20,6 +20,15 @@ export const routes: Routes = [
   },
   {
     path: APP_NAVIGATION_PATHS.ELECTRICITY,
+    loadComponent: () => import('./electricity/category/electricity-category.component').then(m => m.ElectricityCategoryComponent),
+    title: 'Milloin sähköä kannattaa käyttää? – Saunominen, pyykinpesu ja auton lataus halvalla sähköllä | Milloin…',
+    data: {
+      description:
+        'Milloin sähkö on halpaa, milloin saunotaan, pestään pyykit ja ladataan auto? Vastaukset pörssisähkön tuntihinnoista.',
+    } satisfies SeoRouteData,
+  },
+  {
+    path: APP_NAVIGATION_PATHS.ELECTRICITY_PRICE,
     loadComponent: () => import('./electricity/electricity.component').then(m => m.ElectricityComponent),
     title: 'Pörssisähkön hinta nyt – Milloin sähkö on halpaa? | Milloin…',
     data: {
