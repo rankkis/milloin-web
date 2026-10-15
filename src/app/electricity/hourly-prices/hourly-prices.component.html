@@ -1,12 +1,12 @@
 <h2 id="hourly-prices-title" class="title">Pörssisähkön tuntihinnat</h2>
 
 <div class="days">
+  @let open = showEstimates();
   @for (day of days(); track day.title) {
-    <section class="day" [attr.aria-labelledby]="'hourly-prices-' + $index">
-      <h3 class="day__title" [id]="'hourly-prices-' + $index">{{ day.title }} <span class="day__date">{{ day.date }}@if (day.estimate) { · arvio}</span></h3>
-      @let open = opened().has(day.date);
-      @if (!day.estimate || open) {
-        <table class="table" [id]="'hourly-prices-table-' + $index">
+    @if (!day.estimate || open) {
+      <section class="day" [attr.aria-labelledby]="'hourly-prices-' + $index">
+        <h3 class="day__title" [id]="'hourly-prices-' + $index">{{ day.title }} <span class="day__date">{{ day.date }}@if (day.estimate) { · arvio}</span></h3>
+        <table class="table">
           <thead>
             <tr>
               <th scope="col">Klo</th>
@@ -28,20 +28,21 @@
             }
           </tbody>
         </table>
-      }
-      @if (day.estimates > 0) {
-        <button
-          type="button"
-          class="more"
-          data-test-id="hourly-prices-show-estimates"
-          [attr.aria-expanded]="open"
-          (click)="toggleEstimates(day.date)"
-        >
-          @if (open) { Piilota arviot } @else { Näytä arviot ({{ day.estimates }} h) }
-        </button>
-      }
-    </section>
+      </section>
+    }
   }
 </div>
 
-<p class="note">Hinnat sisältävät arvonlisäveron 25,5 %. Tunnin hinta on sen neljän 15 minuutin hinnan keskiarvo.@if (hasEstimates()) { Arvio-tunnit ovat milloin.xyz:n oma ennuste, eivät julkaistuja pörssihintoja.}</p>
+@if (estimates() > 0) {
+  <button
+    type="button"
+    class="more"
+    data-test-id="hourly-prices-show-estimates"
+    [attr.aria-expanded]="open"
+    (click)="toggleEstimates()"
+  >
+    @if (open) { Piilota arviot } @else { Näytä arviot ({{ estimates() }} h) }
+  </button>
+}
+
+<p class="note">Hinnat sisältävät arvonlisäveron 25,5 %. Tunnin hinta on sen neljän 15 minuutin hinnan keskiarvo.@if (estimates() > 0) { Arvio-tunnit ovat milloin.xyz:n oma ennuste, eivät julkaistuja pörssihintoja.}</p>

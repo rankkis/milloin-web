@@ -243,28 +243,28 @@ describe('ElectricityComponent', () => {
       'mailto:jarkko.peltola@hurlumhei.xyz',
     );
 
+    // Folded behind one button; the estimate-only day is hidden until opened
+    expect(texts('app-hourly-prices tr.estimate').length).toBe(0);
+    expect(texts('app-hourly-prices h3').length).toBe(2);
+    const button = () => element.querySelector<HTMLButtonElement>('[data-test-id="hourly-prices-show-estimates"]')!;
+    expect(element.querySelectorAll('[data-test-id="hourly-prices-show-estimates"]').length).toBe(1);
+    expect(button().textContent?.trim()).toBe('Näytä arviot (23 h)');
+    expect(button().getAttribute('aria-expanded')).toBe('false');
+
+    button().click();
+    fixture.detectChanges();
     expect(texts('app-hourly-prices h3').map((title) => title.replace(/\s+/g, ' '))).toEqual([
       'Tänään ke 7.10.',
       'Huomenna to 8.10.',
       'Ylihuomenna pe 9.10. · arvio',
     ]);
-    // Folded: one button per day with estimates, the estimate-only day has no table yet
-    expect(texts('app-hourly-prices tr.estimate').length).toBe(0);
-    expect(texts('app-hourly-prices table').length).toBe(2);
-    const buttons = () =>
-      Array.from(element.querySelectorAll<HTMLButtonElement>('[data-test-id="hourly-prices-show-estimates"]'));
-    expect(buttons().map((button) => button.textContent?.trim())).toEqual(['Näytä arviot (23 h)']);
-    expect(buttons()[0].getAttribute('aria-expanded')).toBe('false');
-
-    buttons()[0].click();
-    fixture.detectChanges();
     expect(texts('app-hourly-prices tr.estimate').length).toBe(23);
     expect(texts('app-hourly-prices tr.estimate th')[0]).toBe('00:00–01:00');
     expect(texts('app-hourly-prices tr.estimate .table__price')[0]).toBe('≈ 8,00');
-    expect(buttons()[0].textContent?.trim()).toBe('Piilota arviot');
-    expect(buttons()[0].getAttribute('aria-expanded')).toBe('true');
+    expect(button().textContent?.trim()).toBe('Piilota arviot');
+    expect(button().getAttribute('aria-expanded')).toBe('true');
 
-    buttons()[0].click();
+    button().click();
     fixture.detectChanges();
     expect(texts('app-hourly-prices tr.estimate').length).toBe(0);
     expect(text('app-hourly-prices .note')).toContain('Arvio-tunnit ovat milloin.xyz:n oma ennuste');

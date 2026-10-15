@@ -220,15 +220,13 @@ Then('the hourly price tables hide the estimated hours behind {string}', async (
   await expect(page.locator('app-hourly-prices .note')).toContainText('milloin.xyz:n oma ennuste');
 });
 
-/** Clicks every day's button that is in the given state */
+/** Clicks the one button that opens or closes every estimated hour */
 const toggleEstimates = async (page: Page, expanded: boolean) => {
-  const buttons = estimateButtons(page).and(page.locator(`[aria-expanded="${expanded}"]`));
-  await expect(buttons.first()).toBeVisible();
-  // A clicked button leaves the set, so always click the first one left
-  for (let left = await buttons.count(); left > 0; left--) {
-    await buttons.first().click();
-    await expect(buttons).toHaveCount(left - 1);
-  }
+  const button = estimateButtons(page);
+  await expect(button).toHaveCount(1);
+  await expect(button).toHaveAttribute('aria-expanded', String(expanded));
+  await button.click();
+  await expect(button).toHaveAttribute('aria-expanded', String(!expanded));
 };
 
 When('I open the estimated hours in the tables', async ({ page }) => {
