@@ -50,17 +50,12 @@ const ENCE_RESPONSE = `{
   imports: [RouterLink, CodeBlockComponent],
   template: `
     <h1>Miscellaneous</h1>
-    <p class="lead">
-      The questions that fit no other category, as on the
-      <a href="https://milloin.xyz/mitakin-tapahtuu" data-test-id="docs-misc-site">Sekalaista</a> page of milloin.xyz.
-      Every path is under <code>/v1/misc</code>.
-    </p>
+    <p class="lead">The questions that fit no other category. Every path is under <code>/v1/misc</code>.</p>
 
     <h2>When does ENCE play?</h2>
     <p>
       The next Counter-Strike 2 match of ENCE, the Finnish CS2 team, with its streams, the next matches, the latest
-      results and news. The same data answers
-      <a href="https://milloin.xyz/ence-pelaa" data-test-id="docs-misc-ence-site">Milloin Ence pelaa?</a>
+      results and news. The site no longer shows it, but the API still serves it.
     </p>
     <app-code-block title="Request" [code]="enceRequest" />
     <app-code-block title="Response" [code]="enceResponse" />

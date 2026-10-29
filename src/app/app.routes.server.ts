@@ -20,12 +20,13 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'kelan-tuet-maksetaan', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'veronpalautukset-tulevat', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'elake-maksetaan', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
-  { path: 'mitakin-tapahtuu', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
-  { path: 'ence-pelaa', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'docs', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   { path: 'docs/**', renderMode: RenderMode.Server, headers: CACHE_HEADERS },
   // Earlier addresses that redirect to the new ones
   { path: 'kannattaa-pesta-pyykkia', renderMode: RenderMode.Server, status: 301 },
   { path: 'kannattaa-ladata-auto', renderMode: RenderMode.Server, status: 301 },
+  // Removed pages that redirect to home
+  { path: 'mitakin-tapahtuu', renderMode: RenderMode.Server, status: 302 },
+  { path: 'ence-pelaa', renderMode: RenderMode.Server, status: 302 },
   { path: '**', renderMode: RenderMode.Server, status: 404, headers: CACHE_HEADERS },
 ];

@@ -15,8 +15,6 @@ const PAGES = [
   { path: '/kelan-tuet-maksetaan', h1: 'Milloin Kelan tuet maksetaan?', prices: false },
   { path: '/veronpalautukset-tulevat', h1: 'Milloin veronpalautukset tulevat?', prices: false },
   { path: '/elake-maksetaan', h1: 'Milloin eläke maksetaan?', prices: false },
-  { path: '/mitakin-tapahtuu', h1: 'Sekalaista', prices: false },
-  { path: '/ence-pelaa', h1: 'Milloin Ence pelaa?', prices: false },
 ];
 
 const h1Of = (html: string): string | undefined =>

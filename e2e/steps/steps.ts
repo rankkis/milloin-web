@@ -42,6 +42,10 @@ Then('the API reference does not list {string}', async ({ page }, text: string) 
   await expect(page.locator('.reference').getByText(text)).toHaveCount(0);
 });
 
+Then('the categories are {string}', async ({ page }, list: string) => {
+  await expect(page.locator('.group__link')).toHaveText(list.split(', '));
+});
+
 Then('the questions are {string}', async ({ page }, list: string) => {
   await expect(page.locator('.question__text')).toHaveText(list.split(', '));
 });
@@ -81,6 +85,11 @@ When('I request {string} without following redirects', async ({ ctx, request }, 
 
 Then('it redirects to {string}', async ({ ctx }, path: string) => {
   expect([301, 302, 307, 308]).toContain(ctx.response?.status());
+  expect(new URL(ctx.response?.headers()['location'] ?? '', 'https://milloin.xyz').pathname).toBe(path);
+});
+
+Then('it redirects to {string} temporarily', async ({ ctx }, path: string) => {
+  expect([302, 307]).toContain(ctx.response?.status());
   expect(new URL(ctx.response?.headers()['location'] ?? '', 'https://milloin.xyz').pathname).toBe(path);
 });
 
