@@ -2,7 +2,6 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { APP_NAVIGATION_PATHS } from '../app.paths';
 import { ElectricityAnswers, Answer } from '../electricity/electricity-answers';
-import { EnceAnswers } from '../ence/ence-answer';
 import { finnishToday } from '../money/banking-days';
 import { MONEY_QUESTIONS } from '../money/money-questions';
 import { IconComponent } from '../shared/icon/icon.component';
@@ -18,13 +17,12 @@ const ALL = 'all';
 @Component({
   selector: 'app-home',
   imports: [RouterLink, IconComponent, SpinnerComponent, ConsentSettingsLinkComponent],
-  providers: [ElectricityAnswers, EnceAnswers],
+  providers: [ElectricityAnswers],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomeComponent {
   private readonly answers = inject(ElectricityAnswers);
-  private readonly ence = inject(EnceAnswers);
 
   readonly categories = CATEGORIES;
   readonly pricePath = APP_NAVIGATION_PATHS.ELECTRICITY_PRICE;
@@ -66,7 +64,6 @@ export class HomeComponent {
     kela: this.moneyAnswer('kela'),
     'tax-refund': this.moneyAnswer('tax-refund'),
     pension: this.moneyAnswer('pension'),
-    ence: this.ence.answer,
   };
 
   private readonly loadingOf: Partial<Record<QuestionId, () => boolean>> = {
@@ -74,7 +71,6 @@ export class HomeComponent {
     sauna: this.answers.sauna.isLoading,
     laundry: this.answers.laundry.isLoading,
     ev: this.answers.ev.isLoading,
-    ence: this.ence.ence.isLoading,
   };
 
   answer(id: QuestionId): Answer | undefined {
@@ -96,7 +92,6 @@ export class HomeComponent {
 
   reload(): void {
     this.answers.reload();
-    this.ence.reload();
   }
 
   readonly errorMessage = resourceErrorMessage;

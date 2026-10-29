@@ -10,8 +10,6 @@ export const APP_NAVIGATION_PATHS = {
   KELA: 'kelan-tuet-maksetaan',
   TAX_REFUND: 'veronpalautukset-tulevat',
   PENSION: 'elake-maksetaan',
-  MISC: 'mitakin-tapahtuu',
-  ENCE: 'ence-pelaa',
   /** Developer docs of the public API, in English */
   DOCS: 'docs',
 };
@@ -20,6 +18,15 @@ export const APP_NAVIGATION_PATHS = {
 export const LEGACY_PATH_REDIRECTS: Record<string, string> = {
   'kannattaa-pesta-pyykkia': APP_NAVIGATION_PATHS.WASH_LAUNDRY,
   'kannattaa-ladata-auto': APP_NAVIGATION_PATHS.CHARGE_EV,
+};
+
+/**
+ * Removed pages, redirected to home (also in vercel.json). Not permanently, so the paths can be used again:
+ * Milloin Ence pelaa? and its category Sekalaista were removed when ENCE went bankrupt (October 2026).
+ */
+export const REMOVED_PATH_REDIRECTS: Record<string, string> = {
+  'mitakin-tapahtuu': '/',
+  'ence-pelaa': '/',
 };
 
 /**

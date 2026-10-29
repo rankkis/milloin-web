@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://milloin.xyz/</loc>
-    <lastmod>2026-10-09</lastmod>
+    <lastmod>2026-10-29</lastmod>
     <changefreq>hourly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -58,18 +58,6 @@
     <loc>https://milloin.xyz/elake-maksetaan</loc>
     <lastmod>2026-10-09</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://milloin.xyz/mitakin-tapahtuu</loc>
-    <lastmod>2026-10-09</lastmod>
-    <changefreq>hourly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://milloin.xyz/ence-pelaa</loc>
-    <lastmod>2026-10-09</lastmod>
-    <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
